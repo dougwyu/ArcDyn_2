@@ -1,0 +1,26 @@
+#!/bin/sh
+#BSUB -q short-eth     # debug, short-eth (24 hours), mellanox-ib (168 hours = 7 days), long-eth (168 hrs)
+#BSUB -J ascpdown
+#BSUB -oo ascpdown.out
+#BSUB -eo ascpdown.err
+#BSUB -M 4000
+#BSUB -B        # sends email to me when job starts
+#BSUB -N        # sends email to me when job finishes
+
+. /etc/profile
+
+# downloading plates GH on 15 Jan 2017, using a modified command from Earlham
+# PSEQ-1586  (run 171121_D00534_0184_ACBU0KANXX)
+~/.aspera/connect/bin/ascp -D -v -i ~/.aspera/connect/etc/asperaweb_id_dsa.openssh -QT -P33001 -l 300m -W ATM2_ACsfnvY5lm3e3iteI6oN2K-M9LFe-u2M-MhGWZxXrWVPPMAAFv-C7GWANzUfSx6be_YtFO_2MTA --user=faspex "es1.earlham.ac.uk:/ENQ-2379 - Data Transfer - PSEQ-1586 - aa05dd41-d87b-495b-bf14-ad5b507b92d6.aspera-package/PKG - ENQ-2379 - Data Transfer - PSEQ-1586" ./
+
+# PSEQ-1600 (run171212_D00507_0346_ACBVM9ANXX)
+~/.aspera/connect/bin/ascp -D -v -i ~/.aspera/connect/etc/asperaweb_id_dsa.openssh -QT -P33001 -l 300m -W ATM2_ACsF3Iz9vHAYd-v-HTblEjLSo-DSsxq7bNUTP2buJ6-c0MAAGXaOdb7-R7tSTrqF_vNZUe_2MTA --user=faspex "es1.earlham.ac.uk:/ENQ-2379 - Data Transfer - PSEQ-1600 - c02e130c-b0f6-4ab9-a966-7adf7bb4799e.aspera-package/PKG - ENQ-2379 - Data Transfer - PSEQ-1600" ./
+
+# PSEQ-1603 (run 171205_D00507_0345_ACBVL8ANXX)
+~/.aspera/connect/bin/ascp -D -v -i ~/.aspera/connect/etc/asperaweb_id_dsa.openssh -QT -P33001 -l 300m -W ATM2_ACsCJk_Se0XMp5OjeYikiPCL_zQR-NMNRCP-EXkcexoVjoAAGf22nS4jGJISWI79yqK0Wg_2MTA --user=faspex "es1.earlham.ac.uk:/ENQ-2379 - Data Transfer - PSEQ-1603 - bca82176-7bd1-46ed-a36d-18efc7039326.aspera-package/PKG - ENQ-2379 - Data Transfer - PSEQ-1603" ./
+
+# PSEQ-1586 – trimmed (run 171121_D00534_0184_ACBU0KANXX)
+~/.aspera/connect/bin/ascp -D -v -i ~/.aspera/connect/etc/asperaweb_id_dsa.openssh -QT -P33001 -l 300m -W ATM2_ACsIEms86SOtwY8rUm8ynpiI5MPzvLhfcX_oxWnpRjjV_YAAH6bqDmODN1_RM9BconTKpo_2MTA --user=faspex "es1.earlham.ac.uk:/ENQ-2379 - Data Transfer - PSEQ-1586 - trimmed - 92bab1d8-0f51-46e0-a067-55344e93b69d.aspera-package/PKG - ENQ-2379 - Data Transfer - PSEQ-1586 - trimmed" ./
+
+# PSEQ-1572 – truncated Read 2 (run 171107_D00534_0183_BCBUAFANXX)
+~/.aspera/connect/bin/ascp -D -v -i ~/.aspera/connect/etc/asperaweb_id_dsa.openssh -QT -P33001 -l 300m -W ATM2_ACsxVJ1-alBwXYesvWBG-ashOdUsz-j0faaEa9RemeiqSsAAFO4nJHBozeDGeWBjMOjCZ__2MTA --user=faspex "es1.earlham.ac.uk:/ENQ-2379 - Data Transfer - PSEQ-1572 - truncated R2 - 9910d2ea-99c8-4a1c-bd68-fb24970d8ef9.aspera-package/PKG - ENQ-2379 - Data Transfer - PSEQ-1572 - truncated R2" ./

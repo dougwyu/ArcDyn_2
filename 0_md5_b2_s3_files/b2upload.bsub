@@ -1,0 +1,16 @@
+####### b2upload.bsub #################
+#!/bin/sh
+#BSUB -q short-eth     # 16 threads
+#BSUB -J b2upload
+#BSUB -oo b2upload.out
+#BSUB -eo b2upload.err
+#BSUB -M 4000
+#BSUB -B        # sends email to me when job starts
+#BSUB -N        # sends email to me when job finishes
+
+. /etc/profile
+module purge
+module load python/anaconda/4.2/3.5
+
+bash b2_upload.sh
+######################################

@@ -1,0 +1,24 @@
+#!/bin/sh
+#BSUB -q short-eth     # 16 threads
+#BSUB -J md5sumchk
+#BSUB -oo md5sumchk.out
+#BSUB -eo md5sumchk.err
+#BSUB -M 4000
+#BSUB -B        # sends email to me when job starts
+#BSUB -N        # sends email to me when job finishes
+
+. /etc/profile
+module purge
+
+cd PKG-ENQ-2379-Data_Transfer-PSEQ-1586 || exit; md5sum -c 171121_D00534_0184_ACBU0KANXX_PSEQ-1586.md5list.txt  > 171121_D00534_0184_ACBU0KANXX_PSEQ-1586.md5list.txt.out
+cd .. || exit
+
+cd PKG-ENQ-2379-Data_Transfer-PSEQ-1600 || exit; md5sum -c 171212_D00507_0346_ACBVM9ANXX_PSEQ-1600.md5list.txt  > 171212_D00507_0346_ACBVM9ANXX_PSEQ-1600.md5list.txt.out
+cd .. || exit
+
+cd PKG-ENQ-2379-Data_Transfer-PSEQ-1572-truncated_R2 || exit; md5sum -c 171107_D00534_0183_BCBUAFANXX_PSEQ-1572.md5list.txt  > 171107_D00534_0183_BCBUAFANXX_PSEQ-1572.md5list.txt.out
+cd .. || exit
+
+cd PKG-ENQ-2379-Data_Transfer-PSEQ-1603 || exit;  md5sum -c 171205_D00507_0345_ACBVL8ANXX_PSEQ-1603.md5list.txt  > 171205_D00507_0345_ACBVL8ANXX_PSEQ-1603.md5list.txt.out
+cd .. || exit
+######################################

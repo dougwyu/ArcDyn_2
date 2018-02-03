@@ -1,0 +1,25 @@
+#!/bin/sh
+#BSUB -q long-eth     # debug, short (24 hours), medium (24 hours), long (168 hours = 7 days)
+#BSUB -J s3upEarlhm
+#BSUB -oo s3upEarlham.out
+#BSUB -eo s3upEarlham.err
+#BSUB -M 4000
+#BSUB -B        # sends email to me when job starts
+#BSUB -N        # sends email to me when job finishes
+
+. /etc/profile
+module purge
+module add python/anaconda/2.5/2.7
+
+# PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1618_8_lanes.tar
+# PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1600_2_lanes.tar
+
+# tar -cvf PKG-ENQ-1643-Data_Transfer-PSEQ-1618_8_lanes.tar PKG-ENQ-1643-Data_Transfer-PSEQ-1618_8_lanes/ # create tar file to be uploaded
+md5sum PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1618_8_lanes.tar > PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1618_8_lanes.tar.md5
+s3cmd put --multipart-chunk-size-mb=100 PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1618_8_lanes.tar s3://amazon-glacier-douglasyu/PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1618_8_lanes.tar
+
+# tar -cvf PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1600_2_lanes.tar PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1600_2_lanes/ # create tar file to be uploaded
+md5sum PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1600_2_lanes.tar > PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1600_2_lanes.tar.md5
+s3cmd put --multipart-chunk-size-mb=100 PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1600_2_lanes.tar s3://amazon-glacier-douglasyu/PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1600_2_lanes.tar
+
+s3cmd ls --list-md5 s3://amazon-glacier-douglasyu > amazon-glacier-douglasyu20180123.md5 # to confirm that md5s match on hpc and amazon

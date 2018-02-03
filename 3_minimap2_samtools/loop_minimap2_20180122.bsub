@@ -1,0 +1,26 @@
+#!/bin/sh
+#BSUB -q mellanox-ib     #debug, short (24 hours), medium (24 hours), long (168 hours = 7 days)
+#BSUB -J mnmploop01
+#BSUB -oo mnmploop01.out
+#BSUB -eo mnmploop01.err
+#BSUB -R "rusage[mem=120000]"
+#BSUB -M 120000
+#BSUB -B        #sends email to me when job starts
+#BSUB -N        # sends email to me when job finishes
+
+. /etc/profile
+module purge
+module load samtools # samtools 1.5
+module load python/anaconda/4.2/2.7 # Python 2.7.12
+module load java  # java/jdk1.8.0_51
+module load gcc # needed to run bedtools
+PATH=$PATH:~/scripts/cutadapt-1.11/build/scripts-2.7
+PATH=$PATH:~/scripts/bwa_0.7.17_r1188 # made 22 Jan 2018 from github
+PATH=$PATH:~/scripts/bfc/ # r181 # made 3 Aug 2015 from github
+PATH=$PATH:~/scripts/vsearch-2.6.2-linux-x86_64/bin/ # downloaded 22 Jan 2018 from github
+PATH=$PATH:~/scripts/TrimGalore-0.4.5/ # downloaded 22 Jan 2018 from github
+PATH=$PATH:~/scripts/minimap2/  # made 22 Jan 2018 from github 2.7-r659-dirty
+PATH=$PATH:~/scripts/bedtools2/bin # made 22 Jan 2018 from github 2.27.1
+
+
+bash _loop_minimap2_20180122.sh
