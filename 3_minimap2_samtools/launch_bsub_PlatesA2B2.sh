@@ -95,6 +95,7 @@ bsub < loop_samtools_only_20180123.bsub
 
 cd ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA03
 bsub < loop_samtools_only_20180123.bsub
+bjobs
 
 cd ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA04
 bsub < loop_samtools_only_20180123.bsub
@@ -116,8 +117,4 @@ bsub < loop_samtools_only_20180123.bsub
 
 cd ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA10
 bsub < loop_samtools_only_20180123.bsub
-
-cd ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA11
-bsub < loop_samtools_only_20180123.bsub
-
-bjobs
+bjobs | sort -k8

@@ -86,17 +86,20 @@ ls
 
 ####### launch samtools scripts #######
 cd ~/greenland_2017/platesGH/platesGH_combined/BWA01
+ls
 bsub < loop_samtools_only_20180123.bsub
-bjobs
+bjobs | sort -k8
 
 cd ~/greenland_2017/platesGH/platesGH_combined/BWA02
 bsub < loop_samtools_only_20180123.bsub
+bjobs | sort -k8
 
 cd ~/greenland_2017/platesGH/platesGH_combined/BWA03
 bsub < loop_samtools_only_20180123.bsub
 
 cd ~/greenland_2017/platesGH/platesGH_combined/BWA04
 bsub < loop_samtools_only_20180123.bsub
+ls minimap2_outputs/
 
 cd ~/greenland_2017/platesGH/platesGH_combined/BWA05
 bsub < loop_samtools_only_20180123.bsub
@@ -115,8 +118,4 @@ bsub < loop_samtools_only_20180123.bsub
 
 cd ~/greenland_2017/platesGH/platesGH_combined/BWA10
 bsub < loop_samtools_only_20180123.bsub
-
-cd ~/greenland_2017/platesGH/platesGH_combined/BWA11
-bsub < loop_samtools_only_20180123.bsub
-
-bjobs
+bjobs | sort -k8
