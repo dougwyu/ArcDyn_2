@@ -1,3 +1,4 @@
 .DS_Store
 4_idxstats_tabulate/idxstats_files/*
 4_idxstats_tabulate/.Rproj.user/*
+4_idxstats_tabulate/idx_meta_genomecov_wide.txt
