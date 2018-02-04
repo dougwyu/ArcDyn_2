@@ -11,10 +11,17 @@ This file takes the idxstats.txt outputs of the samtools filters and combines in
 ```{r}
 rm(list=ls())
 library(tidyverse)
-# [1] "broom"       "cli"         "crayon"      "dplyr"       "dbplyr"      "forcats"     "ggplot2"     "haven"       "hms"      
-# [10] "httr"        "jsonlite"    "lubridate"   "magrittr"    "modelr"      "purrr"       "readr"       "readxl"     "reprex" 
-# [19] "rlang"       "rstudioapi"  "rvest"       "stringr"     "tibble"      "tidyr"       "xml2"        "tidyverse"  
+# ── Attaching packages ───────────────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──
+# ✔ ggplot2 2.2.1     ✔ purrr   0.2.4
+# ✔ tibble  1.4.2     ✔ dplyr   0.7.4
+# ✔ tidyr   0.7.2     ✔ stringr 1.2.0
+# ✔ readr   1.1.1     ✔ forcats 0.2.0
+# ── Conflicts ──────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+# ✖ dplyr::filter() masks stats::filter()
+# ✖ dplyr::lag()    masks stats::lag()
 
+library(readxl)
+library(lubridate)
 # library(parallel)
 # library(knitr)
 # library(lattice)
@@ -25,7 +32,7 @@ library(tidyverse)
 ```
 
 ```{r set paths}
-# setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping")
+setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping-git")
 folder1 <- "idxstats_files"  # this is the enclosing folder around the "BWA" folders for a given set of soups
 folder2 <- "minimap2_outputs" # this is the enclosing folder for the minimap2/samtools outputs
 folder3 <- "~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/sample_tracking"  # this is the enclosing folder around the sample_tracking spreadsheet, which i will place on hpc
@@ -156,7 +163,6 @@ idx_meta %>% distinct(Sample_alias)
 idx_meta %>% distinct(well) %>% count()  # number of distinct values of well:  96
 idx_meta %>% distinct(ArcDyn_Plate_name) %>% count()  # number of distinct values of ArcDyn_Plate_name:  should be 2
 idx_meta %>% distinct(samtools_filter) %>% count()  # number of distinct values of samtools_filter: should be 1
-
 ```
 
 
@@ -259,9 +265,13 @@ idx_meta_genomcov_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogen
 # sorts wide table by whether the mitogenome name contains "ng_COI".  If TRUE, then naturally sorts to the end (because F from FALSE comes before T from TRUE)
 idx_meta_genomcov_wide <- idx_meta_genomcov_wide %>% dplyr::arrange(grepl("ng_COI", idx_meta_genomcov_wide$mitogenome))
 
-
+write_tsv(idx_meta_genomcov_wide, "idx_meta_genomecov_wide.txt")
 ```
 
+Do the lysis buffer and COI_spike corrections here
+```{r}
+
+```
 
 
 ## Next steps:
@@ -270,13 +280,14 @@ idx_meta_genomcov_wide <- idx_meta_genomcov_wide %>% dplyr::arrange(grepl("ng_CO
 2. DONE merge with sample excel workbook to add the sample date information
 3. DONE go through the genomecov files and calculate the mean and standard deviation of coverage for each mitogenome/sample and add the columns to the idx table
 4. DONE make wide table using tidyr (the column data format should be DateTrap (e.g. 1998_08_05_TrapA) in temporal order).  
-
 5. DONE platesGH:  combine_fastq, fastQC, multiqc (using PKG-ENQ-2379-Data_Transfer-PSEQ-1586-trimmed), remove orig fastq.gz files.  
 6. DONE platesA2B2: combine_fastq, fastQC, multiqc, remove orig fastq.gz files
-7. minimap2/samtools for platesGH
-8. minimap2/samtools for platesA2B2
+7. DONE minimap2/samtools for platesGH
+8. DONE minimap2/samtools for platesA2B2
 
 9. adapt R code for running on hpc and run, COMPARE WITH YINQIU'S BWA CODE, THE POSITIVE CONTROLS, THE COI SPIKE RATIOS, THE SEASONAL PATTERNS
+
+9.1 remove orig fastq.gz files from A2B2 and GH when i'm done mapping`
 
 10. make textfile for taxonomy (class, order, family, genus, species) of each mitogenome and join to idx_meta_genomecov
 
