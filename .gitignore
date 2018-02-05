@@ -3,3 +3,5 @@
 4_idxstats_tabulate/.Rproj.user/*
 4_idxstats_tabulate/idx_meta_genomecov_wide.txt
 4_idxstats_tabulate/idx_meta_genomecov.txt
+4_idxstats_tabulate/idx_meta_genomcov_mapped_reads_lysis_corr_wide.txt
+4_idxstats_tabulate/idx_meta_genomcov_mapped_reads_COI_lysis_corr_wide.txt
