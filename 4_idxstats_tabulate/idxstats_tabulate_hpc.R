@@ -1,14 +1,4 @@
----
-title: "idxstats_cbind"
-author: "Douglas Yu"
-date: "28/01/2018"
-output: html_document
----
-
-This file takes the idxstats.txt outputs of the samtools filters and combines into a single large table, which is suitable for comparing with the 
-
-
-```{r}
+## ------------------------------------------------------------------------
 # rm(list=ls())
 library(tidyverse)
 # ── Attaching packages ───────────────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──
@@ -22,6 +12,7 @@ library(tidyverse)
 
 library(readxl)
 library(lubridate)
+library(knitr)
 # library(parallel)
 # library(knitr)
 # library(lattice)
@@ -29,19 +20,15 @@ library(lubridate)
 # library(sjPlot)
 # library(openxlsx)
 # library(RColorBrewer)
-```
 
-```{r set paths}
+## ----set paths-----------------------------------------------------------
 # setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping-git")
 getwd()
 folder1 <- "idxstats_files"  # this is the enclosing folder around the "BWA" folders for a given set of soups
 folder2 <- "minimap2_outputs" # this is the enclosing folder for the minimap2/samtools outputs
 folder3 <- "~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/sample_tracking"  # this is the enclosing folder around the sample_tracking spreadsheet, which i will place on hpc
-```
 
-
-Read in all idx_stats files, add metadata to columns, and merge into one big table in long format (vertically by time)
-```{r 1. read and tabulate idx files}
+## ----1. read and tabulate idx files--------------------------------------
 # produces a list of unique idx filenames (full filenames but no path)
 # use this command if i have a particular folder2 value (e.g. BWA02) to pull from
 # idx_files <- list.files(file.path(folder1, folder2), pattern = "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt") # 
@@ -113,12 +100,8 @@ idx_mitogenome_table <- idx %>% group_by(well) %>% distinct(mitogenome) %>% coun
 
 # 28160/160 = 176 # 28160 rows / 160 mitogenomes = 176 samples.  
 
-```
 
-
-Merge with sample excel workbook to add the sample date information
-
-```{r 2. read sample metadata and add lysis buffer info}
+## ----2. read sample metadata and add lysis buffer info-------------------
 filename1 <- "Samples_for_sequencing_at_TGAC_Zackenberg_bulk_samples_April_2016_20160512.xlsx"
 
 samplemetadata <- read_excel(file.path(folder3, filename1), sheet = "original", na = "NA") 
@@ -131,11 +114,8 @@ samplemetadata <- left_join(samplemetadata, lysisbufferdata) # R message: "Joini
 samplemetadata <- samplemetadata %>% dplyr::mutate(lysis_buffer_proportion=lysis_buffer_orig_total_ml/lysis_buffer_purified_ml)
 samplemetadata$lysis_buffer_proportion <- round(samplemetadata$lysis_buffer_proportion, 2) # round to 2 decimal places
 # later, *multiply* the mapped_reads column by lysis_buffer_proportion to normalise by total amount of lysis buffer used to digest the sample
-```
 
-NB  there are two samples with missing lysis buffer data (because they are not included in the Orig_bwa worksheet:  2013JUL15_Art3_TrapC_Wk29, 1999JUL22_Art3_TrapC_Wk29)
-
-```{r 3. left_join sample metadata to idx table}
+## ----3. left_join sample metadata to idx table---------------------------
 
 idx_meta <- left_join(idx, samplemetadata) # R message:  "Joining, by = c("sample", "well")"
 
@@ -163,10 +143,8 @@ names(idx_meta)
 # [13] "Sample_alias"               "ArcDyn_Plate_name"          "EI_Plate_name"              "TGAC_barcode"              
 # [17] "Concentration_ng_per_ul"    "Sample_volume_ul"           "Quantification_method"      "x.260_280_ratio"           
 # [21] "lysis_buffer_purified_ml"   "lysis_buffer_orig_total_ml" "lysis_buffer_proportion" 
-```
 
-
-```{r sanity checks}
+## ----sanity checks-------------------------------------------------------
 idx_meta %>% distinct(Date) %>% count()  # number of distinct values of Date:  68
 idx_meta %>% distinct(Plot) %>% count()  # number of distinct values of Plot:  should be 1
 idx_meta %>% distinct(Trap) %>% count()  # number of distinct values of Trap:  should be 3 (A,B,C)
@@ -181,10 +159,8 @@ idx_meta %>% distinct(ArcDyn_Plate_name) %>% count()  # number of distinct value
 idx_meta %>% distinct(samtools_filter) %>% count()  # number of distinct values of samtools_filter: should be 1
 idx_meta %>% distinct(Full_name_of_the_sample) %>% count()  # number of distinct values of samtools_filter: should be 1
 idx_meta %>% distinct(Full_name_of_the_sample) %>% arrange(Full_name_of_the_sample) # number of distinct values of samtools_filter: should be 176
-```
 
-
-```{r 4. read in genomecov_d.txt.gz files and add to idx_meta}
+## ----4. read in genomecov_d.txt.gz files and add to idx_meta-------------
 # setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping")
 
 genomecovfile <- "*F2308_f0x2_q1_sorted_genomecov_d\\.txt\\.gz"  # choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_)
@@ -264,11 +240,8 @@ names(idx_meta_genomecov)
 
 # write_tsv(idx_meta_genomecov, "idx_meta_genomecov.txt") # so if i need to read in a file during debuggging, here it is
 
-```
 
-
-Move the COI spike data into separate columns in a wide dataset and left_join back to test_idx_meta_genomecov
-```{r}
+## ------------------------------------------------------------------------
 # used for debugging, in case i screw up the dataset while writing code
 # idx_meta_genomecov <- read_delim("idx_meta_genomecov.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
@@ -308,10 +281,8 @@ names(idx_meta_genomecov)
 # [27] "coefvar"                                     "length"                                     
 # [29] "pathname_genomecov"                          "Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI"
 # [31] "Coleoptera_Elateridae_40ng_COI"              "Coleoptera_Mordellidae_20ng_COI"            
-```
 
-
-```{r cleanup files}
+## ----cleanup files-------------------------------------------------------
 rm(genomecoverages_summ)
 rm(idx)
 rm(idx_meta)
@@ -320,10 +291,8 @@ rm(lysisbufferdata)
 rm(samplemetadata)
 rm(COI_spike_reads)
 rm(COI_spike_reads_wide)
-```
 
-Analyse the COI_spike read numbers and choose which reads to use as a correction factor. Correct mapped reads for COI_spike information and lysis buffer proportion
-```{r}
+## ------------------------------------------------------------------------
 # Calculate the pairwise ratios of the different COI_spike reads
 idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate(ratio_mordellid20_bombyx10=Coleoptera_Mordellidae_20ng_COI/Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI) 
 idx_meta_genomecov$ratio_mordellid20_bombyx10 <- round(idx_meta_genomecov$ratio_mordellid20_bombyx10, 1)
@@ -385,10 +354,8 @@ names(idx_meta_genomecov)
 # [35] "ratio_mordellid20_bombyx10"                  "ratio_elaterid40_bombyx"                    
 # [37] "ratio_elaterid40_mordellid20"                "elaterid_mordellid_sum"                     
 # [39] "COI_corr"    
-```
 
-Make wide table for visualisation
-```{r tidyr make wide table}
+## ----tidyr make wide table-----------------------------------------------
 # create variable from Date and Trap(ABC)
 # stringr::str_pad(x, width = 2, side = "left", pad = "0")  # to ensure that the date always has two digits, e.g. 07.
 idx_meta_genomecov$DateTrap <- str_c("Date", year(idx_meta_genomecov$Date), str_pad(month(idx_meta_genomecov$Date), 2, side = "left", pad = "0"), str_pad(day(idx_meta_genomecov$Date), 2, side = "left", pad = "0"), idx_meta_genomecov$Trap, sep = "_")
@@ -408,174 +375,77 @@ idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dpl
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
 write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide.txt")
-```
 
-## Next steps:
+## ------------------------------------------------------------------------
+purl("idxstats_tabulate_macOS.Rmd")
 
-1. DONE Read in all idx_stats files, add sample metadata to columns, and merge into one table in long format (vertically by time)
-2. DONE merge with sample excel workbook to add the sample date information
-3. DONE go through the genomecov files and calculate the mean and standard deviation of coverage for each mitogenome/sample and add the columns to the idx table
-4. DONE make wide table using tidyr (the column data format should be DateTrap (e.g. 1998_08_05_TrapA) in temporal order). 
-5. DONE confirm that i have the correct number of samples (compare with number of input files) e.g. PlatesAB only have 176 bam files (or did i only download 176 bam files?) but of course we created 2*96=192 files, some of which failed to sequence
-6. DONE Debug the bug that causes sample to have repeated lines, using a tabulate command to check that I don't have repeated lines.  Answer: re-run the minimap2/samtools/bedtools scripts and redownload the idxstats files.  i put the same idxstats files into multiple BWA folders in my test folders
-7. DONE platesGH:  combine_fastq, fastQC, multiqc (using PKG-ENQ-2379-Data_Transfer-PSEQ-1586-trimmed), remove orig fastq.gz files.  
-8. DONE platesA2B2: combine_fastq, fastQC, multiqc, remove orig fastq.gz files
-9. DONE minimap2/samtools for platesGH
-10. DONE minimap2/samtools for platesA2B2
-
-11. adapt R code for running on hpc and run, INCLUDE LYSIS BUFFER INFORMATION, COMPARE PlatesAB WITH YINQIU'S BWA_results_20161025.xlsx, THE POSITIVE CONTROLS, THE COI SPIKE RATIOS, THE SEASONAL PATTERNS
-
-12. remove original, noncombined fastq.gz files from A2B2 and GH when i'm done mapping and checking. 
-
-13. make textfile for taxonomy (class, order, family, genus, species) of each mitogenome and join to idx_meta_genomecov
-
-14. visualise minimap2 bam files and check that i am not mapping to the Ns between the protein-coding genes. SHOULD I SUBTRACT A FIXED NUMBER FROM EACH MITOGENOME LENGTH TO CALCULATE THE CORRECT LENGTH OF THE CODING PORTION?  
-
-
-
-
-
-
-names(idx_meta_genomecov)
-[1] "Date"                                        "Plot"
-[3] "Trap"                                        "Week"
-[5] "mitogenome"                                  "COI_Species"
-[7] "mapped_reads"                                "mapped_reads_COI_corr"
-[9] "mapped_reads_COI_lysis_corr"                 "mean_coverage"
-[11] "stddev"                                      "coefvar"
-[13] "length"                                      "sample"
-[15] "well"                                        "samtools_filter"
-[17] "pathname"                                    "Full_name_of_the_sample"
-[19] "Sample_alias"                                "ArcDyn_Plate_name"
-[21] "EI_Plate_name"                               "TGAC_barcode"
-[23] "Concentration_ng_per_ul"                     "Sample_volume_ul"
-[25] "Quantification_method"                       "x.260_280_ratio"
-[27] "lysis_buffer_purified_ml"                    "lysis_buffer_orig_total_ml"
-[29] "lysis_buffer_proportion"                     "sum_coverage"
-[31] "pathname_genomecov"                          "Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI"
-[33] "Coleoptera_Elateridae_40ng_COI"              "Coleoptera_Mordellidae_20ng_COI"
-[35] "ratio_mordellid20_bombyx10"                  "ratio_elaterid40_bombyx"
-[37] "ratio_elaterid40_mordellid20"                "elaterid_mordellid_sum"
-[39] "COI_corr"
-
-### Metadata:
-From idxstats.txt
-Date:  Date of ArcDyn Sample
-Plot:  Zackenberg Plot (only Art3)
-Trap:  Window trap within Art3 (A, B, C)
-Week:  Week of the year (alternative to Date)
-mitogenome:  name of mitogenome sequencer (from reference fasta file used by minimap2)
-mt_length:  length of the mitogenome (including Ns between the genes) used by minimap2
-mapped_reads:  number of reads mapped to each mitogenome by minimap2 and filtered through samtools
-sample:  unique sample name derived from each sample's foldername (e.g. Sample_IPO3916_A1 -> IPO3916_A1). IPO3916 refers to the Plate and A1 refers to the well. I use this to link to my ArcDyn sample metadata
-well:  well of the Plate
-samtools_filter:  parameter used by samtools view to filter out badly mapped reads (e.g. -F2308 -f0x2 -q1 -> F2308_f0x2_q1)
-pathname:  path to the idx_stats file
-
-### From Excel spreadsheet that ArcDyn uses to record metadata for each sample
-Full_name_of_the_sample:  full name of the sample from the ArcDyn metadata (e.g. 1999JUL08_Art3_TrapA_Wk27). 
-Sample_alias:  code for the Year_Trap_Week (e.g. 98_B_33)
-ArcDyn_Plate_name:  ArcDyn plate name (e.g. Anteater, which is Plate A)
-EI_Plate_name:  name of plate given by Earlham Institute (e.g. IPO3916)
-TGAC_Barcode:  number on the barcode sticker that i placed on the plate (SAM27529_PRO 1323_S1_gDNA).  this links back to the photo i take of each plate after it is loaded.
-Concentration_ng_per_ul:  DNA concentration as it is given to EI
-Sample_volume_ul:  how much volume of liquid given to EI per sample in each well
-Quantification method: the method ArcDyn used to quantify DNA amount
-x.260_280_ratio:  the 260/280 ratio ArcDyn measured for the sample's DNA
-
-### From bedtools/genomecov -d output file
-sum_coverage:  sum of the coverage per nucleotide = the total bases of all the reads that mapped to each mitogenome
-mean_coverage:  sum/length of the mitogenome that was mapped to
-stddev:  standard deviation of the coverage (e.g. is the mapping even or uneven?)
-coefvar:  stddev/mean_coverage.  another measure of unevenness
-length:  length of the mitogenome being mapped to.  should be the same as mt_length
-pathname_genomecov:  path to the bedtools genomecov -d output file
-
-### Calculated columns
-Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI:  reads that mapped to this COI spike sequence
-Coleoptera_Elateridae_40ng_COI:  reads that mapped to this COI spike sequence
-Coleoptera_Mordellidae_20ng_COI:  reads that mapped to this COI spike sequence
-ratio_mordellid20_bombyx10:  ratio of mordellid to bombyx reads, should be 2
-ratio_elaterid40_bombyx:  ratio of elaterid to bombyx reads, should be 4
-ratio_elaterid40_mordellid20:  ratio of elaterid to mordellid reads, should be 2
-elaterid_mordellid_sum:  sum of elaterid and mordellid reads
-COI_corr:  COI_spike correction factor:  elaterid_mordellid_sum/min(elaterid_mordellid_sum)
-lysis_buffer_proportion:  lysis buffer correction factor:  lysis_buffer_purified_ml/lysis_buffer_orig_total_ml
-mapped_reads_COI_corr:  mapped reads after correction with COI_corr
-mapped_reads_COI_lysis_corr:  mapped reads after correction with COI_corr and lysis_buffer
-
-
-
-Don't use this code.  I wrote this when i tried to do the COI spike corrections with a wide table.  Wrong idea.   
-```{r COI_spike corrections on wide table, eval=FALSE, include=FALSE}
-
-# used for debugging, in case i screw up the dataset while writing code
-# idx_meta_genomcov_mapped_reads_lysis_corr_wide <- read_delim("idx_meta_genomcov_mapped_reads_lysis_corr_wide.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
-
-# pull out the COI spike rows
-bombyx_corr <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% dplyr::filter(str_detect(.$mitogenome, '1-2_Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI')) 
-
-mordellid_corr <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% dplyr::filter(str_detect(.$mitogenome, '3-1_Coleoptera_Mordellidae_20ng_COI')) 
-
-elaterid_corr <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% dplyr::filter(str_detect(.$mitogenome, '2-1_Coleoptera_Elateridae_40ng_COI')) 
-
-# calculate the ratios of the COI spikes and bind the rows to the original dataset
-bombyx_bombyx <- as.data.frame(as.numeric(t(bombyx_corr[,-1]))/as.numeric(t(bombyx_corr[,-1])))
-colnames(bombyx_bombyx)[1] <- "bombyx_bombyx"
-bombyx_bombyx <- as.data.frame(t(bombyx_bombyx)) %>% rownames_to_column(var="mitogenome")
-
-mordellid_bombyx <- data_frame(as.numeric(t(mordellid_corr[,-1]))/as.numeric(t(bombyx_corr[,-1])))
-colnames(mordellid_bombyx)[1] <- "mordellid20_bombyx10"
-mordellid_bombyx <- as.data.frame(t(mordellid_bombyx)) %>% rownames_to_column(var="mitogenome")
-
-elaterid_bombyx <- data_frame(as.numeric(t(elaterid_corr[,-1]))/as.numeric(t(bombyx_corr[,-1])))
-colnames(elaterid_bombyx)[1] <- "elaterid40_bombyx"
-elaterid_bombyx <- as.data.frame(t(elaterid_bombyx)) %>% rownames_to_column(var="mitogenome")
-
-elaterid_mordellid <- data_frame(as.numeric(t(elaterid_corr[,-1]))/as.numeric(t(mordellid_corr[,-1])))
-colnames(elaterid_mordellid)[1] <- "elaterid40_mordellid20"
-elaterid_mordellid <- as.data.frame(t(elaterid_mordellid)) %>% rownames_to_column(var="mitogenome")
-
-# bind together and then bind onto bottom of genomecov wide dataset
-COI_spike <- bind_rows(bombyx_bombyx, mordellid_bombyx, elaterid_bombyx, elaterid_mordellid)
-colnames(COI_spike) <- colnames(idx_meta_genomcov_mapped_reads_lysis_corr_wide)
-idx_meta_genomcov_mapped_reads_lysis_corr_wide <- bind_rows(idx_meta_genomcov_mapped_reads_lysis_corr_wide, COI_spike)
-
-# check pairwise ratios of COI spikes
-# should be 2, but it's 3.7
-ratio_mordellid20_bombyx10 <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% filter(str_detect(.$mitogenome, 'mordellid20_bombyx10')) %>% dplyr::select(-mitogenome) %>% t() %>% as.numeric() %>% mean(na.rm = TRUE) %>% round(1); ratio_mordellid20_bombyx10
-
-# should be 4, but it's 7.3
-ratio_elaterid40_bombyx <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% filter(str_detect(.$mitogenome, 'elaterid40_bombyx')) %>% dplyr::select(-mitogenome) %>% t() %>% as.numeric() %>% mean(na.rm = TRUE) %>% round(1); ratio_elaterid40_bombyx
-
-# should be 2, and it's 1.9
-ratio_elaterid40_mordellid20 <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% filter(str_detect(.$mitogenome, 'elaterid40_mordellid20')) %>% dplyr::select(-mitogenome) %>% t() %>% as.numeric() %>% mean(na.rm = TRUE) %>% round(1); ratio_elaterid40_mordellid20
-
-# Use the sum of elaterid and mordellid reads to do the correction.  Bombyx didn't show up
-
-elaterid_mordellid_sum <- as.data.frame(as.numeric(t(elaterid_corr[,-1])) + as.numeric(t(mordellid_corr[,-1])))
-colnames(elaterid_mordellid_sum)[1] <- "elaterid_mordellid_sum"
-elaterid_mordellid_sum <- as.data.frame(t(elaterid_mordellid_sum)) %>% rownames_to_column(var="mitogenome")
-colnames(elaterid_mordellid_sum) <- colnames(idx_meta_genomcov_mapped_reads_lysis_corr_wide)
-idx_meta_genomcov_mapped_reads_lysis_corr_wide <- bind_rows(idx_meta_genomcov_mapped_reads_lysis_corr_wide, elaterid_mordellid_sum) 
-
-elaterid_mordellid_min <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% filter(str_detect(.$mitogenome, 'elaterid_mordellid_sum')) %>% dplyr::select(-mitogenome)  %>% t() %>% as.numeric() %>% min(na.rm = TRUE) 
-elaterid_mordellid_min # 115100.3 mapped_reads
-
-# now calculate the column-wise correction factor COI_corr:  elaterid_mordellid_sum/elaterid_mordellid_min
-COI_corr <- as.data.frame(as.numeric(t(elaterid_mordellid_sum[,-1]))/elaterid_mordellid_min)
-colnames(COI_corr)[1] <- "COI_corr"
-COI_corr <- as.data.frame(t(COI_corr)) %>% rownames_to_column(var="mitogenome")
-colnames(COI_corr) <- colnames(idx_meta_genomcov_mapped_reads_lysis_corr_wide)
-idx_meta_genomcov_mapped_reads_lysis_corr_wide <- bind_rows(idx_meta_genomcov_mapped_reads_lysis_corr_wide, COI_corr)
-
-
-# START HERE:  pull out COI_corr and divide it into mapped_reads (using a long format dataset) and generate the new wide dataset with lysis and COI corrected reads
-COI_corr_t <- t(COI_corr) %>% as.numeric() 
-%>% as.data.frame()
-test <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% gather(date, mapped_reads_lysis_corr, -mitogenome)
-
-
-```
-
+## ----COI_spike corrections on wide table, eval=FALSE, include=FALSE------
+## 
+## # used for debugging, in case i screw up the dataset while writing code
+## # idx_meta_genomcov_mapped_reads_lysis_corr_wide <- read_delim("idx_meta_genomcov_mapped_reads_lysis_corr_wide.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+## 
+## # pull out the COI spike rows
+## bombyx_corr <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% dplyr::filter(str_detect(.$mitogenome, '1-2_Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI'))
+## 
+## mordellid_corr <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% dplyr::filter(str_detect(.$mitogenome, '3-1_Coleoptera_Mordellidae_20ng_COI'))
+## 
+## elaterid_corr <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% dplyr::filter(str_detect(.$mitogenome, '2-1_Coleoptera_Elateridae_40ng_COI'))
+## 
+## # calculate the ratios of the COI spikes and bind the rows to the original dataset
+## bombyx_bombyx <- as.data.frame(as.numeric(t(bombyx_corr[,-1]))/as.numeric(t(bombyx_corr[,-1])))
+## colnames(bombyx_bombyx)[1] <- "bombyx_bombyx"
+## bombyx_bombyx <- as.data.frame(t(bombyx_bombyx)) %>% rownames_to_column(var="mitogenome")
+## 
+## mordellid_bombyx <- data_frame(as.numeric(t(mordellid_corr[,-1]))/as.numeric(t(bombyx_corr[,-1])))
+## colnames(mordellid_bombyx)[1] <- "mordellid20_bombyx10"
+## mordellid_bombyx <- as.data.frame(t(mordellid_bombyx)) %>% rownames_to_column(var="mitogenome")
+## 
+## elaterid_bombyx <- data_frame(as.numeric(t(elaterid_corr[,-1]))/as.numeric(t(bombyx_corr[,-1])))
+## colnames(elaterid_bombyx)[1] <- "elaterid40_bombyx"
+## elaterid_bombyx <- as.data.frame(t(elaterid_bombyx)) %>% rownames_to_column(var="mitogenome")
+## 
+## elaterid_mordellid <- data_frame(as.numeric(t(elaterid_corr[,-1]))/as.numeric(t(mordellid_corr[,-1])))
+## colnames(elaterid_mordellid)[1] <- "elaterid40_mordellid20"
+## elaterid_mordellid <- as.data.frame(t(elaterid_mordellid)) %>% rownames_to_column(var="mitogenome")
+## 
+## # bind together and then bind onto bottom of genomecov wide dataset
+## COI_spike <- bind_rows(bombyx_bombyx, mordellid_bombyx, elaterid_bombyx, elaterid_mordellid)
+## colnames(COI_spike) <- colnames(idx_meta_genomcov_mapped_reads_lysis_corr_wide)
+## idx_meta_genomcov_mapped_reads_lysis_corr_wide <- bind_rows(idx_meta_genomcov_mapped_reads_lysis_corr_wide, COI_spike)
+## 
+## # check pairwise ratios of COI spikes
+## # should be 2, but it's 3.7
+## ratio_mordellid20_bombyx10 <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% filter(str_detect(.$mitogenome, 'mordellid20_bombyx10')) %>% dplyr::select(-mitogenome) %>% t() %>% as.numeric() %>% mean(na.rm = TRUE) %>% round(1); ratio_mordellid20_bombyx10
+## 
+## # should be 4, but it's 7.3
+## ratio_elaterid40_bombyx <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% filter(str_detect(.$mitogenome, 'elaterid40_bombyx')) %>% dplyr::select(-mitogenome) %>% t() %>% as.numeric() %>% mean(na.rm = TRUE) %>% round(1); ratio_elaterid40_bombyx
+## 
+## # should be 2, and it's 1.9
+## ratio_elaterid40_mordellid20 <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% filter(str_detect(.$mitogenome, 'elaterid40_mordellid20')) %>% dplyr::select(-mitogenome) %>% t() %>% as.numeric() %>% mean(na.rm = TRUE) %>% round(1); ratio_elaterid40_mordellid20
+## 
+## # Use the sum of elaterid and mordellid reads to do the correction.  Bombyx didn't show up
+## 
+## elaterid_mordellid_sum <- as.data.frame(as.numeric(t(elaterid_corr[,-1])) + as.numeric(t(mordellid_corr[,-1])))
+## colnames(elaterid_mordellid_sum)[1] <- "elaterid_mordellid_sum"
+## elaterid_mordellid_sum <- as.data.frame(t(elaterid_mordellid_sum)) %>% rownames_to_column(var="mitogenome")
+## colnames(elaterid_mordellid_sum) <- colnames(idx_meta_genomcov_mapped_reads_lysis_corr_wide)
+## idx_meta_genomcov_mapped_reads_lysis_corr_wide <- bind_rows(idx_meta_genomcov_mapped_reads_lysis_corr_wide, elaterid_mordellid_sum)
+## 
+## elaterid_mordellid_min <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% filter(str_detect(.$mitogenome, 'elaterid_mordellid_sum')) %>% dplyr::select(-mitogenome)  %>% t() %>% as.numeric() %>% min(na.rm = TRUE)
+## elaterid_mordellid_min # 115100.3 mapped_reads
+## 
+## # now calculate the column-wise correction factor COI_corr:  elaterid_mordellid_sum/elaterid_mordellid_min
+## COI_corr <- as.data.frame(as.numeric(t(elaterid_mordellid_sum[,-1]))/elaterid_mordellid_min)
+## colnames(COI_corr)[1] <- "COI_corr"
+## COI_corr <- as.data.frame(t(COI_corr)) %>% rownames_to_column(var="mitogenome")
+## colnames(COI_corr) <- colnames(idx_meta_genomcov_mapped_reads_lysis_corr_wide)
+## idx_meta_genomcov_mapped_reads_lysis_corr_wide <- bind_rows(idx_meta_genomcov_mapped_reads_lysis_corr_wide, COI_corr)
+## 
+## 
+## # START HERE:  pull out COI_corr and divide it into mapped_reads (using a long format dataset) and generate the new wide dataset with lysis and COI corrected reads
+## COI_corr_t <- t(COI_corr) %>% as.numeric()
+## %>% as.data.frame()
+## test <- idx_meta_genomcov_mapped_reads_lysis_corr_wide %>% gather(date, mapped_reads_lysis_corr, -mitogenome)
+## 
+## 
 
