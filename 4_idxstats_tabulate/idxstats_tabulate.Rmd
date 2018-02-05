@@ -405,9 +405,9 @@ idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dpl
 # i originally found that TrapC_2013_Jul_22 occurred once for week 30 and once for week 29.  I checked the original Excel worksheet and found that 2013JUL22_Art3_TrapC_Wk29 should be 2013JUL15_Art3_TrapC_Wk29.  Thus, the TrapC_2013_Jul_22/week29 combination shouldn't exist.  I have fixed the Excel file.
 
 # Make wide table for visualisation (left to right should follow temporal order (DateTrap))
-idx_meta_genomcov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
+idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
-# write_tsv(idx_meta_genomcov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomcov_mapped_reads_COI_lysis_corr_wide.txt")
+write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide.txt")
 ```
 
 ## Next steps:
