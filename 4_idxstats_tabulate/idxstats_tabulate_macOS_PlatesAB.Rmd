@@ -276,10 +276,6 @@ names(idx_meta_genomecov)
 # [21] "Quantification_method"      "x.260_280_ratio"            "lysis_buffer_orig_total_ul" "lysis_buffer_purified_ul"  
 # [25] "lysis_buffer_proportion"    "sum_coverage"               "mean_coverage"              "stddev"                    
 # [29] "coefvar"                    "length"                     "pathname_genomecov"    
-
-# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesAB_20180210.txt") # so if i need to read in a file during debuggging, here it is
-# used for debugging, in case i screw up the dataset while writing code
-# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesAB_20180210.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 ```
 
 
@@ -449,23 +445,31 @@ names(idx_meta_genomecov)
 # [41] "COI_corr"   
 ```
 
-Make wide table for visualisation
-```{r tidyr make wide table}
+
+```{r add DateTrap variable and save idx_meta_genomecov table}
 # create variable from Date and Trap(ABC)
 # stringr::str_pad(x, width = 2, side = "left", pad = "0")  # to ensure that the date always has two digits, e.g. 07.
 idx_meta_genomecov$DateTrap <- str_c("Date", year(idx_meta_genomecov$Date), str_pad(month(idx_meta_genomecov$Date), 2, side = "left", pad = "0"), str_pad(day(idx_meta_genomecov$Date), 2, side = "left", pad = "0"), idx_meta_genomecov$Trap, sep = "_")
 
 # these tables check that i only have one row for each Full_name_of_the_sample, DateTrap, and pathname
 # ideally, there should be a 1 in all rows of column "n"
-idxstats_by_Full_name_of_the_sample <- idx_meta_genomecov %>% dplyr::group_by(Full_name_of_the_sample) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n))  
+idxstats_by_Full_name_of_the_sample <- idx_meta_genomecov %>% dplyr::group_by(Full_name_of_the_sample) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n)); View(idxstats_by_Full_name_of_the_sample)
 
 # ideally, there should be a 1 in all rows of column "n"
-idxstats_by_DateTrap <- idx_meta_genomecov %>% dplyr::group_by(DateTrap) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n))  
+idxstats_by_DateTrap <- idx_meta_genomecov %>% dplyr::group_by(DateTrap) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n));  View(idxstats_by_DateTrap)
 
 # ideally, there should be a 1 in all rows of column "n"
-idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n))
+idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n));  View(idxstats_by_pathname)
 # i originally found that TrapC_2013_Jul_22 occurred once for week 30 and once for week 29.  I checked the original Excel worksheet and found that 2013JUL22_Art3_TrapC_Wk29 should be 2013JUL15_Art3_TrapC_Wk29.  Thus, the TrapC_2013_Jul_22/week29 combination shouldn't exist.  I have fixed the Excel file.
 
+
+# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesAB_20180210.txt") # so if i need to read in a file during debuggging, here it is
+# used for debugging, in case i screw up the dataset while writing code
+# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesAB_20180210.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+```
+
+Make wide table for visualisation
+```{r}
 # Make wide table for visualisation (left to right should follow temporal order (DateTrap))
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
@@ -494,12 +498,11 @@ idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dp
 
 12. Compare PlatesAB and A2B2 WITH YINQIU'S BWA_results_20161025.xlsx.  
 13. Compare PlatesGH, PlatesEF with the positive controls, the seasonal patterns, the COI spikes
+14. remove original, noncombined fastq.gz files from A2B2 and GH when i'm done mapping and checking.
 
-12. remove original, noncombined fastq.gz files from A2B2 and GH when i'm done mapping and checking.
+15. make textfile for taxonomy (class, order, family, genus, species) of each mitogenome and join to idx_meta_genomecov
 
-13. make textfile for taxonomy (class, order, family, genus, species) of each mitogenome and join to idx_meta_genomecov
-
-14. visualise minimap2 bam files and check that i am not mapping to the Ns between the protein-coding genes. SHOULD I SUBTRACT A FIXED NUMBER FROM EACH MITOGENOME LENGTH TO CALCULATE THE CORRECT LENGTH OF THE CODING PORTION?  
+16. visualise minimap2 bam files and check that i am not mapping to the Ns between the protein-coding genes. SHOULD I SUBTRACT A FIXED NUMBER FROM EACH MITOGENOME LENGTH TO CALCULATE THE CORRECT LENGTH OF THE CODING PORTION?  
 
 
 
@@ -536,13 +539,15 @@ Week:  Week of the year (alternative to Date)
 mitogenome:  name of mitogenome sequencer (from reference fasta file used by minimap2)
 mt_length:  length of the mitogenome (including Ns between the genes) used by minimap2
 mapped_reads:  number of reads mapped to each mitogenome by minimap2 and filtered through samtools
-sample:  unique sample name derived from each sample's foldername (e.g. Sample_IPO3916_A1 -> IPO3916_A1). IPO3916 refers to the Plate and A1 refers to the well. I use this to link to my ArcDyn sample metadata
+sample:  unique sample name derived from each sample's foldername (e.g. Sample_IPO3916_A1 -> IPO3916_A1). IPO3916 refers to the Plate and A1 refers to the well. I use this to link to my ArcDyn sample metadata.  In other sequencing runs, sample takes the format:  PlateH_F6 (Plate_Well).
+EI_sample_name:  sample name based on barcode:  e.g. PrO1747_S142_DNA.  I don't need to use these
 well:  well of the Plate
 samtools_filter:  parameter used by samtools view to filter out badly mapped reads (e.g. -F2308 -f0x2 -q1 -> F2308_f0x2_q1)
 pathname:  path to the idx_stats file
 
 ### From Excel spreadsheet that ArcDyn uses to record metadata for each sample
-Full_name_of_the_sample:  full name of the sample from the ArcDyn metadata (e.g. 1999JUL08_Art3_TrapA_Wk27).
+Full_name_of_the_sample:  full name of the sample from the ArcDyn metadata (e.g. 1999JUL08_Art3_TrapA_Wk27)
+Short_name_of_the_sample:  different version using only year (e.g. 1997_Art3_TrapA_Wk27)
 Sample_alias:  code for the Year_Trap_Week (e.g. 98_B_33)
 ArcDyn_Plate_name:  ArcDyn plate name (e.g. Anteater, which is Plate A)
 EI_Plate_name:  name of plate given by Earlham Institute (e.g. IPO3916)
@@ -551,6 +556,10 @@ Concentration_ng_per_ul:  DNA concentration as it is given to EI
 Sample_volume_ul:  how much volume of liquid given to EI per sample in each well
 Quantification method: the method ArcDyn used to quantify DNA amount
 x.260_280_ratio:  the 260/280 ratio ArcDyn measured for the sample's DNA
+
+### lysis buffer information
+lysis_buffer_orig_total_ul:  The total amount of lysis buffer used to digest the sample.  More lysis buffer is used for samples with higher biomass
+lysis_buffer_purified_ul:  The amount of lysis buffer used to extract DNA. 
 
 ### From bedtools/genomecov -d output file
 sum_coverage:  sum of the coverage per nucleotide = the total bases of all the reads that mapped to each mitogenome
@@ -564,15 +573,19 @@ pathname_genomecov:  path to the bedtools genomecov -d output file
 Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI:  reads that mapped to this COI spike sequence
 Coleoptera_Elateridae_40ng_COI:  reads that mapped to this COI spike sequence
 Coleoptera_Mordellidae_20ng_COI:  reads that mapped to this COI spike sequence
+COI_spike_sum:  sum of Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Elateridae_40ng_COI, Coleoptera_Mordellidae_20ng_COI
 ratio_mordellid20_bombyx10:  ratio of mordellid to bombyx reads, should be 2
 ratio_elaterid40_bombyx:  ratio of elaterid to bombyx reads, should be 4
 ratio_elaterid40_mordellid20:  ratio of elaterid to mordellid reads, should be 2
-elaterid_mordellid_sum:  sum of elaterid and mordellid reads
+elaterid_mordellid_sum:  sum of elaterid and mordellid reads, used for COI_spike correction
 COI_corr:  COI_spike correction factor:  elaterid_mordellid_sum/min(elaterid_mordellid_sum)
-lysis_buffer_proportion:  lysis buffer correction factor:  lysis_buffer_purified_ml/lysis_buffer_orig_total_ml
+lysis_buffer_proportion:  lysis buffer correction factor:  lysis_buffer_purified_ul/lysis_buffer_orig_total_ul
 mapped_reads_COI_corr:  mapped reads after correction with COI_corr
 mapped_reads_COI_lysis_corr:  mapped reads after correction with COI_corr and lysis_buffer
-
+COI_Species: "COI_Spike", "ArcDyn_Species".   ArcDyn_Species are the ArcDyn soups, and COI_Spike are the spiked in species.  Used to separate out the spikes to correct mapped reads
+mock_ArcDyn:  "arcdyn", "control", "mock".  arcdyn is ArcDyn soups.  Control is COI negative controls. mock is mock soups (positive controls)
+DateTrap:  format:  Date_1998_08_26_TrapA.  Used to sort the columns in the wide format
+YearWeekTrap:  format: 1997_Wk27_TrapA.  Used to sort the columns in the wide format when the Month and Date information not available
 
 
 Don't use this code.  I wrote this when i tried to do the COI spike corrections with a wide table.  Wrong idea.   

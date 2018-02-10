@@ -285,10 +285,6 @@ names(idx_meta_genomecov)
 # [21] "Sample_volume_ul"           "Quantification_method"      "x.260_280_ratio"            "lysis_buffer_orig_total_ul"
 # [25] "lysis_buffer_purified_ul"   "lysis_buffer_proportion"    "sum_coverage"               "mean_coverage"             
 # [29] "stddev"                     "coefvar"                    "length"                     "pathname_genomecov"        
-
-# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesAB_20180210.txt") # so if i need to read in a file during debuggging, here it is
-# used for debugging, in case i screw up the dataset while writing code
-# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesAB_20180210.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 ```
 
 
@@ -464,9 +460,8 @@ names(idx_meta_genomecov)
 # [43] "COI_corr"      
 ```
 
-Make wide table for visualisation
-```{r tidyr make wide table}
-# create variable from Date and Trap(ABC)
+
+```{r create variable from Date and Trap(ABC)}
 # stringr::str_pad(x, width = 2, side = "left", pad = "0")  # to ensure that the date always has two digits, e.g. 07.
 idx_meta_genomecov$DateTrap <- str_c("Date", year(idx_meta_genomecov$Date), str_pad(month(idx_meta_genomecov$Date), 2, side = "left", pad = "0"), str_pad(day(idx_meta_genomecov$Date), 2, side = "left", pad = "0"), idx_meta_genomecov$Trap, sep = "_")
 
@@ -481,6 +476,15 @@ idxstats_by_DateTrap <- idx_meta_genomecov %>% dplyr::group_by(DateTrap) %>% dpl
 idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n)); View(idxstats_by_pathname)
 # i originally found that TrapC_2013_Jul_22 occurred once for week 30 and once for week 29.  I checked the original Excel worksheet and found that 2013JUL22_Art3_TrapC_Wk29 should be 2013JUL15_Art3_TrapC_Wk29.  Thus, the TrapC_2013_Jul_22/week29 combination shouldn't exist.  I have fixed the Excel file.
 
+
+# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesA2B2_20180210.txt") # so if i need to read in a file during debuggging, here it is
+# used for debugging, in case i screw up the dataset while writing code
+# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesA2B2_20180210.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+# 
+```
+
+Make wide table for visualisation
+```{r}
 # Make wide table for visualisation (left to right should follow temporal order (DateTrap))
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 

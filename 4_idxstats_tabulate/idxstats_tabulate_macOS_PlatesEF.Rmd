@@ -129,7 +129,6 @@ length(idx$mitogenome) / idx_mitogenome_table[1,2] == idx %>% distinct(sample) %
 
 
 Read in sample metadata
-
 ```{r 2. read sample metadata and create Short_name_of_the_sample}
 samplemetadata <- read_excel(file.path(samplemetadatafolder, samplemetadatafilename), sheet = "edited", na = "NA")
 
@@ -142,6 +141,12 @@ samplemetadata <- samplemetadata %>% dplyr::select(Full_name_of_the_sample, Date
 # use tidyr::unite to make Short_name_of_the_sample
 samplemetadata <- samplemetadata %>% tidyr::unite("Short_name_of_the_sample", c("Year", "Plot", "Trap", "Week"))
 
+names(samplemetadata)
+#  [1] "Full_name_of_the_sample"  "Date"                     "Short_name_of_the_sample" "Sample_alias"            
+#  [5] "ArcDyn_Plate_name"        "EI_Plate_name"            "well"                     "DNA_conc"                
+#  [9] "species_name"             "barcode_used"             "Sample_type"              "sample_reference"        
+# [13] "Concentration_ng_per_ul"  "Sample_volume_ul"         "Quantification_method"    "x.260_280_ratio"         
+# [17] "x.260_230_ratio"          "Buffer_used"              "Extraction_kit_protocol" 
 ```
 
 
@@ -287,10 +292,6 @@ names(idx_meta_genomecov)
 # [21] "Sample_volume_ul"           "Quantification_method"      "x.260_280_ratio"            "lysis_buffer_orig_total_ul"
 # [25] "lysis_buffer_purified_ul"   "lysis_buffer_proportion"    "sum_coverage"               "mean_coverage"             
 # [29] "stddev"                     "coefvar"                    "length"                     "pathname_genomecov"   
-
-# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesEF_20180210.txt") # so if i need to read in a file during debuggging, here it is
-# used for debugging, in case i screw up the dataset while writing code
-# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesEF_20180210.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 ```
 
 
@@ -466,8 +467,8 @@ names(idx_meta_genomecov)
 # [43] "COI_corr"     
 ```
 
-Make wide table for visualisation
-```{r tidyr make wide table}
+
+```{r separate mock and arcdyn soups}
 # remove mock soup data
 mocks_idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::filter(Plot == "evenDNA")
 idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::filter(Plot == "Art3")
@@ -478,14 +479,23 @@ idx_meta_genomecov$DateTrap <- str_c("Date", year(idx_meta_genomecov$Date), str_
 
 # these tables check that i only have one row for each Full_name_of_the_sample, DateTrap, and pathname
 # ideally, there should be a 1 in all rows of column "n"
-idxstats_by_Full_name_of_the_sample <- idx_meta_genomecov %>% dplyr::group_by(Full_name_of_the_sample) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n))  
+idxstats_by_Full_name_of_the_sample <- idx_meta_genomecov %>% dplyr::group_by(Full_name_of_the_sample) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n));  View(idxstats_by_Full_name_of_the_sample)
 
 # ideally, there should be a 1 in all rows of column "n"
-idxstats_by_DateTrap <- idx_meta_genomecov %>% dplyr::group_by(DateTrap) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n))  
+idxstats_by_DateTrap <- idx_meta_genomecov %>% dplyr::group_by(DateTrap) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n));  View(idxstats_by_DateTrap)
 
 # ideally, there should be a 1 in all rows of column "n"
-idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n))
+idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n)); View(idxstats_by_pathname)
 
+
+# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesEF_20180210.txt") # so if i need to read in a file during debuggging, here it is
+# used for debugging, in case i screw up the dataset while writing code
+# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesEF_20180210.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+
+```
+
+
+```{r Make wide table for visualisation}
 # Make wide table for visualisation (left to right should follow temporal order (DateTrap))
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
@@ -493,7 +503,6 @@ idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dp
 mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide <- mocks_idx_meta_genomecov %>% dplyr::select(Sample_alias, mitogenome, mapped_reads_COI_corr) %>% dplyr::arrange(Sample_alias) %>% tidyr::spread(Sample_alias, mapped_reads_COI_corr) %>% dplyr::arrange(mitogenome)
 
 mocks_idx_meta_genomecov_mapped_reads_wide <- mocks_idx_meta_genomecov %>% dplyr::select(Sample_alias, mitogenome, mapped_reads) %>% dplyr::arrange(Sample_alias) %>% tidyr::spread(Sample_alias, mapped_reads) %>% dplyr::arrange(mitogenome)
-
 
 # uncomment to save tables
 # write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesEF_20180210.txt")
