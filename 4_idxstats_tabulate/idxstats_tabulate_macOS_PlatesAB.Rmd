@@ -33,26 +33,29 @@ library(knitr)
 # library(RColorBrewer)
 ```
 
-```{r set paths}
-# setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping-git")
+```{r set paths and filenames for PlatesAB}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/")
 getwd()
-folder1 <- "minimap2_all_outputs_PlatesAB"  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
-# folder2 <- "minimap2_outputs" # this is the enclosing folder for the minimap2/samtools outputs
-folder3 <- "~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/sample_tracking"  # this is the enclosing folder around the sample_tracking spreadsheet, which i will place on hpc
+
+idxstatsgenomecovfolder <- "minimap2_all_outputs_PlatesAB"  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+
+samplemetadatafolder <- "~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/sample_tracking"  # this is the enclosing folder around the sample metadata spreadsheet, which i will place on hpc
+
+samplemetadatafilename <- "Samples_for_sequencing_at_TGAC_Zackenberg_bulk_samples_April_2016_20160512.xlsx"
+
+lysisbufferfilename <- "lysis_buffer_volumes_PlatesAB_A2B2_20180208.xlsx"  # this is based on Yinqiu's lysis buffer datasheet, which i edited a bit to make the sample names consistent so that tables could be joined via "Short_name_of_the_sample".  Also, i replaced missing data or cells with notes with NA
 ```
 
-
 Read in all idx_stats files, add metadata to columns, and merge into one big table in long format (vertically by time)
-```{r 1. read and tabulate idx files}
+```{r 1. read and tabulate idx files for PlatesAB, eval=FALSE}
 # produces a list of unique idx filenames (full filenames but no path)
 # use this command if i have a particular folder2 value (e.g. BWA02) to pull from
-# idx_files <- list.files(file.path(folder1, folder2), pattern = "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt") #
+# idx_files <- list.files(file.path(idxstatsgenomecovfolder, folder2), pattern = "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt")
 
 idxstatsfile <- "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"  # choose the filename suffix to match the desired samtools filter. precede with * as a wildcard. \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files() below)
 
-# idx_files <- list.files(Sys.glob(file.path(folder1, "BWA??", folder2)), pattern = idxstatsfile, full.names = TRUE) # old version
-idx_files <- list.files(Sys.glob(file.path(folder1)), pattern = idxstatsfile, full.names = TRUE)
+# idx_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder, "BWA??", folder2)), pattern = idxstatsfile, full.names = TRUE) # old version
+idx_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder)), pattern = idxstatsfile, full.names = TRUE)
 head(idx_files)
     # Sys.glob is used to generate:  [1] "idxstats_files/BWA01" "idxstats_files/BWA02"
     # list.files is used to look in those folders for files matching "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"
@@ -76,18 +79,19 @@ loadFile1 <- function(x) {
         unmapped_reads = col_integer()
         ))
 
-    # read in filename, extract and sub in the first bit of the name, remove any filepaths (using basename) and store in df$sample.  example filename:  Sample_IPO3916_A1_F2308_f0x2_q60_sorted.bam_idxstats.txt
+    # read in filename, extract and sub in the first bit of the name, remove any filepaths (using basename) and store in df$sample.  example filename:  
+    # Sample_IPO3916_A2_F2308_f0x2_q1_sorted.bam_idxstats.txt # PlatesAB
 
     # df$sample <- sub("([^\\.]+)\\_sorted.bam_idxstats.txt", "\\1", basename(x))
-    df$sample <- sub("Sample_([A-Z,a-f,0-9]+_\\D\\d+)_[\\w]+_sorted.bam_idxstats.txt", "\\1", basename(x), perl=TRUE)
+    df$sample <- sub("Sample_([A-Z,0-9]+_\\D\\d+)_[\\w]+_sorted.bam_idxstats.txt", "\\1", basename(x), perl=TRUE)
     # \\w any letter, digit, underscore
     # \\D any non-digit, \\d any digit
 
-    df$well <- sub("Sample_[A-Z,a-f,0-9]+_(\\D\\d+)_[\\w]+_sorted.bam_idxstats.txt", "\\1", basename(x), perl=TRUE)
+    df$well <- sub("Sample_[A-Z,0-9]+_(\\D\\d+)_[\\w]+_sorted.bam_idxstats.txt", "\\1", basename(x), perl=TRUE)
     # extract well number from filename
     # \\w any letter, digit, underscore
 
-    df$samtools_filter <- sub("Sample_[\\w]+_(F[\\w]+)_sorted.bam_idxstats.txt", "\\1", basename(x), perl=TRUE)
+    df$samtools_filter <- sub("Sample_[A-Z,0-9]+_\\D\\d+_(F[\\w]+)_sorted.bam_idxstats.txt", "\\1", basename(x), perl=TRUE)
     # extract samtools parameters from filename
 
     df$pathname <- x
@@ -95,7 +99,7 @@ loadFile1 <- function(x) {
 
     # output is df
     df
-    }
+}
 
 # lapply the loadFile() function to all of the idx_files, save the output in idx as a list
 idx <- purrr::map(idx_files, loadFile1) # map is equivalent to lapply
@@ -112,52 +116,63 @@ idx %>% distinct(well) %>% count()  # number of distinct values of well, as a sa
 idx %>% distinct(sample) %>% count()  # number of distinct values of sample:  176.  I originally input 192, but only have 176 idx files.  
 idx %>% distinct(pathname) %>% count()  # number of distinct values of sample:  176.  I originally input 192, but only have 176 idx files.  
 idx %>% distinct(samtools_filter) %>% count() # number of distinct values of samtools_filter: should be 1
+idx %>% distinct(samtools_filter)  # show samtools filter value:  should be something like F2308_f0x2_q1
 
 idx_mitogenome_table <- idx %>% group_by(well) %>% distinct(mitogenome) %>% count() # should be 160
 
-30720/160 = 192 # 30720 rows / 160 mitogenomes = 192 samples = 2 
+# 30720/160 = 192 # 30720 rows / 160 mitogenomes = 192 samples = 2 
 
 ```
 
 
-Merge with sample excel workbook to add the sample date information
+Read in sample metadata
 
-```{r 2. read sample metadata and add lysis buffer info}
-filename1 <- "Samples_for_sequencing_at_TGAC_Zackenberg_bulk_samples_April_2016_20160512.xlsx"
+```{r 2. read sample metadata and create Short_name_of_the_sample}
+samplemetadata <- read_excel(file.path(samplemetadatafolder, samplemetadatafilename), sheet = "original", na = "NA")
 
-samplemetadata <- read_excel(file.path(folder3, filename1), sheet = "original", na = "NA")
+# use tidyr::separate to parse out metadata from Full_name_of_the_sample
+samplemetadata <- samplemetadata %>% tidyr::separate(Full_name_of_the_sample, c("Date", "Plot", "Trap", "Week"), sep = "_", remove = FALSE)
+samplemetadata$Date <- as_date(ymd(samplemetadata$Date))
+samplemetadata$Year <- year(samplemetadata$Date)
+samplemetadata <- samplemetadata %>% dplyr::select(Full_name_of_the_sample, Date, Year, Plot:Extraction_kit_protocol)
 
-filename2 <- "lysis_buffer_data_20161025.xlsx"
-lysisbufferdata <- read_excel(file.path(folder3, filename2), sheet = "Orig_bwa", na = "NA")
+# use tidyr::unite to make Short_name_of_the_sample
+samplemetadata <- samplemetadata %>% tidyr::unite("Short_name_of_the_sample", c("Year", "Plot", "Trap", "Week"))
+```
 
-samplemetadata <- left_join(samplemetadata, lysisbufferdata) # R message: "Joining, by = c("Full_name_of_the_sample", "sample")"
 
-samplemetadata <- samplemetadata %>% dplyr::mutate(lysis_buffer_proportion=lysis_buffer_orig_total_ml/lysis_buffer_purified_ml)
+```{r 2. read lysis buffer info and join to sample metadata}
+lysisbufferdata <- read_excel(file.path(samplemetadatafolder, lysisbufferfilename), sheet = "revised_sample_name", na = "NA")
+lysisbufferdata <- lysisbufferdata %>% dplyr::select(Short_name_of_the_sample, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul)
+
+samplemetadata <- left_join(samplemetadata, lysisbufferdata) # R message: "Joining, by = "Short_name_of_the_sample""
+
+samplemetadata <- samplemetadata %>% dplyr::mutate(lysis_buffer_proportion=lysis_buffer_orig_total_ul/lysis_buffer_purified_ul)
+
 samplemetadata$lysis_buffer_proportion <- round(samplemetadata$lysis_buffer_proportion, 2) # round to 2 decimal places
 # later, *multiply* the mapped_reads column by lysis_buffer_proportion to normalise by total amount of lysis buffer used to digest the sample
 ```
 
-NB  there are two samples with missing lysis buffer data (because they are not included in the Orig_bwa worksheet:  2013JUL15_Art3_TrapC_Wk29, 1999JUL22_Art3_TrapC_Wk29)
 
 ```{r 3. left_join sample metadata to idx table}
 
 idx_meta <- left_join(idx, samplemetadata) # R message:  "Joining, by = c("sample", "well")"
 
-# use tidyr::separate to parse out metadata from Full_name_of_the_sample
-idx_meta <- idx_meta %>% tidyr::separate(Full_name_of_the_sample, c("Date", "Plot", "Trap", "Week"), sep = "_", remove = FALSE)
-idx_meta$Date <- as_date(ymd(idx_meta$Date))
+# use tidyr::separate to parse out metadata from Short_name_of_the_sample
+idx_meta <- idx_meta %>% tidyr::separate(Short_name_of_the_sample, c("Year", "Plot", "Trap", "Week"), sep = "_", remove = TRUE)
 
 # sort columns, remove useless columns
 idx_meta <- idx_meta %>% dplyr::select(Date, Plot, Trap, Week, mitogenome:lysis_buffer_proportion)
+
 idx_meta <- idx_meta %>% dplyr::select(-row, -column, -sample_reference, -species_name, -barcode_used, -Sample_type, -x.260_230_ratio, -Buffer_used, -Extraction_kit_protocol) %>% dplyr::arrange(Date, Trap)
 
 names(idx_meta)
 #  [1] "Date"                       "Plot"                       "Trap"                       "Week"                      
 #  [5] "mitogenome"                 "mt_length"                  "mapped_reads"               "sample"                    
 #  [9] "well"                       "samtools_filter"            "pathname"                   "Full_name_of_the_sample"   
-# [13] "Sample_alias"               "ArcDyn_Plate_name"          "EI_Plate_name"              "TGAC_barcode"              
-# [17] "Concentration_ng_per_ul"    "Sample_volume_ul"           "Quantification_method"      "x.260_280_ratio"           
-# [21] "lysis_buffer_purified_ml"   "lysis_buffer_orig_total_ml" "lysis_buffer_proportion"    
+# [13] "Year"                       "Sample_alias"               "ArcDyn_Plate_name"          "EI_Plate_name"             
+# [17] "TGAC_barcode"               "Concentration_ng_per_ul"    "Sample_volume_ul"           "Quantification_method"     
+# [21] "x.260_280_ratio"            "lysis_buffer_orig_total_ul" "lysis_buffer_purified_ul"   "lysis_buffer_proportion" 
 ```
 
 
@@ -174,19 +189,18 @@ idx_meta %>% distinct(Sample_alias)
 idx_meta %>% distinct(well) %>% count()  # number of distinct values of well:  96
 idx_meta %>% distinct(ArcDyn_Plate_name) %>% count()  # number of distinct values of ArcDyn_Plate_name:  should be 2
 idx_meta %>% distinct(samtools_filter) %>% count()  # number of distinct values of samtools_filter: should be 1
+idx_meta %>% distinct(samtools_filter)   # should only have samtools filter information:  e.g. F2308_f0x2_q1
 idx_meta %>% distinct(Full_name_of_the_sample) %>% count()  # number of distinct values of Full_name_of_the_sample: should be 192
 idx_meta %>% distinct(Full_name_of_the_sample) %>% arrange(Full_name_of_the_sample) # number of distinct values of samtools_filter: should be 192
 ```
 
 
 ```{r 4. read in genomecov_d.txt.gz files and add to idx_meta}
-# setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping")
-
 genomecovfile <- "*F2308_f0x2_q1_sorted_genomecov_d\\.txt\\.gz"  # choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_)
 
-# genomecov_files <- list.files(Sys.glob(file.path(folder1, "BWA??", folder2)), pattern = genomecovfile, full.names = TRUE) # previous version
+# genomecov_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder, "BWA??", folder2)), pattern = genomecovfile, full.names = TRUE) # previous version
 
-genomecov_files <- list.files(Sys.glob(file.path(folder1)), pattern = genomecovfile, full.names = TRUE)
+genomecov_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder)), pattern = genomecovfile, full.names = TRUE)
 head(genomecov_files)
     # Sys.glob is used to generate:  [1] "idxstats_files/BWA01" "idxstats_files/BWA02"
     # list.files is used to look in those folders for files matching "*F2308_f0x2_q1_sorted_genomecov_d\\.txt\\.gz"
@@ -231,12 +245,17 @@ loadFile2 <- function(x) {
     df
 }
 
-
+# this step requires 3-4 minutes to run
 # lapply the loadFile2() function to all of the genomecov_files, save the output in genomecovfiles as a list
 genomecoverages_summ <- purrr::map(genomecov_files, loadFile2) # map is equivalent to lapply
 
+
 # rbind the list into a dataframe
 genomecoverages_summ <- do.call(rbind, genomecoverages_summ)
+
+# save this file to avoid having to constantly run the map() step
+# saveRDS(genomecoverages_summ, "genomecoverages_summ_20180209.RDS", compress = TRUE)
+# genomecoverages_summ <- readRDS("genomecoverages_summ_20180209.RDS")
 
 # left_join genomecoverages_summ to idx_meta
 idx_meta_genomecov <- left_join(idx_meta, genomecoverages_summ) # R message:  Joining, by = c("mitogenome", "sample", "well", "samtools_filter")
@@ -247,18 +266,17 @@ idx_meta_genomecov <- idx_meta_genomecov %>% arrange(Date, Trap)
 idx_meta_genomecov$COI_Species <- if_else(grepl("ng_COI", idx_meta_genomecov$mitogenome), "COI_Spike", "ArcDyn_Species")
 
 # reorder the columns for convenience
-idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::select(Date:mitogenome, COI_Species, mapped_reads, sample:pathname_genomecov)
+idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::select(Date:mitogenome, COI_Species, mapped_reads, mt_length:pathname_genomecov) # changed sample to mt_length
 
 names(idx_meta_genomecov)
 #  [1] "Date"                       "Plot"                       "Trap"                       "Week"                      
 #  [5] "mitogenome"                 "COI_Species"                "mapped_reads"               "sample"                    
 #  [9] "well"                       "samtools_filter"            "pathname"                   "Full_name_of_the_sample"   
-# [13] "Sample_alias"               "ArcDyn_Plate_name"          "EI_Plate_name"              "TGAC_barcode"              
-# [17] "Concentration_ng_per_ul"    "Sample_volume_ul"           "Quantification_method"      "x.260_280_ratio"           
-# [21] "lysis_buffer_purified_ml"   "lysis_buffer_orig_total_ml" "lysis_buffer_proportion"    "sum_coverage"              
-# [25] "mean_coverage"              "stddev"                     "coefvar"                    "length"                    
-# [29] "pathname_genomecov"  
-#
+# [13] "Year"                       "Sample_alias"               "ArcDyn_Plate_name"          "EI_Plate_name"             
+# [17] "TGAC_barcode"               "Concentration_ng_per_ul"    "Sample_volume_ul"           "Quantification_method"     
+# [21] "x.260_280_ratio"            "lysis_buffer_orig_total_ul" "lysis_buffer_purified_ul"   "lysis_buffer_proportion"   
+# [25] "sum_coverage"               "mean_coverage"              "stddev"                     "coefvar"                   
+# [29] "length"                     "pathname_genomecov"  
 
 # write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesAB.txt") # so if i need to read in a file during debuggging, here it is
 
@@ -318,6 +336,9 @@ rm(lysisbufferdata)
 rm(samplemetadata)
 rm(COI_spike_reads)
 rm(COI_spike_reads_wide)
+# rm(test_idx_meta)
+# rm(test_samplemetadata)
+# rm(genomecoverages_summ_test)
 ```
 
 
@@ -373,7 +394,7 @@ par(mfrow=c(1,1))
 # filter out samples with mapped_reads<2000 to begin with
 
 sample_names <- sum_idx_meta_genomecov %>% dplyr::filter(mapped_reads < 2000) %>% dplyr::select(Full_name_of_the_sample)
-samples_to_remove <- sample_names %>% dplyr::pull(Full_name_of_the_sample)
+samples_to_remove <- sample_names %>% dplyr::pull(Full_name_of_the_sample) # pull out a single variable
 samples_to_remove # 3 samples to remove
 idx_meta_genomecov <- idx_meta_genomecov %>% filter(!Full_name_of_the_sample %in% samples_to_remove) # 29673 + 471 = 30144
 
@@ -401,7 +422,7 @@ idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::select(Date:mapped_reads, ma
 idx_meta_genomecov$mapped_reads_COI_corr <- round(idx_meta_genomecov$mapped_reads_COI_corr, 2)
 
 # generate summed table again
-sum_idx_meta_genomecov2 <- idx_meta_genomecov %>% 
+sum_idx_meta_genomecov <- idx_meta_genomecov %>% 
     group_by(Full_name_of_the_sample) %>% 
     summarise_at(vars(mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, elaterid_mordellid_sum), funs(sum(as.numeric(.)))) %>%
     arrange(mapped_reads)
@@ -454,7 +475,7 @@ idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dp
 ```
 
 ```{r, eval=FALSE}
-purl("idxstats_tabulate_macOS.Rmd")
+# purl("idxstats_tabulate_macOS.Rmd")
 ```
 
 
@@ -471,7 +492,7 @@ purl("idxstats_tabulate_macOS.Rmd")
 9. DONE minimap2/samtools for platesGH
 10. DONE minimap2/samtools for platesA2B2
 
-11. create lysis buffer datasets, download idxstats and genomecov data, run R code on Plates AB, A2B2, EF, GH:  COMPARE PlatesAB and A2B2 WITH YINQIU'S BWA_results_20161025.xlsx.  Compare Plates?? with the positive controls, the seasonal patterns, the COI spikes
+11. create lysis buffer datasets, download idxstats and genomecov data, run R code on Plates AB, A2B2, EF, GH:  COMPARE PlatesAB and A2B2 WITH YINQIU'S BWA_results_20161025.xlsx.  Compare PlatesGH with the positive controls, the seasonal patterns, the COI spikes
 
 12. remove original, noncombined fastq.gz files from A2B2 and GH when i'm done mapping and checking.
 
