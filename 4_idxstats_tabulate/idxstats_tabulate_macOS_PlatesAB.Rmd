@@ -130,7 +130,7 @@ idx %>% distinct(pathname) %>% count()  # number of distinct values of pathname:
 idx %>% distinct(samtools_filter) %>% count() # number of distinct values of samtools_filter: should be 1
 idx %>% distinct(samtools_filter)  # show samtools filter value:  should be something like F2308_f0x2_q1
 
-idx_mitogenome_table <- idx %>% group_by(well) %>% distinct(mitogenome) %>% count() %>% arrange(desc(n)) # should be 160
+idx_mitogenome_table <- idx %>% group_by(well) %>% distinct(mitogenome) %>% count() %>% arrange(desc(n)); View(idx_mitogenome_table) # should be 160 in all rows
 
 length(idx$mitogenome) / idx_mitogenome_table[1,2] == idx %>% distinct(sample) %>% count()  # should evaluate to TRUE
 # 30720 rows / 160 mitogenomes = 192 samples
@@ -167,7 +167,6 @@ samplemetadata$lysis_buffer_proportion <- round(samplemetadata$lysis_buffer_prop
 
 
 ```{r 3. left_join sample metadata to idx table}
-
 idx_meta <- left_join(idx, samplemetadata) # R message:  "Joining, by = c("sample", "well")"
 
 # use tidyr::separate to parse out metadata from Short_name_of_the_sample
@@ -266,8 +265,8 @@ genomecoverages_summ <- purrr::map(genomecov_files, loadFile2); notify("Your loa
 genomecoverages_summ <- do.call(rbind, genomecoverages_summ)
 
 # save this file to avoid having to constantly run the map() step
-# saveRDS(genomecoverages_summ, "genomecoverages_summ_20180210.RDS", compress = TRUE)
-# genomecoverages_summ <- readRDS("genomecoverages_summ_20180210.RDS")
+# saveRDS(genomecoverages_summ, "genomecoverages_summ_20180211.RDS", compress = TRUE)
+# genomecoverages_summ <- readRDS("genomecoverages_summ_20180211.RDS")
 
 # left_join genomecoverages_summ to idx_meta
 idx_meta_genomecov <- left_join(idx_meta, genomecoverages_summ) # R message:  Joining, by = c("mitogenome", "sample", "well", "samtools_filter")
@@ -398,14 +397,14 @@ hist(sum_idx_meta_genomecov$elaterid_mordellid_sum, breaks = 20000, xlim = c(0, 
 hist(sum_idx_meta_genomecov$elaterid_mordellid_sum, breaks = 20000, xlim = c(0, 100559900))
 par(mfrow=c(1,1))
 
-# filter out samples with elaterid_mordellid_sum < 10612886 to begin with
+# filter out samples with elaterid_mordellid_sum < 9 000 000 to begin with
 
-sample_names <- sum_idx_meta_genomecov %>% dplyr::filter(elaterid_mordellid_sum < 10612886) %>% dplyr::select(Full_name_of_the_sample)
+sample_names <- sum_idx_meta_genomecov %>% dplyr::filter(elaterid_mordellid_sum < 9000000) %>% dplyr::select(Full_name_of_the_sample)
 samples_to_remove <- sample_names %>% dplyr::pull(Full_name_of_the_sample) # pull out a single variable
-samples_to_remove # 3 samples to remove
-idx_meta_genomecov <- idx_meta_genomecov %>% filter(!Full_name_of_the_sample %in% samples_to_remove) # 29673 + 471 = 30144
+samples_to_remove # 1 sample to remove
+idx_meta_genomecov <- idx_meta_genomecov %>% filter(!Full_name_of_the_sample %in% samples_to_remove) # 29987 + 157 = 30144
 
-# sanity check:  189 samples, which is correct since i removed 3 samples
+# sanity check:  191 samples, which is correct since i removed 1 sample
 idx_meta_genomecov %>% distinct(Full_name_of_the_sample) %>% count()  # number of distinct values of Full_name_of_the_sample
 ```
 
@@ -476,9 +475,9 @@ idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dpl
 # i originally found that TrapC_2013_Jul_22 occurred once for week 30 and once for week 29.  I checked the original Excel worksheet and found that 2013JUL22_Art3_TrapC_Wk29 should be 2013JUL15_Art3_TrapC_Wk29.  Thus, the TrapC_2013_Jul_22/week29 combination shouldn't exist.  I have fixed the Excel file.
 
 
-# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesAB_20180210.txt") # so if i need to read in a file during debuggging, here it is
+# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesAB_20180211.txt") # so if i need to read in a file during debuggging, here it is
 # used for debugging, in case i screw up the dataset while writing code
-# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesAB_20180210.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesAB_20180211.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 ```
 
 Make wide table for visualisation
@@ -487,7 +486,7 @@ Make wide table for visualisation
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save table
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesAB_20180210.txt")
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesAB_20180211.txt")
 ```
 
 ```{r, eval=FALSE}

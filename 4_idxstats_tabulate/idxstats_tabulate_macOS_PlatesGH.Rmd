@@ -65,7 +65,9 @@ Read in all idx_stats files, add metadata to columns, and merge into one big tab
 # use this command if i have a particular folder2 value (e.g. BWA02) to pull from
 # idx_files <- list.files(file.path(idxstatsgenomecovfolder, folder2), pattern = "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt")
 
-idxstatsfile <- "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"  # choose the filename suffix to match the desired samtools filter. precede with * as a wildcard. \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files() below)
+# idxstatsfile <- "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"  # choose the filename suffix to match the desired samtools filter. precede with * as a wildcard. \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files() below)
+
+idxstatsfile <- "*F2308_q1_sorted.bam_idxstats\\.txt"  # choose the filename suffix to match the desired samtools filter. precede with * as a wildcard. \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files() below)
 
 idx_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder)), pattern = idxstatsfile, full.names = TRUE)
 head(idx_files)
@@ -129,7 +131,7 @@ idx %>% distinct(pathname) %>% count()  # number of distinct values of sample:  
 idx %>% distinct(samtools_filter) %>% count() # number of distinct values of samtools_filter: should be 1
 idx %>% distinct(samtools_filter) # should look like:  F2308_f0x2_q1
 
-idx_mitogenome_table <- idx %>% group_by(well) %>% distinct(mitogenome) %>% count() %>% arrange(desc(n)) # should be 160
+idx_mitogenome_table <- idx %>% group_by(well) %>% distinct(mitogenome) %>% count() %>% arrange(desc(n)); View(idx_mitogenome_table) # should be 160
 
 length(idx$mitogenome) / idx_mitogenome_table[1,2] == idx %>% distinct(sample) %>% count()  # should evaluate to TRUE
 # 30400 rows / 160 mitogenomes = 190 samples
@@ -226,8 +228,10 @@ idx_meta %>% distinct(Short_name_of_the_sample) %>% arrange(Short_name_of_the_sa
 
 
 ```{r 4. read in genomecov_d.txt.gz files and add to idx_meta}
-genomecovfile <- "*F2308_f0x2_q1_sorted_genomecov_d\\.txt\\.gz"  # choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_).      
+# genomecovfile <- "*F2308_f0x2_q1_sorted_genomecov_d\\.txt\\.gz"  # choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_).      
 # \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files()
+
+genomecovfile <- "*F2308_q1_sorted_genomecov_d\\.txt\\.gz"  # choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_).      
 
 genomecov_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder)), pattern = genomecovfile, full.names = TRUE)
 head(genomecov_files)
@@ -286,8 +290,8 @@ genomecoverages_summ <- purrr::map(genomecov_files, loadFile2); notify("Your loa
 # rbind the list into a dataframe
 genomecoverages_summ <- do.call(rbind, genomecoverages_summ)
 # save this file to avoid having to constantly run the map() step
-# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesGH_20180210.RDS", compress = TRUE)
-# genomecoverages_summ <- readRDS("genomecoverages_summ_PlatesGH_20180210.RDS")
+# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesGH_20180211.RDS", compress = TRUE)
+# genomecoverages_summ <- readRDS("genomecoverages_summ_PlatesGH_20180211.RDS")
 # 
 
 # left_join genomecoverages_summ to idx_meta
@@ -401,7 +405,7 @@ par(mfrow=c(1,1))
 
 sample_names <- sum_idx_meta_genomecov %>% dplyr::filter(COI_spike_sum < 100000) %>% dplyr::select(Short_name_of_the_sample)
 samples_to_remove <- sample_names %>% dplyr::pull(Short_name_of_the_sample) # pull out a single variable
-samples_to_remove # 5 samples to remove
+samples_to_remove # 5 samples to remove including ME50_1
 idx_meta_genomecov <- idx_meta_genomecov %>% filter(!Short_name_of_the_sample %in% samples_to_remove) # 29045 obs
 
 # sanity check:  185 samples, which is correct since i removed 5 samples
@@ -491,7 +495,7 @@ names(idx_meta_genomecov)
 mocks_idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::filter(!mock_ArcDyn == "arcdyn") # to include COI_negative control
 idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::filter(mock_ArcDyn == "arcdyn")
 
-# create variable from Year, Week, and Trap(ABC) # commented out because i month and date information now
+# create variable from Year, Week, and Trap(ABC) # commented out because i have month and date information now
 # stringr::str_pad(x, width = 2, side = "left", pad = "0")  # to ensure that the date always has two digits, e.g. 07.
 # idx_meta_genomecov$YearWeekTrap <- str_c(idx_meta_genomecov$Year, idx_meta_genomecov$Week, idx_meta_genomecov$Trap, sep = "_")
     
@@ -509,9 +513,9 @@ idxstats_by_DateTrap <- idx_meta_genomecov %>% dplyr::group_by(DateTrap) %>% dpl
 # ideally, there should be a 1 in all rows of column "n"
 idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n));  View(idxstats_by_pathname)
 
-# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesGH_20180210.txt") # so if i need to read in a file during debuggging, here it is
+# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesGH_20180211.txt") # so if i need to read in a file during debuggging, here it is
 # used for debugging, in case i screw up the dataset while writing code
-# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesGH_20180210.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesGH_20180211.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 ```
 
 
@@ -526,11 +530,11 @@ mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide <- mocks_idx_meta_genomecov 
 mocks_idx_meta_genomecov_mapped_reads_wide <- mocks_idx_meta_genomecov %>% dplyr::select(Short_name_of_the_sample, mitogenome, mapped_reads) %>% dplyr::arrange(Short_name_of_the_sample) %>% tidyr::spread(Short_name_of_the_sample, mapped_reads) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save wide tables
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesGH_20180210.txt")
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesGH_20180211.txt")
 # 
-# write_tsv(mocks_idx_meta_genomecov_mapped_reads_wide, "mocks_idx_meta_genomecov_mapped_reads_wide_PlatesGH_20180210.txt")
+# write_tsv(mocks_idx_meta_genomecov_mapped_reads_wide, "mocks_idx_meta_genomecov_mapped_reads_wide_PlatesGH_20180211.txt")
 # 
-# write_tsv(mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide, "mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide_PlatesGH_20180210.txt")
+# write_tsv(mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide, "mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide_PlatesGH_20180211.txt")
 ```
 
 ```{r, eval=FALSE}

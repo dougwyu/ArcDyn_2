@@ -17,7 +17,7 @@ library(knitr)
 ```{r load PlatesAB}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/")
 
-idx_meta_genomecov_AB <- read_delim("idx_meta_genomecov_PlatesAB_20180210.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+idx_meta_genomecov_AB <- read_delim("idx_meta_genomecov_PlatesAB_20180211.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
 idx_meta_genomecov_AB <- idx_meta_genomecov_AB %>% dplyr::select(Date:mitogenome, mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, mean_coverage, stddev, coefvar, samtools_filter, mt_length, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul, lysis_buffer_proportion, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI, elaterid_mordellid_sum, COI_corr, Concentration_ng_per_ul, Sample_volume_ul, x.260_280_ratio, sample, ArcDyn_Plate_name, EI_Plate_name, well, Sample_alias, TGAC_barcode, pathname, pathname_genomecov, Full_name_of_the_sample)
 
@@ -32,7 +32,7 @@ idx_meta_genomecov_AB$EI_RUN <- "idx_meta_genomecov_AB"
 ```{r load PlatesA2B2}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesA2B2")
 
-idx_meta_genomecov_A2B2 <- read_delim("idx_meta_genomecov_PlatesA2B2_20180210.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+idx_meta_genomecov_A2B2 <- read_delim("idx_meta_genomecov_PlatesA2B2_20180211.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
 # names(idx_meta_genomecov_A2B2)
 
@@ -49,7 +49,7 @@ idx_meta_genomecov_A2B2$EI_RUN <- "idx_meta_genomecov_A2B2"
 ```{r load PlatesEF}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesEF")
 
-idx_meta_genomecov_EF <- read_delim("idx_meta_genomecov_PlatesEF_20180210.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+idx_meta_genomecov_EF <- read_delim("idx_meta_genomecov_PlatesEF_20180211.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
 # names(idx_meta_genomecov_EF)
 
@@ -70,7 +70,7 @@ idx_meta_genomecov_EF$EI_RUN <- "idx_meta_genomecov_EF"
 ```{r load PlatesGH}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesGH")
 
-idx_meta_genomecov_GH <- read_delim("idx_meta_genomecov_PlatesGH_20180210.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+idx_meta_genomecov_GH <- read_delim("idx_meta_genomecov_PlatesGH_20180211.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
 idx_meta_genomecov_GH <- idx_meta_genomecov_GH %>% dplyr::rename(Concentration_ng_per_ul="Concentration_ng_ul")
 idx_meta_genomecov_GH <- idx_meta_genomecov_GH %>% dplyr::rename(ArcDyn_Plate_name="Plate")
@@ -150,10 +150,10 @@ idx_meta_genomecov_ABA2B2EFGH_wide <- idx_meta_genomecov_ABA2B2EFGH %>% dplyr::s
 ```{r write tables, eval=FALSE}
 # idx_meta-genomecov long table for Otso, 110057 rows, 36 columns
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesABA2B2EFGH")
-write_tsv(idx_meta_genomecov_ABA2B2EFGH, "idx_meta_genomecov_ABA2B2EFGH_20180210.txt")
+write_tsv(idx_meta_genomecov_ABA2B2EFGH, "idx_meta_genomecov_ABA2B2EFGH_20180211.txt")
 
 # idx_meta-genomecov wide table for visualisation:  157 rows, 702 columns
-write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide, "idx_meta_genomecov_ABA2B2EFGH_wide_20180210.txt")
+write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide, "idx_meta_genomecov_ABA2B2EFGH_wide_20180211.txt")
 ```
 
 

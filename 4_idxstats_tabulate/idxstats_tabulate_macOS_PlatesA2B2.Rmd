@@ -66,7 +66,9 @@ Read in all idx_stats files, add metadata to columns, and merge into one big tab
 # use this command if i have a particular folder2 value (e.g. BWA02) to pull from
 # idx_files <- list.files(file.path(idxstatsgenomecovfolder, folder2), pattern = "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt")
 
-idxstatsfile <- "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"  # choose the filename suffix to match the desired samtools filter. precede with * as a wildcard. \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files() below)
+# idxstatsfile <- "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"  # choose the filename suffix to match the desired samtools filter. precede with * as a wildcard. \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files() below)
+
+idxstatsfile <- "*F2308_q1_sorted.bam_idxstats\\.txt"  # choose the filename suffix to match the desired samtools filter. precede with * as a wildcard. \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files() below)
 
 idx_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder)), pattern = idxstatsfile, full.names = TRUE)
 head(idx_files)
@@ -130,8 +132,7 @@ idx %>% distinct(well) %>% count()  # 94, number of distinct values of well, as 
 idx %>% distinct(sample) %>% count()  # number of distinct values of sample:  168  I originally input 192, but only have 168 idx files.  
 idx %>% distinct(pathname) %>% count()  # number of distinct values of sample:  168  I originally input 192, but only have 168 idx files.  
 idx %>% distinct(samtools_filter) %>% count() # number of distinct values of samtools_filter: should be 1
-idx %>% distinct(samtools_filter) # should look like:  F2308_f0x2_q1
-
+idx %>% distinct(samtools_filter) # should look something like:  F2308_f0x2_q1
 idx_mitogenome_table <- idx %>% group_by(well) %>% distinct(mitogenome) %>% count() %>% arrange(desc(n)) # all columns should be 160
 length(idx$mitogenome) / idx_mitogenome_table[1,2] == idx %>% distinct(sample) %>% count()  # should evaluate to TRUE
 # 26880 rows / 160 mitogenomes = 168 samples
@@ -215,7 +216,10 @@ idx_meta %>% distinct(Full_name_of_the_sample) %>% arrange(Full_name_of_the_samp
 
 
 ```{r 4. read in genomecov_d.txt.gz files and add to idx_meta}
-genomecovfile <- "*F2308_f0x2_q1_sorted_genomecov_d\\.txt\\.gz"  # choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_).      
+# genomecovfile <- "*F2308_f0x2_q1_sorted_genomecov_d\\.txt\\.gz"  # choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_).      
+# \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files()
+
+genomecovfile <- "*F2308_q1_sorted_genomecov_d\\.txt\\.gz"  # choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_).      
 # \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files()
 
 genomecov_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder)), pattern = genomecovfile, full.names = TRUE)
@@ -272,8 +276,8 @@ genomecoverages_summ <- purrr::map(genomecov_files, loadFile2); notify("Your loa
 # rbind the list into a dataframe
 genomecoverages_summ <- do.call(rbind, genomecoverages_summ)
 # save this file to avoid having to constantly run the map() step
-# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesA2B2_20180210.RDS", compress = TRUE)
-# genomecoverages_summ <- readRDS("genomecoverages_summ_PlatesA2B2_20180210.RDS")
+# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesA2B2_20180211.RDS", compress = TRUE)
+# genomecoverages_summ <- readRDS("genomecoverages_summ_PlatesA2B2_20180211.RDS")
 
 
 # left_join genomecoverages_summ to idx_meta
@@ -407,7 +411,7 @@ idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate(ratio_elaterid40_bomb
 idx_meta_genomecov$ratio_elaterid40_bombyx <- round(idx_meta_genomecov$ratio_elaterid40_bombyx, 1)
 ggplot(idx_meta_genomecov, aes(x=ratio_elaterid40_bombyx)) + geom_density(alpha=0.5)
 mean(idx_meta_genomecov$ratio_elaterid40_bombyx); sd(idx_meta_genomecov$ratio_elaterid40_bombyx)
-# should be 4, and its 3.45, sd = 0.70
+# should be 4, and its 3.41, sd = 0.70
 
 idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate(ratio_elaterid40_mordellid20=Coleoptera_Elateridae_40ng_COI/Coleoptera_Mordellidae_20ng_COI)
 idx_meta_genomecov$ratio_elaterid40_mordellid20 <- round(idx_meta_genomecov$ratio_elaterid40_mordellid20, 1)
@@ -488,9 +492,9 @@ idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dpl
 # i originally found that TrapC_2013_Jul_22 occurred once for week 30 and once for week 29.  I checked the original Excel worksheet and found that 2013JUL22_Art3_TrapC_Wk29 should be 2013JUL15_Art3_TrapC_Wk29.  Thus, the TrapC_2013_Jul_22/week29 combination shouldn't exist.  I have fixed the Excel file.
 
 
-# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesA2B2_20180210.txt") # so if i need to read in a file during debuggging, here it is
+# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesA2B2_20180211.txt") # so if i need to read in a file during debuggging, here it is
 # used for debugging, in case i screw up the dataset while writing code
-# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesA2B2_20180210.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesA2B2_20180211.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 # 
 ```
 
@@ -500,7 +504,7 @@ Make wide table for visualisation
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save table
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesA2B2_20180210.txt")
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesA2B2_20180211.txt")
 ```
 
 ```{r, eval=FALSE}
@@ -530,31 +534,29 @@ idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dp
 14. visualise minimap2 bam files and check that i am not mapping to the Ns between the protein-coding genes. SHOULD I SUBTRACT A FIXED NUMBER FROM EACH MITOGENOME LENGTH TO CALCULATE THE CORRECT LENGTH OF THE CODING PORTION?  
 
 
-
-
-
-
 names(idx_meta_genomecov)
-[1] "Date"                                        "Plot"
-[3] "Trap"                                        "Week"
-[5] "mitogenome"                                  "COI_Species"
-[7] "mapped_reads"                                "mapped_reads_COI_corr"
-[9] "mapped_reads_COI_lysis_corr"                 "mean_coverage"
-[11] "stddev"                                      "coefvar"
-[13] "length"                                      "sample"
-[15] "well"                                        "samtools_filter"
-[17] "pathname"                                    "Full_name_of_the_sample"
-[19] "Sample_alias"                                "ArcDyn_Plate_name"
-[21] "EI_Plate_name"                               "TGAC_barcode"
-[23] "Concentration_ng_per_ul"                     "Sample_volume_ul"
-[25] "Quantification_method"                       "x.260_280_ratio"
-[27] "lysis_buffer_purified_ml"                    "lysis_buffer_orig_total_ml"
-[29] "lysis_buffer_proportion"                     "sum_coverage"
-[31] "pathname_genomecov"                          "Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI"
-[33] "Coleoptera_Elateridae_40ng_COI"              "Coleoptera_Mordellidae_20ng_COI"
-[35] "ratio_mordellid20_bombyx10"                  "ratio_elaterid40_bombyx"
-[37] "ratio_elaterid40_mordellid20"                "elaterid_mordellid_sum"
-[39] "COI_corr"
+ [1] "Date"                                        "Plot"                                       
+ [3] "Trap"                                        "Week"                                       
+ [5] "mitogenome"                                  "COI_Species"                                
+ [7] "mapped_reads"                                "mapped_reads_COI_corr"                      
+ [9] "mapped_reads_COI_lysis_corr"                 "mean_coverage"                              
+[11] "stddev"                                      "coefvar"                                    
+[13] "length"                                      "mt_length"                                  
+[15] "sample"                                      "well"                                       
+[17] "samtools_filter"                             "pathname"                                   
+[19] "Full_name_of_the_sample"                     "Year"                                       
+[21] "Sample_alias"                                "ArcDyn_Plate_name"                          
+[23] "EI_Plate_name"                               "EI_sample"                                  
+[25] "TGAC_barcode"                                "Concentration_ng_per_ul"                    
+[27] "Sample_volume_ul"                            "Quantification_method"                      
+[29] "x.260_280_ratio"                             "lysis_buffer_orig_total_ul"                 
+[31] "lysis_buffer_purified_ul"                    "lysis_buffer_proportion"                    
+[33] "sum_coverage"                                "pathname_genomecov"                         
+[35] "Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI" "Coleoptera_Elateridae_40ng_COI"             
+[37] "Coleoptera_Mordellidae_20ng_COI"             "COI_spike_sum"                              
+[39] "ratio_mordellid20_bombyx10"                  "ratio_elaterid40_bombyx"                    
+[41] "ratio_elaterid40_mordellid20"                "elaterid_mordellid_sum"                     
+[43] "COI_corr"                                    "DateTrap"       
 
 ### Metadata:
 From idxstats.txt
