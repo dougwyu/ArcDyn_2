@@ -38,10 +38,11 @@ cd ~/greenland_2017/platesA2B2/platesA2B2_combined; ls
 parallel "sed 's/mnmploop01/mnmploop{}/g' BWA{}/loop_minimap2_20180211.bsub > BWA{}/loop_minimap2_20180211_tmp.bsub" ::: 01 02 03 04 05 06 07 08 09 10
 parallel "mv BWA{}/loop_minimap2_20180211_tmp.bsub BWA{}/loop_minimap2_20180211.bsub" ::: 01 02 03 04 05 06 07 08 09 10
 head BWA10/loop_minimap2_20180211.bsub # check.  should be mnmploop10
+ls 
 
 # parallel "sed 's/samtools01/samtools{}/g' BWA{}/loop_samtools_only_20180210.bsub > BWA{}/loop_samtools_only_20180210_tmp.bsub" ::: 01 02 03 04 05 06 07 08 09 10
 # parallel "mv BWA{}/loop_samtools_only_20180210_tmp.bsub BWA{}/loop_samtools_only_20180210.bsub" ::: 01 02 03 04 05 06 07 08 09 10
-head BWA10/loop_samtools_only_20180210.bsub # check.  should be mnmploop10
+# head BWA10/loop_samtools_only_20180210.bsub # check.  should be mnmploop10
 ls # BWA* folders should now sort to bottom
 
 ####### launch samtools scripts #######
