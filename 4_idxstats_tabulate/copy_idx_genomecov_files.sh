@@ -8,36 +8,70 @@ set -o pipefail
 #######################################################################################
 #######################################################################################
 
+ssh hpc
+interactive
+
 QSCORE=1
-PLATE="GH"
+FILTER="F2308"
 
-cd /gpfs/home/b042/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine
-mkdir minimap2_all_outputs_PlatesAB/ # rm -rf minimap2_all_outputs/
-# rm -rf minimap2_all_outputs/
-
-cd greenland_2017/plates${PLATE}_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed
-mkdir minimap2_all_outputs_Plates${PLATE}/
-
-cd ~/greenland_2017/plates${PLATE}/plates${PLATE}_combined/
-mkdir minimap2_all_outputs_Plates${PLATE}/
+####### cd into different folders ########
+# AB # different scripts because the pathname is different
+PLATE="AB"
+WORKINGPATH="$HOME/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/"
+cd ${WORKINGPATH}
 ls
+mkdir minimap2_all_outputs_Plates${PLATE}/; ls # rm -rf minimap2_all_outputs/
 
+# A2B2
+PLATE="A2B2"
+WORKINGPATH="$HOME/greenland_2017/plates${PLATE}/plates${PLATE}_combined/"
+cd ${WORKINGPATH}
+ls
+mkdir minimap2_all_outputs_Plates${PLATE}/
+ls minimap2_all_outputs_Plates${PLATE}/
+
+# EF
+PLATE="EF"
+WORKINGPATH="$HOME/greenland_2017/plates${PLATE}_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed"
+cd ${WORKINGPATH}
+ls
+mkdir minimap2_all_outputs_Plates${PLATE}/
+ls minimap2_all_outputs_Plates${PLATE}/
+
+# GH
+PLATE="GH"
+WORKINGPATH="$HOME/greenland_2017/plates${PLATE}/plates${PLATE}_combined/"
+cd ${WORKINGPATH}
+ls
+mkdir minimap2_all_outputs_Plates${PLATE}/
+ls minimap2_all_outputs_Plates${PLATE}/
+
+
+####### copy files to minimap2_all_outputs_Plates${PLATE} #######
 # e.g. Sample_IPO3916_C5_F2308_f0x2_q60_sorted.bam_idxstats.txt
-ls BWA*/minimap2_outputs/*_F2308_f0x2_q${QSCORE}_sorted.bam_idxstats.txt | wc -l # 192
-cp BWA*/minimap2_outputs/*_F2308_f0x2_q${QSCORE}_sorted.bam_idxstats.txt minimap2_all_outputs_Plates${PLATE}/
-ls minimap2_all_outputs_Plates${PLATE}/*_F2308_f0x2_q${QSCORE}_sorted.bam_idxstats.txt | wc -l # 192
+ls BWA*/minimap2_outputs/*_${FILTER}_q${QSCORE}_sorted.bam_idxstats.txt
+ls BWA*/minimap2_outputs/*_${FILTER}_q${QSCORE}_sorted.bam_idxstats.txt | wc -l # 192
+cp BWA*/minimap2_outputs/*_${FILTER}_q${QSCORE}_sorted.bam_idxstats.txt minimap2_all_outputs_Plates${PLATE}/
+ls minimap2_all_outputs_Plates${PLATE}/*_${FILTER}_q${QSCORE}_sorted.bam_idxstats.txt | wc -l # 192
 ls minimap2_all_outputs_Plates${PLATE}
 
 # e.g. Sample_IPO3916_C5_F2308_f0x2_q1_sorted_genomecov_d.txt.gz
-ls BWA*/minimap2_outputs/*_F2308_f0x2_q${QSCORE}_sorted.bam_idxstats.txt | wc -l # 192
-cp BWA*/minimap2_outputs/*_F2308_f0x2_q${QSCORE}_sorted_genomecov_d.txt.gz minimap2_all_outputs_Plates${PLATE}/
-ls minimap2_all_outputs_Plates${PLATE}/*_F2308_f0x2_q${QSCORE}_sorted_genomecov_d.txt.gz | wc -l # 192
+ls BWA*/minimap2_outputs/*_${FILTER}_q${QSCORE}_sorted_genomecov_d.txt.gz | wc -l # 192
+cp BWA*/minimap2_outputs/*_${FILTER}_q${QSCORE}_sorted_genomecov_d.txt.gz minimap2_all_outputs_Plates${PLATE}/
+ls minimap2_all_outputs_Plates${PLATE}/*_${FILTER}_q${QSCORE}_sorted_genomecov_d.txt.gz | wc -l # 192
 ls minimap2_all_outputs_Plates${PLATE}
 
-du -sh minimap2_all_outputs_Plates${PLATE}/ # 1.1 GB
+du -sh minimap2_all_outputs_Plates${PLATE}/ # ~1.1 GB
 tar -czvf minimap2_all_outputs_Plates${PLATE}.tar.gz minimap2_all_outputs_Plates${PLATE}/
+ls
+# rm -rf minimap2_all_outputs_Plates${PLATE}/
+ls
 
-scp b042@hpc.uea.ac.uk:~/greenland_2017/platesA2B2/plates${PLATE}_combined/minimap2_all_outputs_Plates${PLATE}.tar.gz ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/Plates${PLATE}
 
-cd ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesA2B2
+# when i'm on a fast network, i can download using scp, but otherwise, use Transmit
+### 2016 run:  AB ###
+# on macOS
 # download minimap2_all_outputs_PlatesAB/
+scp b042@hpc.uea.ac.uk:~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/minimap2_all_outputs_PlatesAB.tar.gz  ~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/
+
+cd /Users/Negorashi2011/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/
