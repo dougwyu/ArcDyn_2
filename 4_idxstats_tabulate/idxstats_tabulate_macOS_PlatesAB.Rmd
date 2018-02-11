@@ -32,6 +32,17 @@ library(beepr)
 # library(sjPlot)
 # library(openxlsx)
 # library(RColorBrewer)
+# 
+
+# function to allow macOS system notifications at end of a long command
+notify <- function(msgString='Message from R', titleString='Message from R', speakIt=FALSE) {
+    cmd <- paste('terminal-notifier -message ', '"', msgString, '"  -title "', titleString, '"', sep='')
+    system(cmd)
+
+    if (speakIt) {
+        system(paste('say', msgString))
+    }
+}
 ```
 
 ```{r set paths and filenames for PlatesAB}
@@ -53,7 +64,9 @@ Read in all idx_stats files, add metadata to columns, and merge into one big tab
 # use this command if i have a particular folder2 value (e.g. BWA02) to pull from
 # idx_files <- list.files(file.path(idxstatsgenomecovfolder, folder2), pattern = "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt")
 
-idxstatsfile <- "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"  # choose the filename suffix to match the desired samtools filter. precede with * as a wildcard. \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files() below)
+# idxstatsfile <- "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"  # choose the filename suffix to match the desired samtools filter. precede with * as a wildcard. \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files() below)
+
+idxstatsfile <- "*F2308_q1_sorted.bam_idxstats\\.txt"  # choose the filename suffix to match the desired samtools filter. precede with * as a wildcard. \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files() below)
 
 # idx_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder, "BWA??", folder2)), pattern = idxstatsfile, full.names = TRUE) # old version
 idx_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder)), pattern = idxstatsfile, full.names = TRUE)
@@ -62,8 +75,6 @@ head(idx_files)
     # list.files is used to look in those folders for files matching "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"
     # full.names = TRUE is used to return the pathnames
     # \\ is used to escape the . before txt (because it is read with grep as "any character")
-
-# idx_files
 
 # column names of idx files
 idx_cols <- c("mitogenome", "mt_length", "mapped_reads", "unmapped_reads")
@@ -197,7 +208,9 @@ idx_meta %>% distinct(Full_name_of_the_sample) %>% arrange(Full_name_of_the_samp
 
 
 ```{r 4. read in genomecov_d.txt.gz files and add to idx_meta}
-genomecovfile <- "*F2308_f0x2_q1_sorted_genomecov_d\\.txt\\.gz"  # choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_)
+# genomecovfile <- "*F2308_f0x2_q1_sorted_genomecov_d\\.txt\\.gz"  # choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_)
+
+genomecovfile <- "*F2308_q1_sorted_genomecov_d\\.txt\\.gz"  # choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_)
 
 genomecov_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder)), pattern = genomecovfile, full.names = TRUE)
 head(genomecov_files)
@@ -247,7 +260,7 @@ loadFile2 <- function(x) {
 # this step requires 3-4 minutes to run
 # lapply the loadFile2() function to all of the genomecov_files, save the output in genomecovfiles as a list
 # map is equivalent to lapply
-genomecoverages_summ <- purrr::map(genomecov_files, loadFile2);  system("say Your loadfile2 function has finally finished!"); beep(sound = 3); beep(sound = 9); beep(sound = 3) 
+genomecoverages_summ <- purrr::map(genomecov_files, loadFile2); notify("Your loadfile2 function has finally finished!", "Message from R", speakIt=TRUE)
 
 # rbind the list into a dataframe
 genomecoverages_summ <- do.call(rbind, genomecoverages_summ)
