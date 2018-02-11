@@ -11,6 +11,10 @@ set -o pipefail
 ssh hpc
 interactive
 
+### CAREFUL:  i have set this up to copy files of only 1 q-score, here, 1.  if i want to copy 1 and 60, i need to set
+# QSCORE="{1,60}" # this needs to be tested.
+# the original samtools output files are still in the BWA* folders
+
 QSCORE=1
 FILTER="F2308"
 
