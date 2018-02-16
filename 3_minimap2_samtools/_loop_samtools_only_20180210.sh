@@ -107,19 +107,19 @@ do
           # samtools view -F 2308 # exclude UNMAP,SECONDARY,SUPPLEMENTARY # exclude unmapped, secondary, and supplementary alignments
           # see https://broadinstitute.github.io/picard/explain-flags.html;  see also https://www.biostars.org/p/256448/
           # samtools view -q 1 # to remove multiply mapped reads = q 0
-     samtools view -b -F 2308 -q 1 ${sample}_sorted.bam -o ${sample}_F2308_q1_sorted.bam
-     samtools index ${sample}_F2308_q1_sorted.bam # creates ${sample}_F2308_q1_sorted.bam.bai file
-     samtools idxstats ${sample}_F2308_q1_sorted.bam > ${sample}_F2308_q1_sorted.bam_idxstats.txt # calculate idxstats
-     bedtools genomecov -d -ibam ${sample}_F2308_q1_sorted.bam | gzip > ${sample}_F2308_q1_sorted_genomecov_d.txt.gz # calc genome cov stats
+     # samtools view -b -F 2308 -q 1 ${sample}_sorted.bam -o ${sample}_F2308_q1_sorted.bam
+     # samtools index ${sample}_F2308_q1_sorted.bam # creates ${sample}_F2308_q1_sorted.bam.bai file
+     # samtools idxstats ${sample}_F2308_q1_sorted.bam > ${sample}_F2308_q1_sorted.bam_idxstats.txt # calculate idxstats
+     # bedtools genomecov -d -ibam ${sample}_F2308_q1_sorted.bam | gzip > ${sample}_F2308_q1_sorted_genomecov_d.txt.gz # calc genome cov stats
 
      #### samtools filtering pipeline using -F 2308 -q 60 ####
           # samtools view -F 2308 # exclude UNMAP,SECONDARY,SUPPLEMENTARY # exclude unmapped, secondary, and supplementary alignments
           # see https://broadinstitute.github.io/picard/explain-flags.html;  see also https://www.biostars.org/p/256448/
           # samtools view -q 1 # to remove multiply mapped reads = q 0
-     samtools view -b -F 2308 -q 60 ${sample}_sorted.bam -o ${sample}_F2308_q60_sorted.bam
-     samtools index ${sample}_F2308_q60_sorted.bam # creates ${sample}_F2308_q60_sorted.bam.bai file
-     samtools idxstats ${sample}_F2308_q60_sorted.bam > ${sample}_F2308_q60_sorted.bam_idxstats.txt # calculate idxstats
-     bedtools genomecov -d -ibam ${sample}_F2308_q60_sorted.bam | gzip > ${sample}_F2308_q60_sorted_genomecov_d.txt.gz # calc genome cov stats
+     # samtools view -b -F 2308 -q 60 ${sample}_sorted.bam -o ${sample}_F2308_q60_sorted.bam
+     # samtools index ${sample}_F2308_q60_sorted.bam # creates ${sample}_F2308_q60_sorted.bam.bai file
+     # samtools idxstats ${sample}_F2308_q60_sorted.bam > ${sample}_F2308_q60_sorted.bam_idxstats.txt # calculate idxstats
+     # bedtools genomecov -d -ibam ${sample}_F2308_q60_sorted.bam | gzip > ${sample}_F2308_q60_sorted_genomecov_d.txt.gz # calc genome cov stats
 
      # #### samtools filtering pipeline using -F 3332 -f 0x2 -q 1 ####
      #      # samtools view -f 0x2 # keep PROPER_PAIR   .. each segment properly aligned according to the aligner
@@ -140,6 +140,16 @@ do
      # samtools index ${sample}_F3332_f0x2_q60_sorted.bam # creates ${sample}_F3332_f0x2_q60_sorted.bam.bai file
      # samtools idxstats ${sample}_F3332_f0x2_q60_sorted.bam > ${sample}_F3332_f0x2_q60_sorted.bam_idxstats.txt # calculate idxstats
      # bedtools genomecov -d -ibam ${sample}_F3332_f0x2_q60_sorted.bam | gzip > ${sample}_F3332_f0x2_q60_sorted_genomecov_d.txt.gz # calc genome cov stats
+
+     # #### samtools filtering pipeline using -F 3332 -f 0x2 -q 30, middle stringency ####
+     #      # samtools view -f 0x2 # keep PROPER_PAIR   .. each segment properly aligned according to the aligner
+     #      # samtools view -F 3332 # exclude DUP,UNMAP,SECONDARY,SUPPLEMENTARY # exclude PCR duplicates, unmapped, secondary, and supplementary alignments
+     #      # see https://broadinstitute.github.io/picard/explain-flags.html;  see also https://www.biostars.org/p/256448/
+     #      # samtools view -q 60 # to remove multiply mapped reads = q 0, and keep only high quality mappings
+     samtools view -b -F 3332 -f 0x2 -q 60 ${sample}_sorted.bam -o ${sample}_F3332_f0x2_q60_sorted.bam
+     samtools index ${sample}_F3332_f0x2_q60_sorted.bam # creates ${sample}_F3332_f0x2_q60_sorted.bam.bai file
+     samtools idxstats ${sample}_F3332_f0x2_q60_sorted.bam > ${sample}_F3332_f0x2_q60_sorted.bam_idxstats.txt # calculate idxstats
+     bedtools genomecov -d -ibam ${sample}_F3332_f0x2_q60_sorted.bam | gzip > ${sample}_F3332_f0x2_q60_sorted_genomecov_d.txt.gz # calc genome cov stats
 
      echo "End of Sample" ${INDEX} of ${#sample_names[@]}
      INDEX=$((INDEX+1))
