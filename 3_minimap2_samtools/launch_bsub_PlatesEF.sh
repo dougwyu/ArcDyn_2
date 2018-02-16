@@ -30,19 +30,61 @@ ls # loop_samtools_only_20180210.bsub and _loop_samtools_only_20180210.sh should
 
 # parallel cp loop_minimap2_20180211.bsub BWA{} ::: 01 02 03 04 05 06 07 08 09 10
 # parallel cp _loop_minimap2_20180211.sh BWA{} ::: 01 02 03 04 05 06 07 08 09 10
-parallel cp loop_samtools_only_20180210.bsub BWA{} ::: 01 02 03 04 05 06 07 08 09 10
-parallel cp _loop_samtools_only_20180210.sh BWA{} ::: 01 02 03 04 05 06 07 08 09 10
+# parallel cp loop_samtools_only_20180210.bsub BWA{} ::: 01 02 03 04 05 06 07 08 09 10
+# parallel cp _loop_samtools_only_20180210.sh BWA{} ::: 01 02 03 04 05 06 07 08 09 10
+parallel cp loop_trimgalore_20180216.bsub BWA{} ::: 01 02 03 04 05 06 07 08 09 10
+parallel cp _loop_trimgalore_20180216.sh BWA{} ::: 01 02 03 04 05 06 07 08 09 10
 ls
+
 # edit the bsub files so that the correct job name will show up (i suppose i could have instead run a job array...)
 # cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed; ls
 # parallel "sed 's/mnmploop01/mnmploop{}/g' BWA{}/loop_minimap2_20180211.bsub > BWA{}/loop_minimap2_20180211_tmp.bsub" ::: 01 02 03 04 05 06 07 08 09 10
 # parallel "mv BWA{}/loop_minimap2_20180211_tmp.bsub BWA{}/loop_minimap2_20180211.bsub" ::: 01 02 03 04 05 06 07 08 09 10
 # head BWA10/loop_minimap2_20180211.bsub # check.  should be mnmploop10
 
-parallel "sed 's/samtools01/samtools{}/g' BWA{}/loop_samtools_only_20180210.bsub > BWA{}/loop_samtools_only_20180210_tmp.bsub" ::: 01 02 03 04 05 06 07 08 09 10
-parallel "mv BWA{}/loop_samtools_only_20180210_tmp.bsub BWA{}/loop_samtools_only_20180210.bsub" ::: 01 02 03 04 05 06 07 08 09 10
-ls # BWA* folders should now sort to bottom
-head -n 3 BWA{01,02,03,05,07,09,10}/loop_samtools_only_20180210.bsub # check.  should be samtools11
+# parallel "sed 's/samtools01/samtools{}/g' BWA{}/loop_samtools_only_20180210.bsub > BWA{}/loop_samtools_only_20180210_tmp.bsub" ::: 01 02 03 04 05 06 07 08 09 10
+# parallel "mv BWA{}/loop_samtools_only_20180210_tmp.bsub BWA{}/loop_samtools_only_20180210.bsub" ::: 01 02 03 04 05 06 07 08 09 10
+# ls # BWA* folders should now sort to bottom
+# head -n 3 BWA{01,02,03,05,07,09,10}/loop_samtools_only_20180210.bsub # check.  should be samtools11
+
+parallel "sed 's/trimgal01/trimgal{}/g' BWA{}/loop_trimgalore_20180216.bsub > BWA{}/loop_trimgalore_20180216_tmp.bsub" ::: 01 02 03 04 05 06 07 08 09 10
+parallel "mv BWA{}/loop_trimgalore_20180216_tmp.bsub BWA{}/loop_trimgalore_20180216.bsub" ::: 01 02 03 04 05 06 07 08 09 10
+head -n 5 BWA{01,02,03,04,05,06,07,08,09,10}/loop_trimgalore_20180216.bsub # check.  should be samtools11
+
+####### launch trimgalore scripts #######
+cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed/BWA01; ls
+bsub < loop_trimgalore_20180216.bsub
+bjobs
+
+cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed/BWA02; ls
+bsub < loop_trimgalore_20180216.bsub
+
+cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed/BWA03; ls
+bsub < loop_trimgalore_20180216.bsub
+
+cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed/BWA04; ls
+bsub < loop_trimgalore_20180216.bsub
+
+cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed/BWA05; ls
+bsub < loop_trimgalore_20180216.bsub
+
+cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed/BWA06; ls
+bsub < loop_trimgalore_20180216.bsub
+
+cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed/BWA07; ls
+bsub < loop_trimgalore_20180216.bsub
+
+cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed/BWA08; ls
+bsub < loop_trimgalore_20180216.bsub
+
+cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed/BWA09; ls
+bsub < loop_trimgalore_20180216.bsub
+
+cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed/BWA10; ls
+bsub < loop_trimgalore_20180216.bsub
+
+bjobs | sort -k8
+cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed/BWA10/PlateF_G10_TCGGATATC-CTTGTA; ls
 
 ####### launch samtools scripts #######
 cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed/BWA01; ls
