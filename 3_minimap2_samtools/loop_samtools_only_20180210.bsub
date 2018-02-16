@@ -1,10 +1,11 @@
 #!/bin/sh
-#BSUB -q short-ib     # short-eth (24 hours), long-eth (168 hours = 7 days), mellanox-ib (7 days)
+#BSUB -q short-eth     # short-eth (24 hours), long-eth (168 hours = 7 days), mellanox-ib (7 days)
 #BSUB -J samtools01
 #BSUB -oo samtools01.out
 #BSUB -eo samtools01.err
 #BSUB -R "rusage[mem=35000]"
 #BSUB -M 35000
+#BSUB -x
 #BSUB -B        #sends email to me when job starts
 #BSUB -N        # sends email to me when job finishes
 
