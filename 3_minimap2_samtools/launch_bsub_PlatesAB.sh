@@ -23,20 +23,20 @@ PATH=$PATH:~/scripts/parallel-20170722/bin/
 # copy the minimap and samtools shell and bsub scripts into each BWA folder
 cd ~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine
 ls
-parallel cp loop_minimap2_20180211.bsub BWA{} ::: 01 02 03 04 05 06 07 08 09 10 11
-parallel cp _loop_minimap2_20180211.sh BWA{} ::: 01 02 03 04 05 06 07 08 09 10 11
+# parallel cp loop_minimap2_20180211.bsub BWA{} ::: 01 02 03 04 05 06 07 08 09 10 11
+# parallel cp _loop_minimap2_20180211.sh BWA{} ::: 01 02 03 04 05 06 07 08 09 10 11
 # parallel cp loop_samtools_only_20180210.bsub BWA{} ::: 01 02 03 04 05 06 07 08 09 10 11
 # parallel cp _loop_samtools_only_20180210.sh BWA{} ::: 01 02 03 04 05 06 07 08 09 10 11
 ls
 # edit the bsub files so that the correct job name will show up (i suppose i could have instead run a job array...)
 cd ~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine
-parallel "sed 's/mnmploop01/mnmploop{}/g' BWA{}/loop_minimap2_20180211.bsub > BWA{}/loop_minimap2_20180211_tmp.bsub" ::: 01 02 03 04 05 06 07 08 09 10 11
-parallel "mv BWA{}/loop_minimap2_20180211_tmp.bsub BWA{}/loop_minimap2_20180211.bsub" ::: 01 02 03 04 05 06 07 08 09 10 11
-head BWA11/loop_minimap2_20180211.bsub # check.  should be mnmploop11
+# parallel "sed 's/mnmploop01/mnmploop{}/g' BWA{}/loop_minimap2_20180211.bsub > BWA{}/loop_minimap2_20180211_tmp.bsub" ::: 01 02 03 04 05 06 07 08 09 10 11
+# parallel "mv BWA{}/loop_minimap2_20180211_tmp.bsub BWA{}/loop_minimap2_20180211.bsub" ::: 01 02 03 04 05 06 07 08 09 10 11
+# head BWA11/loop_minimap2_20180211.bsub # check.  should be mnmploop11
 
-# parallel "sed 's/samtools01/samtools{}/g' BWA{}/loop_samtools_only_20180210.bsub > BWA{}/loop_samtools_only_20180210_tmp.bsub" ::: 01 02 03 04 05 06 07 08 09 10 11
-# parallel "mv BWA{}/loop_samtools_only_20180210_tmp.bsub BWA{}/loop_samtools_only_20180210.bsub" ::: 01 02 03 04 05 06 07 08 09 10 11
-# head BWA11/loop_samtools_only_20180210.bsub # check.  should be samtools11
+parallel "sed 's/samtools01/samtools{}/g' BWA{}/loop_samtools_only_20180210.bsub > BWA{}/loop_samtools_only_20180210_tmp.bsub" ::: 01 02 03 04 05 06 07 08 09 10 11
+parallel "mv BWA{}/loop_samtools_only_20180210_tmp.bsub BWA{}/loop_samtools_only_20180210.bsub" ::: 01 02 03 04 05 06 07 08 09 10 11
+head BWA{01,02,03,05,07,09,11}/loop_samtools_only_20180210.bsub # check.  should be samtools11
 
 ####### launch samtools scripts #######
 cd ~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/BWA01; ls
