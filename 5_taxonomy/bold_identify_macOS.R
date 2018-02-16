@@ -11,8 +11,17 @@ library("readr")
 #### load a fasta file
 testseqsall <- read.fasta(file = "CO1_1sequence_perBIN_040915_COIspiking.fas", seqtype = "DNA", set.attributes = FALSE, as.string = TRUE, forceDNAtolower = FALSE)  # read in fasta file using seqinr
 
-#### bold_identify the sequences
-testseqsallbold <- bold_identify(testseqsall, db = "COX1")
+#### bold_identify all sequences at once
+# testseqsallbold <- bold_identify(testseqsall, db = "COX1")
+
+#### bold_identify one sequence at a time (for large files that take a long time and might crash halfway. this saves the output of each sequence)
+testseqsallbold <- vector('list')
+for (i in 1:length(testseqsall)) {
+    print(i)
+    boldoutput <- bold_identify(testseqsall[i], db = "COX1")
+    testseqsallbold <- c(testseqsallbold, boldoutput)
+}
+
 testseqsallbold <- testseqsallbold[!sapply(testseqsallbold, is.null)] # to remove any null elements
 
 #### add parent taxa to output, wide format
@@ -31,10 +40,3 @@ write_tsv(testseqsallbold_parents_96_to_100.df, "CO1_1sequence_perBIN_040915_COI
 write_tsv(testseqsallbold_parents.df, "CO1_1sequence_perBIN_040915_COIspiking.tsv")
 
 
-# #### bold_identify one seq at a time.  
-# testseqsallbold <- vector('list')
-# for (i in 1:length(testseqsall)) {
-#     print(i)
-#     boldoutput <- bold_identify(testseqsall[i], db = "COX1")
-#     testseqsallbold <- c(testseqsallbold, boldoutput)
-# }
