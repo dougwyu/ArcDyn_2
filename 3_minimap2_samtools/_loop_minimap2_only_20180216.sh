@@ -101,6 +101,7 @@ do
      echo "**** Working folder is" $FOLDER
 
      mkdir _${sample}_working
+
      echo "**** copying trimmed fastq.gz files to working folder"
      cp ${FOLDER}/${sample}_R1_val_1.fq.gz "_${sample}_working/"
      cp ${FOLDER}/${sample}_R2_val_2.fq.gz "_${sample}_working/"
@@ -129,7 +130,6 @@ do
      mv ${sample}_sorted.bam ../minimap2_outputs/
 
      echo "**** end of mapping, sam to bam conversion, and sorting of bam file"
-     # cd ../
 
      cd "${HOMEFOLDER}"
      rm -rf "_${sample}_working" # remove the working directory to make space
