@@ -8,7 +8,7 @@ set -o pipefail
 #######################################################################################
 #######################################################################################
 
-# Usage: bash _loop_minimap2_20180213.sh
+# Usage: bash _loop_minimap2_only_20180216.sh
 
 # Interactive procedure:  first run these commands if running _loop_minimap2_20180122.sh interactively
      # interactive -x -R "rusage[mem=20000]" -M 22000  # alternative is:  interactive -q interactive-lm
@@ -25,7 +25,7 @@ set -o pipefail
      # PATH=$PATH:~/scripts/bedtools2/bin # made 22 Jan 2018 from github 2.27.1
 
 # Batch procedure:  bsub script and submit to mellanox-ib queue
-     ######### loop_minimap2_20180211.bsub ##############################################################################
+     ######### _loop_minimap2_only_20180216.bsub ##############################################################################
      #######################################################################################
      # #!/bin/sh
      # #BSUB -q short-ib     #long-ib & mellanox-ib (168 hours = 7 days), short-ib (24 hours)
@@ -54,23 +54,22 @@ set -o pipefail
      # PATH=$PATH:~/scripts/bedtools2/bin # made 22 Jan 2018 from github 2.27.1
      #
      #
-     # bash _loop_minimap2_20180211.sh
+     # bash _loop_minimap2_only_20180216.sh
      #######################################################################################
      #######################################################################################
 
 # SCRIPT OUTLINE:
-	# make list of folders
-  # loop through folder name to get $FOLDER
-  # get name for $SAMPLEname
-  # move fastq files to a working folder
-  # run trim_galore, minimap2, and samtools view -b, samtools sort, samtools index, and samtools flagstat
-  # move the outputs to minimap2_outputs
-	# rm working folder
-  # next folder
+     # make list of folders
+     # loop through folder names for each SAMPLE
+     # move trimmed fastq files from $SAMPLE name folder to a working folder
+     # run minimap2, and samtools view -b, samtools sort, samtools index, and samtools flagstat
+     # move the outputs to minimap2_outputs
+     # rm working folder
+     # next folder
 
 PIPESTART=$(date)
 
-# upload _loop_minimap2_20180122.sh *into* folder that contains the sample folders that i want to map
+# upload _loop_minimap2_only_20180216.sh *into* folder that contains the sample folders that i want to map
 # when i have lots of sample files, i break it up by putting the sample files into BWA**/ folders and running these scripts inside each one
 HOMEFOLDER=$(pwd) # this sets working directory to that folder
 
@@ -102,17 +101,11 @@ do
      echo "**** Working folder is" $FOLDER
 
      mkdir _${sample}_working
-     echo "**** copying fastq.gz files to working folder"
-     cp ${FOLDER}/*.fastq.gz "_${sample}_working/"
-     echo "**** fastq.gz files moved to working folder"
+     echo "**** copying trimmed fastq.gz files to working folder"
+     cp ${FOLDER}/${sample}_R1_val_1.fq.gz "_${sample}_working/"
+     cp ${FOLDER}/${sample}_R2_val_2.fq.gz "_${sample}_working/"
+     echo "**** trimmed fastq.gz files moved to working folder"
      cd _${sample}_working; # pwd
-
-     #### use trim galore to remove illumina adapters ####
-     echo "**** start of adaptor trimming"
-     trim_galore --paired ${sample}_R1.fastq.gz ${sample}_R2.fastq.gz
-     # alternative more stringent version, not implemented, --length 100 = remove pair if either read ≤ 100 bp (default 20)
-     # trim_galore --paired --length 100 --trim-n ${sample}_R1.fastq.gz ${sample}_R2.fastq.gz
-     echo "**** end of adaptor trimming"
 
      echo "**** start of minimap2"
      #### minimap2 ####
