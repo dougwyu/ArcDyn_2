@@ -105,6 +105,10 @@ do
      echo "Moving to next sample file."
 done
 
+# possible GNU PARALLEL version, since trim galore only uses one cpu per job
+# needs to be tested.  use instead of the whole loop above
+# parallel trim_galore --paired --length 100 --trim-n {}/{}_R1.fastq.gz {}/{}_R2.fastq.gz ::: "${sample_names[@]}"
+
 # mv folderlist.txt minimap2_outputs/
 
 echo "Pipeline started at $PIPESTART"
