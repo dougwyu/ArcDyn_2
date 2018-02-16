@@ -17,7 +17,10 @@ library(knitr)
 ```{r load PlatesAB}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/")
 
-idx_meta_genomecov_AB <- read_delim("idx_meta_genomecov_PlatesAB_20180211.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+outputfolder <- "AB_outputs_20180214_F2308_f0x2_q60"
+idxmetagenomcovfile <- "idx_meta_genomecov_PlatesAB_20180214.txt"
+
+idx_meta_genomecov_AB <- read_delim(file.path(outputfolder, idxmetagenomcovfile), delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
 idx_meta_genomecov_AB <- idx_meta_genomecov_AB %>% dplyr::select(Date:mitogenome, mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, mean_coverage, stddev, coefvar, samtools_filter, mt_length, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul, lysis_buffer_proportion, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI, elaterid_mordellid_sum, COI_corr, Concentration_ng_per_ul, Sample_volume_ul, x.260_280_ratio, sample, ArcDyn_Plate_name, EI_Plate_name, well, Sample_alias, TGAC_barcode, pathname, pathname_genomecov, Full_name_of_the_sample)
 
@@ -32,7 +35,10 @@ idx_meta_genomecov_AB$EI_RUN <- "idx_meta_genomecov_AB"
 ```{r load PlatesA2B2}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesA2B2")
 
-idx_meta_genomecov_A2B2 <- read_delim("idx_meta_genomecov_PlatesA2B2_20180211.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+outputfolder <- "A2B2_outputs_20180214_F2308_f0x2_q60"
+idxmetagenomcovfile <- "idx_meta_genomecov_PlatesA2B2_20180214.txt"
+
+idx_meta_genomecov_A2B2 <- read_delim(file.path(outputfolder, idxmetagenomcovfile), delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
 # names(idx_meta_genomecov_A2B2)
 
@@ -49,15 +55,18 @@ idx_meta_genomecov_A2B2$EI_RUN <- "idx_meta_genomecov_A2B2"
 ```{r load PlatesEF}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesEF")
 
-idx_meta_genomecov_EF <- read_delim("idx_meta_genomecov_PlatesEF_20180211.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+outputfolder <- "EF_outputs_20180214_F2308_f0x2_q60"
+idxmetagenomcovfile <- "idx_meta_genomecov_PlatesEF_20180214.txt"
+
+idx_meta_genomecov_EF <- read_delim(file.path(outputfolder, idxmetagenomcovfile), delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
 # names(idx_meta_genomecov_EF)
 
-idx_meta_genomecov_EF <- idx_meta_genomecov_EF %>% dplyr::select(Date:mitogenome, mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, mean_coverage, stddev, coefvar, samtools_filter, mt_length, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul, lysis_buffer_proportion, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI, bombycid_mordellid_sum, COI_corr, Concentration_ng_per_ul, Sample_volume_ul, x.260_280_ratio, sample, ArcDyn_Plate_name, EI_Plate_name, well, Sample_alias, pathname, pathname_genomecov, Full_name_of_the_sample)
+idx_meta_genomecov_EF <- idx_meta_genomecov_EF %>% dplyr::select(Date:mitogenome, mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, mean_coverage, stddev, coefvar, samtools_filter, mt_length, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul, lysis_buffer_proportion, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI, elaterid_mordellid_sum, COI_corr, Concentration_ng_per_ul, Sample_volume_ul, x.260_280_ratio, sample, ArcDyn_Plate_name, EI_Plate_name, well, Sample_alias, pathname, pathname_genomecov, Full_name_of_the_sample)
 
 idx_meta_genomecov_EF$TGAC_barcode <- "NA"  # not in the sample metadata
 
-idx_meta_genomecov_EF$COI_corr_components <- "bombycid_mordellid_sum"
+idx_meta_genomecov_EF$COI_corr_components <- "elaterid_mordellid_sum"
 
 idx_meta_genomecov_EF$EI_Plate_name <- as.character(idx_meta_genomecov_EF$EI_Plate_name)
 
@@ -70,7 +79,10 @@ idx_meta_genomecov_EF$EI_RUN <- "idx_meta_genomecov_EF"
 ```{r load PlatesGH}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesGH")
 
-idx_meta_genomecov_GH <- read_delim("idx_meta_genomecov_PlatesGH_20180211.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+outputfolder <- "GH_outputs_20180214_F2308_f0x2_q60"
+idxmetagenomcovfile <- "idx_meta_genomecov_PlatesGH_20180214.txt"
+
+idx_meta_genomecov_GH <- read_delim(file.path(outputfolder, idxmetagenomcovfile), delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
 idx_meta_genomecov_GH <- idx_meta_genomecov_GH %>% dplyr::rename(Concentration_ng_per_ul="Concentration_ng_ul")
 idx_meta_genomecov_GH <- idx_meta_genomecov_GH %>% dplyr::rename(ArcDyn_Plate_name="Plate")
@@ -134,7 +146,7 @@ names(idx_meta_genomecov_ABA2B2EFGH)
 ```
 
 
-```{r make wide table}
+```{r make wide tables}
 # create variable from Date, Trap(ABC), and EI_RUN:  e.g. Date_1997_08_04_TrapA_AB
 # stringr::str_pad(x, width = 2, side = "left", pad = "0")  # to ensure that the date always has two digits, e.g. 07.
 # stringr::str_replace(idx_meta_genomecov_ABA2B2EFGH$EI_RUN, "idx_meta_genomecov_", "") # to extract AB, A2B2, EF, GH from EI_RUN
@@ -150,10 +162,24 @@ idx_meta_genomecov_ABA2B2EFGH_wide <- idx_meta_genomecov_ABA2B2EFGH %>% dplyr::s
 ```{r write tables, eval=FALSE}
 # idx_meta-genomecov long table for Otso, 110057 rows, 36 columns
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesABA2B2EFGH")
-write_tsv(idx_meta_genomecov_ABA2B2EFGH, "idx_meta_genomecov_ABA2B2EFGH_20180211.txt")
+# write_tsv(idx_meta_genomecov_ABA2B2EFGH, "idx_meta_genomecov_ABA2B2EFGH_20180214.txt")
 
 # idx_meta-genomecov wide table for visualisation:  157 rows, 702 columns
-write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide, "idx_meta_genomecov_ABA2B2EFGH_wide_20180211.txt")
+# write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide, "idx_meta_genomecov_ABA2B2EFGH_wide_20180214.txt")
 ```
 
+```{r Wide PlateAB only}
+# create new column:  DateTrapEIRUN
+# create variable from Date, Trap(ABC), and EI_RUN:  e.g. Date_1997_08_04_TrapA_AB
+# stringr::str_pad(x, width = 2, side = "left", pad = "0")  # to ensure that the date always has two digits, e.g. 07.
+# stringr::str_replace(idx_meta_genomecov_AB$EI_RUN, "idx_meta_genomecov_", "") # to extract AB, A2B2, EF, GH from EI_RUN
+idx_meta_genomecov_AB$DateTrapEIRUN <- str_c("Date", year(idx_meta_genomecov_AB$Date), str_pad(month(idx_meta_genomecov_AB$Date), 2, side = "left", pad = "0"), str_pad(day(idx_meta_genomecov_AB$Date), 2, side = "left", pad = "0"), idx_meta_genomecov_AB$Trap, str_replace(idx_meta_genomecov_AB$EI_RUN, "idx_meta_genomecov_", ""), sep = "_")
+
+# Make wide table for visualisation (left to right should follow temporal order (DateTrapEIRUN))
+idx_meta_genomecov_AB_wide <- idx_meta_genomecov_AB %>% dplyr::select(DateTrapEIRUN, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrapEIRUN) %>% tidyr::spread(DateTrapEIRUN, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
+
+# idx_meta-genomecov wide table for visualisation:  157 rows, 702 columns
+write_tsv(idx_meta_genomecov_AB_wide, "idx_meta_genomecov_AB_wide_20180214.txt")
+
+```
 
