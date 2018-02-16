@@ -33,7 +33,9 @@ library(beepr)
 # library(openxlsx)
 # library(RColorBrewer)
 # 
+```
 
+```{r notify}
 # function to allow macOS system notifications at end of a long command
 notify <- function(msgString='Message from R', titleString='Message from R', speakIt=FALSE) {
     cmd <- paste('terminal-notifier -message ', '"', msgString, '"  -title "', titleString, '"', sep='')
@@ -49,13 +51,28 @@ notify <- function(msgString='Message from R', titleString='Message from R', spe
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/")
 getwd()
 
-idxstatsgenomecovfolder <- "minimap2_all_outputs_PlatesAB"  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+samtoolsfilter <- "F2308"
+samtoolsqual <- "q60"
+
+idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesAB_", samtoolsfilter)  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+
+# use this version for COI_barcodes mapping
+# idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesAB_", samtoolsfilter, "_COIBarcodesOnly")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+
+idxstatsfile <- paste0("*", samtoolsfilter, "_", samtoolsqual, "_sorted.bam_idxstats\\.txt")  
+    # e.g. "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"
+# choose the filename suffix to match the desired samtools filter. precede with * as a wildcard. \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files() below)
+
+genomecovfile <- paste0("*", samtoolsfilter, "_", samtoolsqual, "_sorted_genomecov_d\\.txt\\.gz")  
+    # e.g. ""*F2308_f0x2_q1_sorted_genomecov_d\\.txt\\.gz""
+# choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_).      
 
 samplemetadatafolder <- "~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/sample_tracking"  # this is the enclosing folder around the sample metadata spreadsheet, which i will place on hpc
 
 samplemetadatafilename <- "Samples_for_sequencing_at_TGAC_Zackenberg_bulk_samples_April_2016_20160512.xlsx"
 
 lysisbufferfilename <- "lysis_buffer_volumes_PlatesAB_A2B2_20180208.xlsx"  # this is based on Yinqiu's lysis buffer datasheet, which i edited a bit to make the sample names consistent so that tables could be joined via "Short_name_of_the_sample".  Also, i replaced missing data or cells with notes with NA
+
 ```
 
 Read in all idx_stats files, add metadata to columns, and merge into one big table in long format (vertically by time)
@@ -64,13 +81,12 @@ Read in all idx_stats files, add metadata to columns, and merge into one big tab
 # use this command if i have a particular folder2 value (e.g. BWA02) to pull from
 # idx_files <- list.files(file.path(idxstatsgenomecovfolder, folder2), pattern = "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt")
 
-# idxstatsfile <- "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"  # choose the filename suffix to match the desired samtools filter. precede with * as a wildcard. \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files() below)
-
-idxstatsfile <- "*F2308_q1_sorted.bam_idxstats\\.txt"  # choose the filename suffix to match the desired samtools filter. precede with * as a wildcard. \\ is used to escape the . before txt (because it is read with grep as "any character" in list.files() below)
+cat("idxstatsgenomecoverfolder is: ", idxstatsgenomecovfolder)
+cat("idxstatsfile search pattern is: ", idxstatsfile)
 
 # idx_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder, "BWA??", folder2)), pattern = idxstatsfile, full.names = TRUE) # old version
 idx_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder)), pattern = idxstatsfile, full.names = TRUE)
-head(idx_files)
+head(idx_files); cat("    ", length(idx_files), "total files")
     # Sys.glob is used to generate:  [1] "idxstats_files/BWA01" "idxstats_files/BWA02"
     # list.files is used to look in those folders for files matching "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"
     # full.names = TRUE is used to return the pathnames
@@ -209,10 +225,10 @@ idx_meta %>% distinct(Full_name_of_the_sample) %>% arrange(Full_name_of_the_samp
 ```{r 4. read in genomecov_d.txt.gz files and add to idx_meta}
 # genomecovfile <- "*F2308_f0x2_q1_sorted_genomecov_d\\.txt\\.gz"  # choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_)
 
-genomecovfile <- "*F2308_q1_sorted_genomecov_d\\.txt\\.gz"  # choose the filename pattern to match the desired samtools filter. precede with * as a wildcard for the sample names (e.g. Sample_IPO3916_A10_)
+cat("Pattern search is for: ", genomecovfile)
 
 genomecov_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder)), pattern = genomecovfile, full.names = TRUE)
-head(genomecov_files)
+head(genomecov_files); cat("    ", length(genomecov_files), "total files")
     # Sys.glob is used to generate:  
         # [1] "minimap2_all_outputs_PlatesAB/Sample_IPO3916_A1_F2308_f0x2_q1_sorted_genomecov_d.txt.gz"
     # list.files is used to look in those folders for files matching "*F2308_f0x2_q1_sorted_genomecov_d\\.txt\\.gz"
@@ -263,10 +279,9 @@ genomecoverages_summ <- purrr::map(genomecov_files, loadFile2); notify("Your loa
 
 # rbind the list into a dataframe
 genomecoverages_summ <- do.call(rbind, genomecoverages_summ)
-
 # save this file to avoid having to constantly run the map() step
-# saveRDS(genomecoverages_summ, "genomecoverages_summ_20180211.RDS", compress = TRUE)
-# genomecoverages_summ <- readRDS("genomecoverages_summ_20180211.RDS")
+# saveRDS(genomecoverages_summ, "genomecoverages_summ_20180214_F2308_f0x2_q60.RDS", compress = TRUE)
+# genomecoverages_summ <- readRDS("genomecoverages_summ_20180214_F2308_f0x2_q60.RDS")
 
 # left_join genomecoverages_summ to idx_meta
 idx_meta_genomecov <- left_join(idx_meta, genomecoverages_summ) # R message:  Joining, by = c("mitogenome", "sample", "well", "samtools_filter")
@@ -399,7 +414,7 @@ par(mfrow=c(1,1))
 
 # filter out samples with elaterid_mordellid_sum < 9 000 000 to begin with
 
-sample_names <- sum_idx_meta_genomecov %>% dplyr::filter(elaterid_mordellid_sum < 9000000) %>% dplyr::select(Full_name_of_the_sample)
+sample_names <- sum_idx_meta_genomecov %>% dplyr::filter(elaterid_mordellid_sum < 20000000) %>% dplyr::select(Full_name_of_the_sample)
 samples_to_remove <- sample_names %>% dplyr::pull(Full_name_of_the_sample) # pull out a single variable
 samples_to_remove # 1 sample to remove
 idx_meta_genomecov <- idx_meta_genomecov %>% filter(!Full_name_of_the_sample %in% samples_to_remove) # 29987 + 157 = 30144
@@ -463,6 +478,9 @@ names(idx_meta_genomecov)
 # stringr::str_pad(x, width = 2, side = "left", pad = "0")  # to ensure that the date always has two digits, e.g. 07.
 idx_meta_genomecov$DateTrap <- str_c("Date", year(idx_meta_genomecov$Date), str_pad(month(idx_meta_genomecov$Date), 2, side = "left", pad = "0"), str_pad(day(idx_meta_genomecov$Date), 2, side = "left", pad = "0"), idx_meta_genomecov$Trap, sep = "_")
 
+# in coefvar column, replace "NaN" string to "NA" and then coerce column back to numeric
+idx_meta_genomecov$coefvar <- idx_meta_genomecov$coefvar %>%  str_replace("NaN", "NA") %>% as.numeric()
+
 # these tables check that i only have one row for each Full_name_of_the_sample, DateTrap, and pathname
 # ideally, there should be a 1 in all rows of column "n"
 idxstats_by_Full_name_of_the_sample <- idx_meta_genomecov %>% dplyr::group_by(Full_name_of_the_sample) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n)); View(idxstats_by_Full_name_of_the_sample)
@@ -475,18 +493,36 @@ idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dpl
 # i originally found that TrapC_2013_Jul_22 occurred once for week 30 and once for week 29.  I checked the original Excel worksheet and found that 2013JUL22_Art3_TrapC_Wk29 should be 2013JUL15_Art3_TrapC_Wk29.  Thus, the TrapC_2013_Jul_22/week29 combination shouldn't exist.  I have fixed the Excel file.
 
 
-# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesAB_20180211.txt") # so if i need to read in a file during debuggging, here it is
+# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesAB_20180214.txt") # so if i need to read in a file during debuggging, here it is
 # used for debugging, in case i screw up the dataset while writing code
-# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesAB_20180211.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesAB_20180214.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+# if i need to read from a folder
+# # idx_meta_genomecov <- read_delim("AB_outputs_20180214_F2308_f0x2_q60/idx_meta_genomecov_PlatesAB_20180214.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 ```
 
 Make wide table for visualisation
 ```{r}
 # Make wide table for visualisation (left to right should follow temporal order (DateTrap))
+# mapped_reads_COI_lysis_corr
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save table
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesAB_20180211.txt")
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesAB_20180214.txt")
+
+hist(idx_meta_genomecov$coefvar, breaks = 2000, xlim = c(0.0000, 5)) # reasonable cutoff at 2.0? 3.0?
+# set a minimum value of coefvar, above which read numbers are set to -
+coefvarmin <- 4.0
+idx_meta_genomecov$mapped_reads_COI_lysis_corr_coefvarmin <- ifelse(idx_meta_genomecov$coefvar <= coefvarmin, idx_meta_genomecov$mapped_reads_COI_lysis_corr, 0)
+# change column order
+idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::select(Date:mapped_reads_COI_lysis_corr, mapped_reads_COI_lysis_corr_coefvarmin, mean_coverage:DateTrap)
+# replace NA values with 0s
+idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate_at(vars(mapped_reads_COI_lysis_corr_coefvarmin), funs(replace(., is.na(.), 0))) # the . stands in for the variables that are being assessed
+
+# mapped_reads_COI_lysis_corr_coefvarmin # set read number = 0 if coefvar > coefvarmin (e.g. 1.8)
+idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr_coefvarmin) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr_coefvarmin) %>% dplyr::arrange(mitogenome)
+
+# uncomment to save table
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide_PlatesAB_20180214.txt")
 ```
 
 ```{r, eval=FALSE}
