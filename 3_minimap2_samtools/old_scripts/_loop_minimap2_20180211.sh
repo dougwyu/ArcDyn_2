@@ -84,6 +84,7 @@ then
 fi
 
 # read in folder list and make a bash array
+# for Plates E and F, the folders are called Plate{E,F}*, so i need to change "Sample_*" to "Plate*"
 find * -maxdepth 0 -type d -name "Sample_*" > folderlist.txt  # find all folders (-type d) starting with "Sample*"
 sample_info=folderlist.txt # put folderlist.txt into variable
 sample_names=($(cut -f 1 "$sample_info" | uniq)) # convert variable to array this way
@@ -115,7 +116,7 @@ do
 
      echo "**** start of minimap2"
      #### minimap2 ####
-     # minimap2 using preset for Illumina PE reads and samtools keep only proper pairs
+     # minimap2 using preset for Illumina PE reads -x sr and output sam file -a | pipe to samtools sort and output bam file
      # minimap2 -ax sr ref.fa read1.fq read2.fq > aln.sam     # paired-end alignment
 
      # against 157 mitogenomes and 3 COI_spike barcodes
@@ -125,6 +126,7 @@ do
      minimap2 -ax sr ~/greenland_2017/CO1_1sequence_perBIN_040915_COIspiking.fas ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
      echo "**** end of minimap2"
 
+     # index and calculate flagstats
      samtools index ${sample}_sorted.bam # creates ${sample}_sorted.bam.bai file
      samtools flagstat ${sample}_sorted.bam > ${sample}_sorted.bam.flagstat.txt # basic stats
 
