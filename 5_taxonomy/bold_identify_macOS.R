@@ -14,7 +14,7 @@ testseqsall <- read.fasta(file = "CO1_1sequence_perBIN_040915_COIspiking.fas", s
 #### bold_identify all sequences at once
 # testseqsallbold <- bold_identify(testseqsall, db = "COX1")
 
-#### bold_identify one sequence at a time (for large files that take a long time and might crash halfway. this saves the output of each sequence)
+#### bold_identify one sequence at a time (for large files that take a long time and might crash partway, this saves the output of each sequence)
 testseqsallbold <- vector('list')
 for (i in 1:length(testseqsall)) {
     print(i)
@@ -22,9 +22,11 @@ for (i in 1:length(testseqsall)) {
     testseqsallbold <- c(testseqsallbold, boldoutput)
 }
 
-testseqsallbold <- testseqsallbold[!sapply(testseqsallbold, is.null)] # to remove any null elements
+#### to remove any null elements
+#### WATCH IF list size gets smaller 
+testseqsallbold <- testseqsallbold[!sapply(testseqsallbold, is.null)] 
 
-#### add parent taxa to output, wide format
+#### add parent taxa to output, wide format (another call to BOLD, but faster)
 testseqsallbold_parents <- bold_identify_parents(testseqsallbold, wide = TRUE)
 
 #### convert list to dataframe
