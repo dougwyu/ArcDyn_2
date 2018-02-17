@@ -10,9 +10,9 @@ set -o pipefail
 
 # upload the new samtools bsub file from macOS
 # run in macOS, not hpc
-scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_minimap2_samtools/loop_samtools_only_20180210.bsub b042@hpc.uea.ac.uk:~/greenland_2017/platesA2B2/platesA2B2_combined/
+scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_minimap2_samtools/loop_minimap2_only_20180216.bsub b042@hpc.uea.ac.uk:~/greenland_2017/platesA2B2/platesA2B2_combined/
 
-scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_minimap2_samtools/_loop_samtools_only_20180210.sh b042@hpc.uea.ac.uk:~/greenland_2017/platesA2B2/platesA2B2_combined/
+scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_minimap2_samtools/_loop_minimap2_only_20180216.sh b042@hpc.uea.ac.uk:~/greenland_2017/platesA2B2/platesA2B2_combined/
 
 ############# launch minimap2 scripts #############
 ssh hpc

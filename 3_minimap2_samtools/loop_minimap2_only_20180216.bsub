@@ -25,4 +25,4 @@ PATH=$PATH:~/scripts/minimap2/  # made 22 Jan 2018 from github 2.7-r659-dirty
 PATH=$PATH:~/scripts/bedtools2/bin # made 22 Jan 2018 from github 2.27.1
 
 
-bash _loop_minimap2_only_20180216.bsub
+bash _loop_minimap2_only_20180216.sh
