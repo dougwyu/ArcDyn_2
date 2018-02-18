@@ -305,7 +305,7 @@ genomecoverages_summ <- purrr::map(genomecov_files, loadFile2); notify("Your loa
 genomecoverages_summ <- do.call(rbind, genomecoverages_summ)
 # save this file to avoid having to constantly run the map() step
 # saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesGH_20180214.RDS", compress = TRUE)
-# genomecoverages_summ <- readRDS("genomecoverages_summ_PlatesGH_20180214.RDS")
+# genomecoverages_summ <- readRDS("GH_outputs_20180214_F2308_f0x2_q60/genomecoverages_summ_PlatesGH_20180214.RDS")
 # 
 
 # left_join genomecoverages_summ to idx_meta
@@ -344,11 +344,11 @@ COI_spike_reads %>% distinct(Short_name_of_the_sample) %>% arrange(Short_name_of
 COI_spike_reads_wide <- COI_spike_reads %>% dplyr::select(sample, Short_name_of_the_sample, mitogenome, mapped_reads) %>%  tidyr::spread(mitogenome, mapped_reads) %>% dplyr::arrange(Short_name_of_the_sample)
 
 # rename columns to remove numbers from in front
-COI_spike_reads_wide <- COI_spike_reads_wide %>% rename(Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI="1-2_Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI")
+COI_spike_reads_wide <- COI_spike_reads_wide %>% dplyr::rename(Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI="1-2_Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI")
 
-COI_spike_reads_wide <- COI_spike_reads_wide %>% rename(Coleoptera_Elateridae_40ng_COI="2-1_Coleoptera_Elateridae_40ng_COI")
+COI_spike_reads_wide <- COI_spike_reads_wide %>% dplyr::rename(Coleoptera_Elateridae_40ng_COI="2-1_Coleoptera_Elateridae_40ng_COI")
 
-COI_spike_reads_wide <- COI_spike_reads_wide %>% rename(Coleoptera_Mordellidae_20ng_COI="3-1_Coleoptera_Mordellidae_20ng_COI")
+COI_spike_reads_wide <- COI_spike_reads_wide %>% dplyr::rename(Coleoptera_Mordellidae_20ng_COI="3-1_Coleoptera_Mordellidae_20ng_COI")
 
 # left_join COI_spike_reads_wide to idx_meta_genomecov
 idx_meta_genomecov <- left_join(idx_meta_genomecov, COI_spike_reads_wide) # R message:  Joining, by = c("Short_name_of_the_sample", "sample")
@@ -423,7 +423,7 @@ samples_to_remove # 5 samples to remove including ME50_1
 idx_meta_genomecov <- idx_meta_genomecov %>% filter(!Short_name_of_the_sample %in% samples_to_remove) # 29045 obs
 
 # sanity check:  185 samples, which is correct since i removed 5 samples
-idx_meta_genomecov %>% distinct(Short_name_of_the_sample) %>% count()  # number of distinct values of Full_name_of_the_sample
+idx_meta_genomecov %>% distinct(Short_name_of_the_sample) %>% dplyr::count()  # number of distinct values of Full_name_of_the_sample
 ```
 
 
