@@ -77,4 +77,5 @@ echo "There are" ${#sample_names[@]} "folders that will be processed." # echo nu
 
 # this is the parallel version, successfully tested on 20180203 in platesGH/platesGH_combined/
 cd "${HOMEFOLDER}" || exit
-parallel "echo Now on species {1} of ${#sample_names[@]}; fastqc {1}/*.fastq.gz" ::: "${sample_names[@]}"
+parallel --progress "echo Now on species {1} of ${#sample_names[@]}; fastqc {1}/*.fq.gz" ::: "${sample_names[@]}"
+# originally fastq.gz, but now that i have left behind only the trimmed versions, the filenames end in fq.gz

@@ -12,4 +12,4 @@
 module purge
 module load java
 
-bash _loop_fastQC_20180202.sh
+bash _loop_fastQC_20180219.sh
