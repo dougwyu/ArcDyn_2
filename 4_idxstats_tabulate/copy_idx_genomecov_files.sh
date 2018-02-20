@@ -25,8 +25,8 @@ PLATE="AB"
 WORKINGPATH="$HOME/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/"
 cd ${WORKINGPATH}
 ls
-mkdir minimap2_all_outputs_Plates${PLATE}/; ls # rm -rf minimap2_all_outputs/
-ls
+mkdir minimap2_all_outputs_Plates${PLATE}/
+ls # rm -rf minimap2_all_outputs/
 ls minimap2_all_outputs_Plates${PLATE}/
 # then run the generic code below
 
@@ -67,18 +67,20 @@ ls minimap2_all_outputs_Plates${PLATE}/
 # FILTER="F2308" # this is what i used for the samtools-to-COIbarcode seqs
 echo $FILTER
 echo $PLATE # check that i'm going to the right folder
+QUAL1=""; echo $QUAL1 # set to "" if i don't want to use this variable for, say, q1
+QUAL2=48; echo $QUAL2
 # e.g. Sample_IPO3916_C5_F2308_f0x2_q60_sorted.bam_idxstats.txt
-parallel ls -l BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted.bam_idxstats.txt ::: 1 60
-parallel ls BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted.bam_idxstats.txt ::: 1 60 | wc -l # 384 = 2 X 192
-parallel cp BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted.bam_idxstats.txt minimap2_all_outputs_Plates${PLATE}/ ::: 1 60
+parallel ls -l BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted.bam_idxstats.txt ::: ${QUAL1} ${QUAL2}
+parallel ls BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted.bam_idxstats.txt ::: ${QUAL1} ${QUAL2} | wc -l # 384 = 2 X 192
+parallel cp BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted.bam_idxstats.txt minimap2_all_outputs_Plates${PLATE}/ ::: ${QUAL1} ${QUAL2}
 ls minimap2_all_outputs_Plates${PLATE}/*_${FILTER}_q*_sorted.bam_idxstats.txt | wc -l # 384 = 2 X 192
 ls minimap2_all_outputs_Plates${PLATE}
 
 # e.g. Sample_IPO3916_C5_F2308_f0x2_q1_sorted_genomecov_d.txt.gz
-parallel ls -l BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted_genomecov_d.txt.gz ::: 1 60
-parallel ls -l BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted_genomecov_d.txt.gz ::: 1 60 | wc -l # 384 = 2 X 192
-parallel cp BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted_genomecov_d.txt.gz minimap2_all_outputs_Plates${PLATE}/ ::: 1 60
-parallel ls minimap2_all_outputs_Plates${PLATE}/*_${FILTER}_q{}_sorted_genomecov_d.txt.gz ::: 1 60 | wc -l # 384 = 2 X 192
+parallel ls -l BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted_genomecov_d.txt.gz ::: ${QUAL1} ${QUAL2}
+parallel ls -l BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted_genomecov_d.txt.gz ::: ${QUAL1} ${QUAL2} | wc -l # 384 = 2 X 192
+parallel cp BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted_genomecov_d.txt.gz minimap2_all_outputs_Plates${PLATE}/ ::: ${QUAL1} ${QUAL2}
+parallel ls minimap2_all_outputs_Plates${PLATE}/*_${FILTER}_q{}_sorted_genomecov_d.txt.gz ::: ${QUAL1} ${QUAL2} | wc -l # 384 = 2 X 192
 ls minimap2_all_outputs_Plates${PLATE}
 
 du -sh minimap2_all_outputs_Plates${PLATE}/ # ~1.1 GB
