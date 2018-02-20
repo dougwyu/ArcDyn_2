@@ -1,0 +1,50 @@
+- This file records notes about what i have done with the ArcDyn files, and also lists to dos
+To dos:
+	- download B2 files and upload to S3 Glacier for long-term storage
+	- list which samples produced 0 data, check against the library QC information, and see if any are legitimately missing or i can ask EI to resupply
+	- re-run minimap2 and samtools
+		- using minimap2 version 2.8, a lower mapping quality (-q 48), based on information from histograms of mapping qualities from two paf files (PlateH D10 & D11).
+		- idxstats.R should use new  GH metadata file (has month and date now)
+	- bwa or bowtie2 against mitogenomes and barcodes and compare
+		- http://homer.ucsd.edu/homer/basicTutorial/mapping.html
+		- bwa index -a bwtsw genome.fa # build index.  What is bwtsw?
+		- bwa mem -t $NPROC genome.fa reads1.fq reads2.fq | samtools view -F 0x4 -b | samtools sort > aln-pe.bam # 
+	- Pardosa glacialis missing from mock samples.  WHY?  @flag
+		- extract Pardosa-mapped reads from a bam file (htsbox bam2fq?)  that has lots of Pardosa in it and use those to map against the mock samples
+	- 16S and 12S genes for phylogeny of mitogenomes to Tea
+	- ArcDyn:  genes and primers for the non-mitogenome species @flag
+	- ArcDyn:  set up a database versioning system for Tea and Yinqiu
+Records:
+	- A2B2 missing files
+		- situation as of 20180219
+			- 16 samples are still running on lane 11
+			- 8 samples produced no data but were included in the already-run 10 lanes and thus produced no fastq files
+			- 168 samples successfully produced at least some data
+			- 16+9+168 = 192 samples
+			- of the 168 samples, 15 of the samples produced such little data that they are being omitted at the R stage
+			- of the 24 samples that produced zero (n=8) or little (n=16) data, it might be the case the PlatesAB produced data for those samples. This appears to be the list of omitted samples
+				[1] "1997AUG20_Art3_TrapA_Wk34" "1997JUL08_Art3_TrapA_Wk28" "2011JUL14_Art3_TrapC_Wk28" "2012AUG19_Art3_TrapA_Wk33"
+				[5] "2013AUG26_Art3_TrapA_Wk35" "2013JUL09_Art3_TrapB_Wk28" "1997AUG05_Art3_TrapC_Wk32" "2013AUG26_Art3_TrapB_Wk35"
+				[9] "1998JUL29_Art3_TrapC_Wk31" "1999AUG26_Art3_TrapA_Wk34" "2011JUL08_Art3_TrapB_Wk27" "2011JUL22_Art3_TrapC_Wk29"
+				[13] "2011AUG25_Art3_TrapA_Wk34" "1999JUL29_Art3_TrapC_Wk30" "2011JUL01_Art3_TrapA_Wk26" "2013JUN17_Art3_TrapB_Wk25"
+				[17] "2012SEP02_Art3_TrapB_Wk35" "2011AUG16_Art3_TrapA_Wk33" "2011AUG06_Art3_TrapC_Wk31" "2011AUG06_Art3_TrapB_Wk31"
+				[21] "2013JUL22_Art3_TrapC_Wk30" "2012AUG19_Art3_TrapB_Wk33" "2013JUL29_Art3_TrapC_Wk31" "1997JUL08_Art3_TrapC_Wk28"
+			- information analysed in:  2017/bulk_samples/platesA2B2/ENQ-1643_PIP-1744_PSEQ-1600_and_PSEQ-1618_datasum_23.01.18.xlsx
+	- check number of samples in A2B2;  should be 168.  
+		- outcome:  yes.  i downloaded 168 sets of fastq files.  
+	- convert some bam files to paf format to look at distribution of mapping qualities (https://github.com/lh3/htsbox):  htsbox samview -p in.bam > out.paf.
+		- https://github.com/lh3/miniasm/blob/master/PAF.md # for PAF format
+		- outcome:  60 is indeed the max value, and looking at the histogram of mapping values, i have decided to re-run with -q 48
+	- view the bam files:  mapping to NNNNN's??  
+		- outcome:  this is known as hard masking, and BWA does not map to these parts.  minimap2 also appears to avoid them in the counting of the alignment 
+	- samtools view -F 0x4 removes UNMAP reads, which reduces the file sizes to 1% of main bam. Thus, samtools filter -F 0x4 the minimap2 outputs
+		- outcome:  re-running minimap2 to reduce size of files. filtered through minimap2_COIBarcodes only sam files to remove unmapped. These unmapped reads are just a copy of the reads in the fq files
+	- run R code on AB, A2B2, GH, and EF and compare with Yinqiu's results and also the COI spike and the positive controls
+		- download samtools outputs for minimap2 to mitogenomes for q60 (F2308_f0x2_q60)
+		- finish running minimap2 and samtools scripts:  download PlatesEF samtools outputs for minimap2 to barcode COIs
+		- save folders with the bamfiles and samtools outputs for minimap2 to barcode COIs
+		- analyse minimap2 against mitogenomes for F2308 f0x2 q60
+		- analyse minimap2 against barcodes_only for F2308, q1 and q60
+		- re-run minimap2 against mitogenomes to re-generate the bam files?  benefit is that i can then run further samtools at any time. cost is storage space
+		- outcome:  i have successfully produced output files for Otso.  now the job is to refine and solve the pardosa problem
+Archive:
