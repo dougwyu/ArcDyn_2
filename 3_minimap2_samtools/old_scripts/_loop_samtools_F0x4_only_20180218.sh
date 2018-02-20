@@ -4,7 +4,7 @@ set -u
 set -o pipefail
 #######################################################################################
 #######################################################################################
-# an interactive shell script to loop through a set of bam files and run samtools to remove unmapped reads
+# an interactive shell script to run samtools to remove unmapped reads from bam files 
 #######################################################################################
 #######################################################################################
 
