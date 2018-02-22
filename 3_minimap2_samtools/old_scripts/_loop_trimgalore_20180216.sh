@@ -84,30 +84,38 @@ sample_names=($(cut -f 1 "$sample_info" | uniq)) # convert variable to array thi
 # echo "${sample_names[@]}" # echo all array elements
 echo "There are" ${#sample_names[@]} "folders that will be processed." # echo number of elements in the array
 
-for sample in "${sample_names[@]}"  # ${sample_names[@]} is the full bash array
-do
-     cd "${HOMEFOLDER}" || exit # cd back outside the sample folder
-     echo "Now on Sample" ${INDEX} of ${#sample_names[@]}
-     INDEX=$((INDEX+1))
-     # pwd
-     FOLDER="${sample}" # this sets the folder name to the value in the bash array (which is a list of the sample folders)
 
-     echo "**** Working folder is" $FOLDER
-
-     #### use trim galore to remove illumina adapters ####
-     cd ${FOLDER} || exit # cd into a sample folder, where i will find the fastq files
-     echo "**** start of adaptor trimming"
-     # trim_galore --paired ${sample}_R1.fastq.gz ${sample}_R2.fastq.gz
-     # using more stringent version, --length 100 = remove pair if either read ≤ 100 bp (default 20)
-     trim_galore --paired --length 100 --trim-n ${sample}_R1.fastq.gz ${sample}_R2.fastq.gz
-     echo "**** end of adaptor trimming"
-
-     echo "Moving to next sample file."
-done
+Sample_PRO1322_PlateB_H10/PRO1322_PlateB_H10_ATAATGATA-TATCAT_L003_R2.fastq.gz
+Sample_PRO1322_PlateB_H10/PRO1322_PlateB_H10_ATAATGATA-TATCAT_L003_R1.fastq.gz
 
 # possible GNU PARALLEL version, since trim galore only uses one cpu per job
 # needs to be tested.  use instead of the whole loop above
-# parallel trim_galore --paired --length 100 --trim-n {}/{}_R1.fastq.gz {}/{}_R2.fastq.gz ::: "${sample_names[@]}"
+
+parallel --progress "echo Now on species {1} of ${#sample_names[@]}; trim_galore --paired --length 100 -trim-n {1}/*_R1.fastq.gz {1}/*_R2.fastq.gz" ::: "${sample_names[@]}"
+# for lane 11 of PlatesA2B2, i run on the original downloaded files
+
+
+
+# for sample in "${sample_names[@]}"  # ${sample_names[@]} is the full bash array
+# do
+#      cd "${HOMEFOLDER}" || exit # cd back outside the sample folder
+#      echo "Now on Sample" ${INDEX} of ${#sample_names[@]}
+#      INDEX=$((INDEX+1))
+#      # pwd
+#      FOLDER="${sample}" # this sets the folder name to the value in the bash array (which is a list of the sample folders)
+#
+#      echo "**** Working folder is" $FOLDER
+#
+#      #### use trim galore to remove illumina adapters ####
+#      cd ${FOLDER} || exit # cd into a sample folder, where i will find the fastq files
+#      echo "**** start of adaptor trimming"
+#      # trim_galore --paired ${sample}_R1.fastq.gz ${sample}_R2.fastq.gz
+#      # using more stringent version, --length 100 = remove pair if either read ≤ 100 bp (default 20)
+#      trim_galore --paired --length 100 --trim-n ${sample}_R1.fastq.gz ${sample}_R2.fastq.gz
+#      echo "**** end of adaptor trimming"
+#
+#      echo "Moving to next sample file."
+# done
 
 # mv folderlist.txt minimap2_outputs/
 
