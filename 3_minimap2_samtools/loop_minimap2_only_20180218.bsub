@@ -1,5 +1,5 @@
 #!/bin/sh
-#BSUB -q short-ib     #long-ib & mellanox-ib (168 hours = 7 days), short-ib (24 hours)
+#BSUB -q mellanox-ib     #long-ib & mellanox-ib (168 hours = 7 days), short-ib (24 hours)
 #BSUB -J mnmploop01
 #BSUB -oo mnmploop01.out
 #BSUB -eo mnmploop01.err
