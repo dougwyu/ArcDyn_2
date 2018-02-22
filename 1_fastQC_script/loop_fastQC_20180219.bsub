@@ -11,5 +11,8 @@
 . /etc/profile
 module purge
 module load java
+module add python/anaconda/4.2/3.5  # multiqc is now in the path
 
 bash _loop_fastQC_20180219.sh
+
+multiqc .  # this analyses the current directory and all subdirectories.

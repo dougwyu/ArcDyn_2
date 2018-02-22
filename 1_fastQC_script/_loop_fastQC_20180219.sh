@@ -12,7 +12,7 @@ set -o pipefail
 
 # Interactive procedure:  run these commands before running _loop_fastqc_20180202.sh interactively
 # interactive
-# module load java/jdk1.8.0_51
+module load java/jdk1.8.0_51
 # upload _loop_fastqc_20180202.sh into enclosing folder (e.g. greenland_2016/platesAB_Earlham_soups/)
 
 # Batch procedure:  bsub script and submit to long-lm queue
@@ -60,6 +60,14 @@ sample_names=($(cut -f 1 "$sample_info" | sort | uniq)) # convert variable to ar
 # echo ${sample_names[@]} # echo all array elements
 echo "There are" ${#sample_names[@]} "folders that will be processed." # echo number of elements in the array
 
+# this is the parallel version, successfully tested on 20180203 in platesGH/platesGH_combined/
+cd "${HOMEFOLDER}" || exit
+# parallel --progress "echo Now on species {1} of ${#sample_names[@]}; fastqc {1}/*.fq.gz" ::: "${sample_names[@]}"
+# originally fastq.gz, but now that i have left behind only the trimmed versions, the filenames end in fq.gz
+
+parallel --progress "echo Now on species {1} of ${#sample_names[@]}; fastqc {1}/*.fq.gz" ::: "${sample_names[@]}"
+# for lane 11 of PlatesA2B2, i run on the original downloaded files
+
 # this is the loop version, tested and working
 # for sample in "${sample_names[@]}"  # ${sample_names[@]} is the full bash array
 # do
@@ -73,9 +81,3 @@ echo "There are" ${#sample_names[@]} "folders that will be processed." # echo nu
 #
 # 	fastqc *.fastq.gz
 # done
-
-
-# this is the parallel version, successfully tested on 20180203 in platesGH/platesGH_combined/
-cd "${HOMEFOLDER}" || exit
-parallel --progress "echo Now on species {1} of ${#sample_names[@]}; fastqc {1}/*.fq.gz" ::: "${sample_names[@]}"
-# originally fastq.gz, but now that i have left behind only the trimmed versions, the filenames end in fq.gz
