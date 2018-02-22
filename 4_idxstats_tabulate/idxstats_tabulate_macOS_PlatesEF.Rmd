@@ -54,9 +54,9 @@ setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesEF")
 getwd()
 
 samtoolsfilter <- "F2308"
-samtoolsqual <- "q60"
+samtoolsqual <- "q48"
 
-idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesEF_", samtoolsfilter)  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesEF_", samtoolsfilter, "_", samtoolsqual)  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 
 # use this version for COI_barcodes mapping
 # idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesEF_", samtoolsfilter, "_COIBarcodesOnly")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
@@ -298,8 +298,8 @@ genomecoverages_summ <- purrr::map(genomecov_files, loadFile2); notify("Your loa
 # rbind the list into a dataframe
 genomecoverages_summ <- do.call(rbind, genomecoverages_summ)
 # save this file to avoid having to constantly run the map() step
-# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesEF_20180214.RDS", compress = TRUE)
-# genomecoverages_summ <- readRDS("EF_outputs_20180214_F2308_f0x2_q60/genomecoverages_summ_PlatesEF_20180214.RDS")
+# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesEF_20180220.RDS", compress = TRUE)
+# genomecoverages_summ <- readRDS("EF_outputs_20180220_F2308_q48/genomecoverages_summ_PlatesEF_20180220.RDS")
 
 
 # left_join genomecoverages_summ to idx_meta
@@ -507,8 +507,8 @@ names(idx_meta_genomecov)
 # save mock soup data
 idx_meta_genomecov %>% distinct(Plot) %>% arrange(Plot) # distinct values of Plot: should be 2
 mocks_idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::filter(!Plot == "Art3")
-# write_tsv(mocks_idx_meta_genomecov, "mocks_idx_meta_genomecov_PlatesEF_20180214.txt") # so if i need to read in a file during debuggging, here it is
-# mocks_idx_meta_genomecov <- read_delim("mocks_idx_meta_genomecov_PlatesEF_20180214.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+# write_tsv(mocks_idx_meta_genomecov, "mocks_idx_meta_genomecov_PlatesEF_20180220.txt") # so if i need to read in a file during debuggging, here it is
+# mocks_idx_meta_genomecov <- read_delim("mocks_idx_meta_genomecov_PlatesEF_20180220.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
 # remove mock soup data from idx_meta_genomecov
 idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::filter(Plot == "Art3")
@@ -531,9 +531,9 @@ idxstats_by_DateTrap <- idx_meta_genomecov %>% dplyr::group_by(DateTrap) %>% dpl
 idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n)); View(idxstats_by_pathname)
 
 
-# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesEF_20180214.txt") # so if i need to read in a file during debuggging, here it is
+# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesEF_20180220.txt") # so if i need to read in a file during debuggging, here it is
 # used for debugging, in case i screw up the dataset while writing code
-# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesEF_20180214.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesEF_20180220.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
 ```
 
@@ -543,7 +543,7 @@ idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dpl
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save tables
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesEF_20180214.txt")
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesEF_20180220.txt")
 
 hist(idx_meta_genomecov$coefvar, breaks = 2000, xlim = c(0.0000, 5)) # reasonable cutoff at 2.0? 3.0?
 # set a minimum value of coefvar, above which read numbers are set to -
@@ -558,7 +558,7 @@ idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate_at(vars(mapped_reads_
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr_coefvarmin) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr_coefvarmin) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save table
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide_PlatesEF_20180214.txt")
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide_PlatesEF_20180220.txt")
 
 
 # Make wide table for visualisation of the mock soups
@@ -569,11 +569,11 @@ mocks_idx_meta_genomecov_coefvar_wide <- mocks_idx_meta_genomecov %>% dplyr::sel
 mocks_idx_meta_genomecov_mapped_reads_wide <- mocks_idx_meta_genomecov %>% dplyr::select(Sample_alias, mitogenome, mapped_reads) %>% dplyr::arrange(Sample_alias) %>% tidyr::spread(Sample_alias, mapped_reads) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save tables (with and without COI_spike_correction)
-# write_tsv(mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide, "mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide_PlatesEF_20180214.txt")
-# 
-# write_tsv(mocks_idx_meta_genomecov_coefvar_wide, "mocks_idx_meta_genomecov_coefvar_wide_PlatesEF_20180214.txt")
-# 
-# write_tsv(mocks_idx_meta_genomecov_mapped_reads_wide, "mocks_idx_meta_genomecov_mapped_reads_wide_PlatesEF_20180214.txt")#
+# write_tsv(mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide, "mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide_PlatesEF_20180220.txt")
+# # 
+# write_tsv(mocks_idx_meta_genomecov_coefvar_wide, "mocks_idx_meta_genomecov_coefvar_wide_PlatesEF_20180220.txt")
+# # 
+# write_tsv(mocks_idx_meta_genomecov_mapped_reads_wide, "mocks_idx_meta_genomecov_mapped_reads_wide_PlatesEF_20180220.txt")#
 ```
 
 ```{r, eval=FALSE}

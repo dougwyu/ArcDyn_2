@@ -16,7 +16,7 @@ PATH=$PATH:~/scripts/parallel-20170722/bin/
 ### CAREFUL:  i have set this up to copy files of only 1 q-score, here, 1.  if i want to copy 1 and 60, i use the GNU parallel code
 # the original samtools output files are still in the BWA* folders
 
-FILTER="F2308_f0x2"
+FILTER="F2308"
 
 ####### cd into different folders and set up output folders to hold everything before running
 ####### the generic copy script below
@@ -89,12 +89,11 @@ ls
 rm -rf minimap2_all_outputs_Plates${PLATE}/
 ls
 
-
 # when i'm on a fast network, i can download using scp, but otherwise, use Transmit
 ### 2016 run:  AB ###
 # on macOS
 # download minimap2_all_outputs_PlatesAB/
-scp b042@hpc.uea.ac.uk:~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/minimap2_all_outputs_PlatesAB.tar.gz  ~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/
+scp b042@hpc.uea.ac.uk:~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/minimap2_all_outputs_Plates${PLATE}_${FILTER}.tar.gz  ~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/
 
 cd /Users/Negorashi2011/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/
 

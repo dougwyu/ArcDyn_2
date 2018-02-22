@@ -52,9 +52,9 @@ setwd("~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_201
 getwd()
 
 samtoolsfilter <- "F2308"
-samtoolsqual <- "q60"
+samtoolsqual <- "q48"
 
-idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesAB_", samtoolsfilter)  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesAB_", samtoolsfilter, "_", samtoolsqual)  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 
 # use this version for COI_barcodes mapping
 # idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesAB_", samtoolsfilter, "_COIBarcodesOnly")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
@@ -280,8 +280,8 @@ genomecoverages_summ <- purrr::map(genomecov_files, loadFile2); notify("Your loa
 # rbind the list into a dataframe
 genomecoverages_summ <- do.call(rbind, genomecoverages_summ)
 # save this file to avoid having to constantly run the map() step
-# saveRDS(genomecoverages_summ, "genomecoverages_summ_20180214_F2308_f0x2_q60.RDS", compress = TRUE)
-# genomecoverages_summ <- readRDS("genomecoverages_summ_20180214_F2308_f0x2_q60.RDS")
+# saveRDS(genomecoverages_summ, "genomecoverages_summ_20180220_F2308_q48.RDS", compress = TRUE)
+# genomecoverages_summ <- readRDS("genomecoverages_summ_20180220_F2308_q48.RDS")
 
 # left_join genomecoverages_summ to idx_meta
 idx_meta_genomecov <- left_join(idx_meta, genomecoverages_summ) # R message:  Joining, by = c("mitogenome", "sample", "well", "samtools_filter")
@@ -414,7 +414,7 @@ par(mfrow=c(1,1))
 
 # filter out samples with elaterid_mordellid_sum < 9 000 000 to begin with
 
-sample_names <- sum_idx_meta_genomecov %>% dplyr::filter(elaterid_mordellid_sum < 20000000) %>% dplyr::select(Full_name_of_the_sample)
+sample_names <- sum_idx_meta_genomecov %>% dplyr::filter(elaterid_mordellid_sum < 9000000) %>% dplyr::select(Full_name_of_the_sample)
 samples_to_remove <- sample_names %>% dplyr::pull(Full_name_of_the_sample) # pull out a single variable
 samples_to_remove # 1 sample to remove
 idx_meta_genomecov <- idx_meta_genomecov %>% filter(!Full_name_of_the_sample %in% samples_to_remove) # 29987 + 157 = 30144
@@ -446,7 +446,7 @@ idx_meta_genomecov$mapped_reads_COI_corr <- round(idx_meta_genomecov$mapped_read
 sum_idx_meta_genomecov2 <- idx_meta_genomecov %>% 
     group_by(Full_name_of_the_sample) %>% 
     summarise_at(vars(mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, elaterid_mordellid_sum), funs(sum(as.numeric(.)))) %>%
-    arrange(mapped_reads)
+    arrange(mapped_reads_COI_lysis_corr)
 
 names(idx_meta_genomecov)
 #  [1] "Date"                                        "Plot"                                       
@@ -493,9 +493,9 @@ idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dpl
 # i originally found that TrapC_2013_Jul_22 occurred once for week 30 and once for week 29.  I checked the original Excel worksheet and found that 2013JUL22_Art3_TrapC_Wk29 should be 2013JUL15_Art3_TrapC_Wk29.  Thus, the TrapC_2013_Jul_22/week29 combination shouldn't exist.  I have fixed the Excel file.
 
 
-# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesAB_20180214.txt") # so if i need to read in a file during debuggging, here it is
+# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesAB_20180220.txt") # so if i need to read in a file during debuggging, here it is
 # used for debugging, in case i screw up the dataset while writing code
-# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesAB_20180214.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesAB_20180220.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 # if i need to read from a folder
 # # idx_meta_genomecov <- read_delim("AB_outputs_20180214_F2308_f0x2_q60/idx_meta_genomecov_PlatesAB_20180214.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 ```
@@ -507,7 +507,7 @@ Make wide table for visualisation
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save table
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesAB_20180214.txt")
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesAB_20180220.txt")
 
 hist(idx_meta_genomecov$coefvar, breaks = 2000, xlim = c(0.0000, 5)) # reasonable cutoff at 2.0? 3.0?
 # set a minimum value of coefvar, above which read numbers are set to -
@@ -522,7 +522,7 @@ idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate_at(vars(mapped_reads_
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr_coefvarmin) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr_coefvarmin) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save table
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide_PlatesAB_20180214.txt")
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide_PlatesAB_20180220.txt")
 ```
 
 ```{r, eval=FALSE}

@@ -26,13 +26,12 @@ library(lubridate)
 library(knitr)
 library(beepr)
 # library(parallel)
-# library(knitr)
 # library(lattice)
 # library(beeswarm)
 # library(sjPlot)
 # library(openxlsx)
 # library(RColorBrewer)
-# 
+#
 
 ```
 
@@ -55,9 +54,9 @@ setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesA2B2")
 getwd()
 
 samtoolsfilter <- "F2308"
-samtoolsqual <- "q60"
+samtoolsqual <- "q48"
 
-idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesA2B2_", samtoolsfilter)  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesA2B2_", samtoolsfilter, "_", samtoolsqual)  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 
 # use this version for COI_barcodes mapping
 # idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesA2B2_", samtoolsfilter, "_COIBarcodesOnly")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
@@ -93,8 +92,8 @@ head(idx_files); cat("    ", length(idx_files), "total files")
     # list.files is used to look in those folders for files matching "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"
     # full.names = TRUE is used to return the pathnames
     # \\ is used to escape the . before txt (because it is read with grep as "any character")
- 
-# column names of idx files 
+
+# column names of idx files
 idx_cols <- c("mitogenome", "mt_length", "mapped_reads", "unmapped_reads")
 
 # function to read_tsv the file and filename and pathname
@@ -182,13 +181,13 @@ samplemetadata$lysis_buffer_proportion <- round(samplemetadata$lysis_buffer_prop
 # later, *multiply* the mapped_reads column by lysis_buffer_proportion to normalise by total amount of lysis buffer used to digest the sample
 ```
 
-The Earlham Institute fastq filenames for PlatesA2B2 are different from PlatesAB. In PlatesA2B2, they use ArcDyn's sample names:  PlatesAB, no longer using EI names, e.g. IPO3916, IP3917.  So i have to do some formatting of the samplemetadata to produce sample names in the format:  PlateA_A1, ... 
+The Earlham Institute fastq filenames for PlatesA2B2 are different from PlatesAB. In PlatesA2B2, they use ArcDyn's sample names:  PlatesAB, no longer using EI names, e.g. IPO3916, IP3917.  So i have to do some formatting of the samplemetadata to produce sample names in the format:  PlateA_A1, ...
 ```{r 3. left_join sample metadata to idx table}
 
 samplemetadata <- samplemetadata %>% rename(EI_sample="sample") # change column name sample to EI_sample.  This column holds the sample name in the format IPO3916_A1.
 
 samplemetadata$sample <- str_c("Plate", substr(samplemetadata$ArcDyn_Plate_name, 1, 1), "_", samplemetadata$well)
-    # substr(samplemetadata$ArcDyn_Plate_name, 1, 1) # extract first character 
+    # substr(samplemetadata$ArcDyn_Plate_name, 1, 1) # extract first character
     # str_c # concatenate multiple strings into a single string
     # alternative for substr is tidyr::str_sub(samplemetadata$ArcDyn_Plate_name, 1, 1)
 
@@ -270,7 +269,7 @@ loadFile2 <- function(x) {
     # extract well number from filename
     # \\w any letter, digit, underscore
     # \\D any non-digit, \\d any digit
-    
+
     df$samtools_filter <- sub("Sample_PRO1322_[\\w]+_(F[\\w]+)_sorted_genomecov_d.txt.gz", "\\1", basename(x), perl=TRUE)
     # extract samtools parameters from filename
 
@@ -292,8 +291,8 @@ genomecoverages_summ <- purrr::map(genomecov_files, loadFile2); notify("Your loa
 # rbind the list into a dataframe
 genomecoverages_summ <- do.call(rbind, genomecoverages_summ)
 # save this file to avoid having to constantly run the map() step
-# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesA2B2_20180214.RDS", compress = TRUE)
-# genomecoverages_summ <- readRDS("genomecoverages_summ_PlatesA2B2_20180214.RDS")
+# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesA2B2_20180220.RDS", compress = TRUE)
+# genomecoverages_summ <- readRDS("genomecoverages_summ_PlatesA2B2_20180220.RDS")
 
 
 # left_join genomecoverages_summ to idx_meta
@@ -378,13 +377,13 @@ rm(sample_names)
 ```
 
 
-Filter out samples that have too-few mapped reads and/or COI_spike reads.  this allows calculation of the best ratio of COI spikes to use.  I'm only doing this so that the wide table doesn't use a too-small COI_spike correction. 
+Filter out samples that have too-few mapped reads and/or COI_spike reads.  this allows calculation of the best ratio of COI spikes to use.  I'm only doing this so that the wide table doesn't use a too-small COI_spike correction.
 ```{r}
 # calculate sum of all COI spike reads for each row
 idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate(COI_spike_sum = Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI + Coleoptera_Elateridae_40ng_COI + Coleoptera_Mordellidae_20ng_COI)
 
-sum_idx_meta_genomecov <- idx_meta_genomecov %>% 
-    group_by(Full_name_of_the_sample) %>% 
+sum_idx_meta_genomecov <- idx_meta_genomecov %>%
+    group_by(Full_name_of_the_sample) %>%
     summarise_at(vars(mapped_reads, COI_spike_sum), funs(sum(as.numeric(.)))) %>%
     arrange(COI_spike_sum)
 sum_idx_meta_genomecov <- sum_idx_meta_genomecov %>%
@@ -413,7 +412,7 @@ idx_meta_genomecov %>% distinct(Full_name_of_the_sample) %>% count()  # number o
 ```
 
 
-Analyse the COI_spike read numbers and choose which reads to use as a correction factor. 
+Analyse the COI_spike read numbers and choose which reads to use as a correction factor.
 ```{r}
 # Calculate the pairwise ratios of the different COI_spike reads
 idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate(ratio_mordellid20_bombyx10=Coleoptera_Mordellidae_20ng_COI/Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI)
@@ -460,8 +459,8 @@ idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::select(Date:mapped_reads, ma
 idx_meta_genomecov$mapped_reads_COI_corr <- round(idx_meta_genomecov$mapped_reads_COI_corr, 2)
 
 # generate summed table again
-sum_idx_meta_genomecov2 <- idx_meta_genomecov %>% 
-    group_by(Full_name_of_the_sample) %>% 
+sum_idx_meta_genomecov2 <- idx_meta_genomecov %>%
+    group_by(Full_name_of_the_sample) %>%
     summarise_at(vars(mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, elaterid_mordellid_sum), funs(sum(as.numeric(.)))) %>%
     arrange(mapped_reads_COI_lysis_corr)
 
@@ -507,10 +506,10 @@ idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dpl
 # i originally found that TrapC_2013_Jul_22 occurred once for week 30 and once for week 29.  I checked the original Excel worksheet and found that 2013JUL22_Art3_TrapC_Wk29 should be 2013JUL15_Art3_TrapC_Wk29.  Thus, the TrapC_2013_Jul_22/week29 combination shouldn't exist.  I have fixed the Excel file.
 
 
-# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesA2B2_20180214.txt") # so if i need to read in a file during debuggging, here it is
+# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesA2B2_20180220.txt") # so if i need to read in a file during debuggging, here it is
 # used for debugging, in case i screw up the dataset while writing code
-# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesA2B2_20180214.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
-# 
+# idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesA2B2_20180220.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+#
 ```
 
 Make wide table for visualisation
@@ -519,7 +518,7 @@ Make wide table for visualisation
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save table
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesA2B2_20180214.txt")
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesA2B2_20180220.txt")
 
 hist(idx_meta_genomecov$coefvar, breaks = 2000, xlim = c(0.0000, 5)) # reasonable cutoff at 2.0? 3.0?
 # set a minimum value of coefvar, above which read numbers are set to -
@@ -534,7 +533,7 @@ idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate_at(vars(mapped_reads_
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr_coefvarmin) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr_coefvarmin) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save table
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide_PlatesA2B2_20180214.txt")
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_coefvarmin_wide_PlatesA2B2_20180220.txt")
 ```
 
 ```{r, eval=FALSE}
