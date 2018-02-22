@@ -1,10 +1,34 @@
 - This file records notes about what i have done with the ArcDyn files, and also lists to dos
 To dos:
+	- go over code in fine detail and see if i can find any bugs:  especially in the table joining steps
 	- download B2 files and upload to S3 Glacier for long-term storage
-	- list which samples produced 0 data, check against the library QC information, and see if any are legitimately missing or i can ask EI to resupply
-	- re-run minimap2 and samtools
-		- using minimap2 version 2.8, a lower mapping quality (-q 48), based on information from histograms of mapping qualities from two paf files (PlateH D10 & D11).
-		- idxstats.R should use new  GH metadata file (has month and date now)
+	- list which samples produced very little or no data, check against the library QC information, and see if any are legitimately missing or i can ask EI to resupply
+		- Darren has sent me library QC information for GH.  look up A2B2, EF:  
+			- LITE update G & H 20171023.rtfd
+					- Plate G 
+						A12
+						B03
+						F07
+						F10
+						D10
+						B10
+						E10
+						B08
+					- Plate H  
+						C08
+						B08
+						F01
+						G03
+						G09
+						C07
+						G06
+						C05
+						B07
+						D05
+						H12
+						G01
+						C02
+						B04
 	- bwa or bowtie2 against mitogenomes and barcodes and compare
 		- http://homer.ucsd.edu/homer/basicTutorial/mapping.html
 		- bwa index -a bwtsw genome.fa # build index.  What is bwtsw?
@@ -14,10 +38,11 @@ To dos:
 	- 16S and 12S genes for phylogeny of mitogenomes to Tea
 	- ArcDyn:  genes and primers for the non-mitogenome species @flag
 	- ArcDyn:  set up a database versioning system for Tea and Yinqiu
+	- make textfile for taxonomy (class, order, family, genus, species) of each mitogenome and join to idx_meta_genomecov
 Records:
 	- A2B2 missing files
 		- situation as of 20180219
-			- 16 samples are still running on lane 11
+			- I think hat 16 samples are still running on lane 11
 			- 8 samples produced no data but were included in the already-run 10 lanes and thus produced no fastq files
 			- 168 samples successfully produced at least some data
 			- 16+9+168 = 192 samples
@@ -40,11 +65,29 @@ Records:
 	- samtools view -F 0x4 removes UNMAP reads, which reduces the file sizes to 1% of main bam. Thus, samtools filter -F 0x4 the minimap2 outputs
 		- outcome:  re-running minimap2 to reduce size of files. filtered through minimap2_COIBarcodes only sam files to remove unmapped. These unmapped reads are just a copy of the reads in the fq files
 	- run R code on AB, A2B2, GH, and EF and compare with Yinqiu's results and also the COI spike and the positive controls
+		- write R code to process the samtools outputs:  idxstats_tabulate
+			-  Read in all idx_stats files, add sample metadata to columns, and merge into one table in long format (vertically by time)
+			-  merge with sample excel workbook to add the sample date information
+			-  go through the genomecov files and calculate the mean and standard deviation of coverage for each mitogenome/sample and add the columns to the idx table
+			-  make wide table using tidyr (the column data format should be DateTrap (e.g. 1998_08_05_TrapA) in temporal order).
+			-  confirm that i have the correct number of samples (compare with number of input files) e.g. PlatesAB only have 176 bam files (answer:  i only initially downloaded 176 bam files for code testing)
+			-  Debug the bug that causes sample to have repeated lines, using a tabulate command to check that I don't have repeated lines.  Answer: re-run the minimap2/samtools/bedtools scripts and redownload the idxstats files.  iit wasn't a bug.  I had put the same idxstats files into multiple BWA folders in my test folders
+			-  create lysis buffer datasets, download idxstats and genomecov data, run R code on Plates AB, A2B2, EF, GH
+		-  platesGH:  combine_fastq, fastQC, multiqc (using PKG-ENQ-2379-Data_Transfer-PSEQ-1586-trimmed), remove orig fastq.gz files.  
+		- remove original, noncombined fastq.gz files from A2B2 and GH when i'm done mapping and checking.
+		-  platesA2B2: combine_fastq, fastQC, multiqc, remove orig fastq.gz files
+		-  minimap2/samtools for platesGH
+		-  minimap2/samtools for platesA2B2
 		- download samtools outputs for minimap2 to mitogenomes for q60 (F2308_f0x2_q60)
 		- finish running minimap2 and samtools scripts:  download PlatesEF samtools outputs for minimap2 to barcode COIs
 		- save folders with the bamfiles and samtools outputs for minimap2 to barcode COIs
+		- Compare PlatesAB and A2B2 WITH YINQIU'S BWA_results_20161025.xlsx.  
+		- Compare PlatesGH, PlatesEF with the positive controls, the seasonal patterns, the COI spikes
 		- analyse minimap2 against mitogenomes for F2308 f0x2 q60
 		- analyse minimap2 against barcodes_only for F2308, q1 and q60
 		- re-run minimap2 against mitogenomes to re-generate the bam files?  benefit is that i can then run further samtools at any time. cost is storage space
 		- outcome:  i have successfully produced output files for Otso.  now the job is to refine and solve the pardosa problem
+		- visualise minimap2 bam files and check that i am not mapping to the Ns between the protein-coding genes. SHOULD I SUBTRACT A FIXED NUMBER FROM EACH MITOGENOME LENGTH TO CALCULATE THE CORRECT LENGTH OF THE CODING PORTION?  
+	- re run minimap2/samtools/bedtools/R pipeline with F2308 q48 and compare with F2308 q60
+		- q48 produces maybe 5-10% more reads and correspondingly more reads for false positives (although the Coef vars for false positives are still high). There is not much benefit nor much cost to using q48.  note that I did not filter for PROPER PAIRS, which should reduce the false positives
 Archive:
