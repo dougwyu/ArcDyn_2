@@ -5,6 +5,7 @@
 #BSUB -eo fastQC.err
 #BSUB -R "rusage[mem=12000]"
 #BSUB -M 12000
+#BSUB -x
 #BSUB -B        #sends email to me when job starts
 #BSUB -N        # sends email to me when job finishes
 
