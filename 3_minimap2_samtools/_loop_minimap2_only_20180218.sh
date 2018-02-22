@@ -83,6 +83,7 @@ then
 fi
 
 # read in folder list and make a bash array
+# run inside each BWA folder
 ##### for Plates E and F, the folders are called Plate{E,F}*, so i need to change "Sample_*" to "Plate*"
 find * -maxdepth 0 -type d -name "Sample_*" > folderlist.txt  # find all folders (-type d) starting with "Sample*"
 sample_info=folderlist.txt # put folderlist.txt into variable
