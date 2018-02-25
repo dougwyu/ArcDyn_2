@@ -132,6 +132,16 @@ do
      rm -f ${sample}_sorted.bam
      samtools index ${sample}_F0x4_sorted.bam # creates ${sample}_F0x4_sorted.bam.bai file
 
+     # UNTESTED pipeline using tee
+          # program1 input.txt | tee intermediate-file.txt | program2 > results.txt  # tee allows the standard output to be redirected to intermediate-file.txt *and* piped to program2
+
+     # minimap2 -ax sr ~/greenland_2017/reference_seqs/positive_control_19_species_3_COI_spikes.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | \ # minimap2 against 19 positive control species and 3 COI_spike barcodes
+     #      tee samtools flagstat - > ${sample}_sorted.bam.flagstat.txt | \ # run flagstat on the unfiltered bam file and also pass the unfiltered bam file to next step
+     #      samtools view -b -F 0x4 | \ # convert to bam file and filter out unmapped reads
+     #      samtools sort -@27 - -o ${sample}_F0x4_sorted.bam # sort and write file
+     # samtools index ${sample}_F0x4_sorted.bam # next command creates ${sample}_F0x4_sorted.bam.bai file
+
+
      echo "**** moving outputs to minimap2_outputs_19posctrls/"
      mv ${sample}_sorted.bam.flagstat.txt ../minimap2_outputs_19posctrls/
      mv ${sample}_F0x4_sorted.bam.bai ../minimap2_outputs_19posctrls/
