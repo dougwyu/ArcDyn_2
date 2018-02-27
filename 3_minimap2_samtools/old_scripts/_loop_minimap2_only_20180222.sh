@@ -94,7 +94,7 @@ echo "There are" ${#sample_names[@]} "folders that will be processed." # echo nu
 for sample in "${sample_names[@]}"  # ${sample_names[@]} is the full bash array
 do
      cd "${HOMEFOLDER}"
-     echo "Now on Sample" ${INDEX} of ${#sample_names[@]}". Moved back to starting directory:"
+     echo "Now on Sample" ${INDEX} of ${#sample_names[@]}". Moved back to starting directory $(date):"
      INDEX=$((INDEX+1))
      # pwd
      FOLDER="${sample}" # this sets the folder name to the value in the bash array (which is a list of the folders)
@@ -103,13 +103,13 @@ do
 
      mkdir _${sample}_working
 
-     echo "**** copying trimmed fastq.gz files to working folder"
+     echo "**** copying trimmed fastq.gz files to working folder $(date)"
      cp ${FOLDER}/${sample}_R1_val_1.fq.gz "_${sample}_working/"
      cp ${FOLDER}/${sample}_R2_val_2.fq.gz "_${sample}_working/"
-     echo "**** trimmed fastq.gz files moved to working folder"
+     echo "**** trimmed fastq.gz files moved to working folder $(date)"
      cd _${sample}_working; # pwd
 
-     echo "**** start of minimap2"
+     echo "**** start of minimap2, sam to bam conversion, sorting of bam file $(date)"
      #### minimap2 ####
      # minimap2 using preset for Illumina PE reads -x sr and output sam file -a | pipe to samtools sort and output bam file
      # minimap2 -ax sr ref.fa read1.fq read2.fq > aln.sam     # paired-end alignment
@@ -122,22 +122,23 @@ do
 
      # against 410 barcodes and 3 COI_spike barcodes
      # minimap2 -ax sr ~/greenland_2017/CO1_1sequence_perBIN_040915_COIspiking.fas ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
-     echo "**** end of minimap2"
+     echo "**** end of minimap2, sam to bam conversion, sorting of bam file $(date)"
 
      # calculate flagstats
      samtools flagstat ${sample}_sorted.bam > ${sample}_sorted.bam.flagstat.txt # basic stats
 
+     echo "**** start of samtools filtering of unmapped reads $(date)"
      # filter out unmapped reads and delete original sorted.bam
      samtools view -b -F 0x4 ${sample}_sorted.bam > ${sample}_F0x4_sorted.bam
      rm -f ${sample}_sorted.bam
      samtools index ${sample}_F0x4_sorted.bam # creates ${sample}_F0x4_sorted.bam.bai file
+     echo "**** end of samtools filtering of unmapped reads $(date)"
 
-     echo "**** moving outputs to minimap2_outputs/"
+     echo "**** start of moving outputs to minimap2_outputs/ $(date)"
      mv ${sample}_sorted.bam.flagstat.txt ../minimap2_outputs/
      mv ${sample}_F0x4_sorted.bam.bai ../minimap2_outputs/
      mv ${sample}_F0x4_sorted.bam ../minimap2_outputs/
-
-     echo "**** end of mapping, sam to bam conversion, and sorting of bam file"
+     echo "**** end of moving outputs to minimap2_outputs/ $(date)"
 
      cd "${HOMEFOLDER}"
      rm -rf "_${sample}_working" # remove the working directory to make space
