@@ -13,9 +13,6 @@ interactive
 # to use parallel without a pathname in bsub scripts
 PATH=$PATH:~/scripts/parallel-20170722/bin/
 
-### CAREFUL:  i have set this up to copy files of only 1 q-score, here, 1.  if i want to copy 1 and 60, i use the GNU parallel code
-# the original samtools output files are still in the BWA* folders
-
 FILTER="F2308"
 
 ####### cd into different folders and set up output folders to hold everything before running
@@ -64,27 +61,35 @@ ls minimap2_all_outputs_Plates${PLATE}/
 ####### generic code to copy files to minimap2_all_outputs_Plates${PLATE} #######
 ####### this folder is then downloaded to my laptop to process with R:  idxstats_tabulate_macOS_Plates*.Rmd
 ####### run once for each library:  AB, A2B2, EF, GH
-# FILTER="F2308" # this is what i used for the samtools-to-COIbarcode seqs
-echo $FILTER
-echo $PLATE # check that i'm going to the right folder
+# choose a filter and run below, then choose any other filters and run below
+FILTER1="F2308" # filter 1
+FILTER2="F2308_f0x2" # filter 2
+echo $FILTER1
+echo $FILTER2
 QUAL1=""; echo $QUAL1 # set to "" if i don't want to use this variable for, say, q1
 QUAL2=48; echo $QUAL2
+
+echo $PLATE # check that i'm going to the right folder
+
 # e.g. Sample_IPO3916_C5_F2308_f0x2_q60_sorted.bam_idxstats.txt
-parallel ls -l BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted.bam_idxstats.txt ::: ${QUAL1} ${QUAL2}
-parallel ls BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted.bam_idxstats.txt ::: ${QUAL1} ${QUAL2} | wc -l # 384 = 2 X 192
-parallel cp BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted.bam_idxstats.txt minimap2_all_outputs_Plates${PLATE}/ ::: ${QUAL1} ${QUAL2}
-ls minimap2_all_outputs_Plates${PLATE}/*_${FILTER}_q*_sorted.bam_idxstats.txt | wc -l # 384 = 2 X 192
+parallel ls -l BWA*/minimap2_outputs/*_{1}_q{2}_sorted.bam_idxstats.txt ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2}
+parallel ls BWA*/minimap2_outputs/*_{1}_q{2}_sorted.bam_idxstats.txt ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # 384 = 2 X 192
+parallel cp BWA*/minimap2_outputs/*_{1}_q{2}_sorted.bam_idxstats.txt minimap2_all_outputs_Plates${PLATE}/ ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2}
+ls minimap2_all_outputs_Plates${PLATE}/*_q*_sorted.bam_idxstats.txt | wc -l # 384 = 2 X 192
+ls minimap2_all_outputs_Plates${PLATE}
+cp BWA*/minimap2_outputs/*_sorted.bam.flagstat.txt minimap2_all_outputs_Plates${PLATE}/
 ls minimap2_all_outputs_Plates${PLATE}
 
 # e.g. Sample_IPO3916_C5_F2308_f0x2_q1_sorted_genomecov_d.txt.gz
-parallel ls -l BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted_genomecov_d.txt.gz ::: ${QUAL1} ${QUAL2}
-parallel ls -l BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted_genomecov_d.txt.gz ::: ${QUAL1} ${QUAL2} | wc -l # 384 = 2 X 192
-parallel cp BWA*/minimap2_outputs/*_${FILTER}_q{}_sorted_genomecov_d.txt.gz minimap2_all_outputs_Plates${PLATE}/ ::: ${QUAL1} ${QUAL2}
-parallel ls minimap2_all_outputs_Plates${PLATE}/*_${FILTER}_q{}_sorted_genomecov_d.txt.gz ::: ${QUAL1} ${QUAL2} | wc -l # 384 = 2 X 192
+parallel ls -l BWA*/minimap2_outputs/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2}
+parallel ls -l BWA*/minimap2_outputs/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # 384 = 2 X 192
+parallel cp BWA*/minimap2_outputs/*_{1}_q{2}_sorted_genomecov_d.txt.gz minimap2_all_outputs_Plates${PLATE}/ ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2}
+parallel ls minimap2_all_outputs_Plates${PLATE}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # 384 = 2 X 192
 ls minimap2_all_outputs_Plates${PLATE}
 
+# tar and gzip for download
 du -sh minimap2_all_outputs_Plates${PLATE}/ # ~1.1 GB
-tar -czvf minimap2_all_outputs_Plates${PLATE}_${FILTER}.tar.gz minimap2_all_outputs_Plates${PLATE}/
+tar -czvf minimap2_all_outputs_Plates${PLATE}_${FILTER2}_q${QUAL2}.tar.gz minimap2_all_outputs_Plates${PLATE}/
 ls
 rm -rf minimap2_all_outputs_Plates${PLATE}/
 ls
