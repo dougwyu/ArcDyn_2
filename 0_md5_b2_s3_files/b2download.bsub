@@ -1,0 +1,32 @@
+####### b2download.bsub #################
+#!/bin/sh
+#BSUB -q short-eth     # 16 threads
+#BSUB -J b2download
+#BSUB -oo b2download.out
+#BSUB -eo b2download.err
+#BSUB -M 4000
+#BSUB -B        # sends email to me when job starts
+#BSUB -N        # sends email to me when job finishes
+
+# purpose is to download the ArcDyn files from backblaze B2 and upload to Amazon S3 Glacier for long-term storage
+
+. /etc/profile
+module purge
+module load python/anaconda/4.2/3.5
+source activate dypython
+PATH=$PATH:/gpfs/home/b042/.local/bin/ # to add path and be able to refer to b2 directly
+
+b2 download-file-by-name greenland-2017-PlatesIJCD PKG_ENQ-1643_Data_Transfer_PSEQ-1599.tar PlatesIJCD_PKG_ENQ-1643_Data_Transfer_PSEQ-1599.tar
+
+b2 download-file-by-name greenland-2017-PlatesIJCD PKG_ENQ-1643_Data_Transfer_SEQ-1601.tar PlatesIJCD_PKG_ENQ-1643_Data_Transfer_SEQ-1601.tar
+
+b2 download-file-by-name greenland-2017-PlatesGH PKG-ENQ-2379-Data_Transfer-PSEQ-1600.tar PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1600.tar
+
+b2 download-file-by-name greenland-2017-PlatesGH PKG-ENQ-2379-Data_Transfer-PSEQ-1603.tar PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1603.tar
+
+b2 download-file-by-name greenland-2017-PlatesGH PKG-ENQ-2379-Data_Transfer-PSEQ-1586.tar PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1586.tar
+
+b2 download-file-by-name greenland-2017-PlatesGH PKG-ENQ-2379-Data_Transfer-PSEQ-1586-trimmed.tar PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1586-trimmed.tar
+
+b2 download-file-by-name greenland-2017-PlatesGH PKG-ENQ-2379-Data_Transfer-PSEQ-1572-truncated_R2.tar PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1572-truncated_R2.tar
+######################################

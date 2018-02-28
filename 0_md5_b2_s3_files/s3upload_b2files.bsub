@@ -1,0 +1,40 @@
+####### s3upload.bsub #################
+#!/bin/sh
+#BSUB -q short-eth     # 16 threads
+#BSUB -J s3upload
+#BSUB -oo s3upload.out
+#BSUB -eo s3upload.err
+#BSUB -M 4000
+#BSUB -B        # sends email to me when job starts
+#BSUB -N        # sends email to me when job finishes
+
+# purpose is to download the ArcDyn files from backblaze B2 and upload to Amazon S3 Glacier for long-term storage
+
+. /etc/profile
+module purge
+module add python/anaconda/2.5/2.7 # makes s3cmd available
+
+md5sum PlatesIJCD_PKG_ENQ-1643_Data_Transfer_PSEQ-1599.tar > PlatesIJCD_PKG_ENQ-1643_Data_Transfer_PSEQ-1599.tar.md5
+s3cmd put --multipart-chunk-size-mb=100 PlatesIJCD_PKG_ENQ-1643_Data_Transfer_PSEQ-1599.tar s3://amazon-glacier-douglasyu/PlatesIJCD_PKG_ENQ-1643_Data_Transfer_PSEQ-1599.tar
+
+md5sum PlatesIJCD_PKG_ENQ-1643_Data_Transfer_SEQ-1601.tar > PlatesIJCD_PKG_ENQ-1643_Data_Transfer_SEQ-1601.tar.md5
+s3cmd put --multipart-chunk-size-mb=100  PlatesIJCD_PKG_ENQ-1643_Data_Transfer_SEQ-1601.tar s3://amazon-glacier-douglasyu/PlatesIJCD_PKG_ENQ-1643_Data_Transfer_SEQ-1601.tar
+
+md5sum PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1600.tar > PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1600.tar.md5
+s3cmd put --multipart-chunk-size-mb=100  PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1600.tar s3://amazon-glacier-douglasyu/PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1600.tar
+
+md5sum PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1603.tar > PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1603.tar.md5
+s3cmd put --multipart-chunk-size-mb=100  PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1603.tar s3://amazon-glacier-douglasyu/PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1603.tar
+
+md5sum PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1586.tar.tar > PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1586.tar.md5
+s3cmd put --multipart-chunk-size-mb=100  PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1586.tar s3://amazon-glacier-douglasyu/PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1586.tar
+
+md5sum PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1586-trimmed.tar > PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1586-trimmed.tar.md5
+s3cmd put --multipart-chunk-size-mb=100  PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1586-trimmed.tar s3://amazon-glacier-douglasyu/PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1586-trimmed.tar
+
+md5sum PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1572-truncated_R2.tar > PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1572-truncated_R2.tar.md5
+s3cmd put --multipart-chunk-size-mb=100  PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1572-truncated_R2.tar s3://amazon-glacier-douglasyu/PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1572-truncated_R2.tar
+
+s3cmd ls --list-md5 s3://amazon-glacier-douglasyu > amazon-glacier-douglasyu20180229.md5 # to confirm that md5s match on hpc and amazon
+
+######################################
