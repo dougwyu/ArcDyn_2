@@ -5,7 +5,7 @@
 #BSUB -eo samtools01.err
 #BSUB -R "rusage[mem=35000]"
 #BSUB -M 35000
-#BSUB -x
+#BSUB -x # exclusive access to node, should be in anything that is threaded
 #BSUB -B        #sends email to me when job starts
 #BSUB -N        # sends email to me when job finishes
 
