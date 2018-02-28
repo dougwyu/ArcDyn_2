@@ -29,10 +29,11 @@ To dos:
 						G01
 						C02
 						B04
-	- bwa or bowtie2 against mitogenomes and barcodes and compare
+	- bwa against mitogenomes and barcodes and compare
 		- http://homer.ucsd.edu/homer/basicTutorial/mapping.html
 		- bwa index -a bwtsw genome.fa # build index.  What is bwtsw?
 		- bwa mem -t $NPROC genome.fa reads1.fq reads2.fq | samtools view -F 0x4 -b | samtools sort > aln-pe.bam # 
+		- samtools depth -a instead of bedtools genomecov -d
 	- Pardosa glacialis missing from mock samples.  WHY?  @flag
 		- extract Pardosa-mapped reads from a bam file (htsbox bam2fq?)  that has lots of Pardosa in it and use those to map against the mock samples
 	- 16S and 12S genes for phylogeny of mitogenomes to Tea
@@ -90,4 +91,14 @@ Records:
 		- visualise minimap2 bam files and check that i am not mapping to the Ns between the protein-coding genes. SHOULD I SUBTRACT A FIXED NUMBER FROM EACH MITOGENOME LENGTH TO CALCULATE THE CORRECT LENGTH OF THE CODING PORTION?  
 	- re run minimap2/samtools/bedtools/R pipeline with F2308 q48 and compare with F2308 q60
 		- q48 produces maybe 5-10% more reads and correspondingly more reads for false positives (although the Coef vars for false positives are still high). There is not much benefit nor much cost to using q48.  note that I did not filter for PROPER PAIRS, which should reduce the false positives
+	- run PlatesGH against 19 positive control species and look at the mocks (20180223)
+		- all 19 species detected except for Pardosa glacialis
+		- within species ratios are accurate
+		- across species gradient is roughly accurate
+		- CVs are low (below 1.5)
+		- upshot:  we can detect even low biomass fraction species (although in this run, i did not map against other mitogenomes so did not test directly for false positives)
+	- re-run PlatesA2B2, adding the final Lane 11 (20180223)
+		- added the final fastq files (after the trimming step)
+		- re-mapped and samtools filtered.  these output files are now the new output files
+		- Lanes 1-11 all have all the samples, so adding Lane 11 did not increase number of samples but did increase by around 10% the amount of sequence data compared to the Lanes 1-10 only run
 Archive:
