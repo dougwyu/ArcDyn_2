@@ -1,7 +1,6 @@
 - This file records notes about what i have done with the ArcDyn files, and also lists to dos
 To dos:
 	- go over code in fine detail and see if i can find any bugs:  especially in the table joining steps
-	- download B2 files and upload to S3 Glacier for long-term storage
 	- list which samples produced very little or no data, check against the library QC information, and see if any are legitimately missing or i can ask EI to resupply
 		- Darren has sent me library QC information for GH.  look up A2B2, EF:  
 			- LITE update G & H 20171023.rtfd
@@ -36,9 +35,7 @@ To dos:
 		- samtools depth -a instead of bedtools genomecov -d
 	- Pardosa glacialis missing from mock samples.  WHY?  @flag
 		- extract Pardosa-mapped reads from a bam file (htsbox bam2fq?)  that has lots of Pardosa in it and use those to map against the mock samples
-	- 16S and 12S genes for phylogeny of mitogenomes to Tea
 	- ArcDyn:  genes and primers for the non-mitogenome species @flag
-	- ArcDyn:  set up a database versioning system for Tea and Yinqiu
 	- make textfile for taxonomy (class, order, family, genus, species) of each mitogenome and join to idx_meta_genomecov
 Records:
 	- A2B2 missing files
@@ -97,8 +94,10 @@ Records:
 		- across species gradient is roughly accurate
 		- CVs are low (below 1.5)
 		- upshot:  we can detect even low biomass fraction species (although in this run, i did not map against other mitogenomes so did not test directly for false positives)
-	- re-run PlatesA2B2, adding the final Lane 11 (20180223)
+	- 20180223: re-run PlatesA2B2, adding the final Lane 11
 		- added the final fastq files (after the trimming step)
 		- re-mapped and samtools filtered.  these output files are now the new output files
 		- Lanes 1-11 all have all the samples, so adding Lane 11 did not increase number of samples but did increase by around 10% the amount of sequence data compared to the Lanes 1-10 only run
-Archive:
+	- 20180227: run pipeline against new mitogenome reference database containing 307 species
+	- 20180228: send 307 mitogenomes to Tea, annotated, so they include any 16S and 12S genes assembled
+	- 20180301: download B2 files and upload to S3 Glacier for long-term storage
