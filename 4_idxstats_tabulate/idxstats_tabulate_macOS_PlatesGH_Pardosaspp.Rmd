@@ -318,7 +318,18 @@ loadFile2 <- function(x) {
     df$pathname_genomecov <- x
     # store full pathname in df$pathname
 
-    df <- df %>% dplyr::group_by(mitogenome) %>% summarise(sum_coverage = sum(coverage), mean_coverage = mean(coverage), stddev = sd(coverage), coefvar = sd(coverage)/mean(coverage), length = n(), sample = first(sample), well = first(well), samtools_filter = first(samtools_filter), pathname_genomecov = first(pathname_genomecov))
+    df <- df %>% dplyr::group_by(mitogenome) %>% 
+        summarise(sum_coverage = sum(coverage), 
+                  mean_coverage = mean(coverage), 
+                  stddev = sd(coverage), 
+                  coefvar = sd(coverage)/mean(coverage), 
+                  length = n(), 
+                  pct_coverage = sum(coverage>0)/n(), # % of positions that have 1 or more reads mapped 
+                  sample = first(sample), 
+                  well = first(well), 
+                  samtools_filter = first(samtools_filter), 
+                  pathname_genomecov = first(pathname_genomecov)
+                  )
 
     # output is df
     df

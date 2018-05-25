@@ -22,7 +22,7 @@ idxmetagenomcovfile <- "idx_meta_genomecov_PlatesAB_20180227.txt"
 
 idx_meta_genomecov_AB <- read_delim(file.path(outputfolder, idxmetagenomcovfile), delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
-idx_meta_genomecov_AB <- idx_meta_genomecov_AB %>% dplyr::select(Date:mitogenome, mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, mean_coverage, stddev, coefvar, samtools_filter, mt_length, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul, lysis_buffer_proportion, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI, elaterid_mordellid_sum, COI_corr, Concentration_ng_per_ul, Sample_volume_ul, x.260_280_ratio, sample, ArcDyn_Plate_name, EI_Plate_name, well, Sample_alias, TGAC_barcode, pathname, pathname_genomecov, Full_name_of_the_sample)
+idx_meta_genomecov_AB <- idx_meta_genomecov_AB %>% dplyr::select(Date:mitogenome, mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, mean_coverage, stddev, coefvar,  pct_coverage, samtools_filter, mt_length, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul, lysis_buffer_proportion, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI, elaterid_mordellid_sum, COI_corr, Concentration_ng_per_ul, Sample_volume_ul, x.260_280_ratio, sample, ArcDyn_Plate_name, EI_Plate_name, well, Sample_alias, TGAC_barcode, pathname, pathname_genomecov, Full_name_of_the_sample)
 
 idx_meta_genomecov_AB$COI_corr_components <- "elaterid_mordellid_sum"
 
@@ -42,7 +42,7 @@ idx_meta_genomecov_A2B2 <- read_delim(file.path(outputfolder, idxmetagenomcovfil
 
 # names(idx_meta_genomecov_A2B2)
 
-idx_meta_genomecov_A2B2 <- idx_meta_genomecov_A2B2 %>% dplyr::select(Date:mitogenome, mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, mean_coverage, stddev, coefvar, samtools_filter, mt_length, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul, lysis_buffer_proportion, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI, elaterid_mordellid_sum, COI_corr, Concentration_ng_per_ul, Sample_volume_ul, x.260_280_ratio, sample, ArcDyn_Plate_name, EI_Plate_name, well, Sample_alias, TGAC_barcode, pathname, pathname_genomecov, Full_name_of_the_sample)
+idx_meta_genomecov_A2B2 <- idx_meta_genomecov_A2B2 %>% dplyr::select(Date:mitogenome, mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, mean_coverage, stddev, coefvar,  pct_coverage, samtools_filter, mt_length, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul, lysis_buffer_proportion, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI, elaterid_mordellid_sum, COI_corr, Concentration_ng_per_ul, Sample_volume_ul, x.260_280_ratio, sample, ArcDyn_Plate_name, EI_Plate_name, well, Sample_alias, TGAC_barcode, pathname, pathname_genomecov, Full_name_of_the_sample)
 
 idx_meta_genomecov_A2B2$COI_corr_components <- "elaterid_mordellid_sum"
 
@@ -62,7 +62,7 @@ idx_meta_genomecov_EF <- read_delim(file.path(outputfolder, idxmetagenomcovfile)
 
 # names(idx_meta_genomecov_EF)
 
-idx_meta_genomecov_EF <- idx_meta_genomecov_EF %>% dplyr::select(Date:mitogenome, mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, mean_coverage, stddev, coefvar, samtools_filter, mt_length, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul, lysis_buffer_proportion, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI, elaterid_mordellid_sum, COI_corr, Concentration_ng_per_ul, Sample_volume_ul, x.260_280_ratio, sample, ArcDyn_Plate_name, EI_Plate_name, well, Sample_alias, pathname, pathname_genomecov, Full_name_of_the_sample)
+idx_meta_genomecov_EF <- idx_meta_genomecov_EF %>% dplyr::select(Date:mitogenome, mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, mean_coverage, stddev, coefvar,  pct_coverage, samtools_filter, mt_length, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul, lysis_buffer_proportion, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI, elaterid_mordellid_sum, COI_corr, Concentration_ng_per_ul, Sample_volume_ul, x.260_280_ratio, sample, ArcDyn_Plate_name, EI_Plate_name, well, Sample_alias, pathname, pathname_genomecov, Full_name_of_the_sample)
 
 idx_meta_genomecov_EF$TGAC_barcode <- "NA"  # not in the sample metadata
 
@@ -92,7 +92,7 @@ idx_meta_genomecov_GH <- idx_meta_genomecov_GH %>% dplyr::rename(TGAC_barcode="E
 
 # names(idx_meta_genomecov_GH)
 
-idx_meta_genomecov_GH <- idx_meta_genomecov_GH %>% dplyr::select(Date, Plot:mitogenome, mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, mean_coverage, stddev, coefvar, samtools_filter, mt_length, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul, lysis_buffer_proportion, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI, elaterid_mordellid_sum, COI_corr, Concentration_ng_per_ul, Sample_volume_ul, x.260_280_ratio, sample, ArcDyn_Plate_name, well, Sample_alias, TGAC_barcode, pathname, pathname_genomecov, Full_name_of_the_sample)
+idx_meta_genomecov_GH <- idx_meta_genomecov_GH %>% dplyr::select(Date, Plot:mitogenome, mapped_reads, mapped_reads_COI_corr, mapped_reads_COI_lysis_corr, sum_coverage, mean_coverage, stddev, coefvar,  pct_coverage, samtools_filter, mt_length, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul, lysis_buffer_proportion, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI, elaterid_mordellid_sum, COI_corr, Concentration_ng_per_ul, Sample_volume_ul, x.260_280_ratio, sample, ArcDyn_Plate_name, well, Sample_alias, TGAC_barcode, pathname, pathname_genomecov, Full_name_of_the_sample)
 
 idx_meta_genomecov_GH$EI_Plate_name <- "NA"  # not in the sample metadata
 
