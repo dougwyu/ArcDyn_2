@@ -56,7 +56,11 @@ getwd()
 samtoolsfilter <- "F2308_f0x2"
 samtoolsqual <- "q48"
 
-idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesEF_", samtoolsfilter, "_", samtoolsqual)  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+# use this version for bwa mapping
+idxstatsgenomecovfolder <- paste0("bwa_outputs_PlatesEF_", samtoolsfilter, "_", samtoolsqual)  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+
+# use this version for minimap2 mapping
+# idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesEF_", samtoolsfilter, "_", samtoolsqual)  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 
 # use this version for COI_barcodes mapping
 # idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesEF_", samtoolsfilter, "_COIBarcodesOnly")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
@@ -257,7 +261,7 @@ columnnames <- c("mitogenome", "position", "coverage")
 # function to read_tsv the file
 loadFile2 <- function(x) {
     df <- read_tsv(gzfile(x),   
-        # e.g. "minimap2_all_outputs_PlatesEF/PlateE_A1_AACCAACCG-GCCAAT_F2308_f0x2_q1_sorted_genomecov_d.txt.gz"
+    # e.g. "minimap2_all_outputs_PlatesEF/PlateE_A1_AACCAACCG-GCCAAT_F2308_f0x2_q1_sorted_genomecov_d.txt.gz"
     col_names = columnnames, na = "NA",
     col_types = cols(
         mitogenome = col_character(),
@@ -266,8 +270,7 @@ loadFile2 <- function(x) {
     trim_ws = TRUE
     )
 
-    # read in filename, extract and sub in the first bit of the name, PlateE_A1_AACCAACCG-GCCAAT_F2308_f0x2_q1_sorted_genomecov_d.txt.gz
-
+    # read in filename "basename(x)", extract the sample name "\\1" from  PlateE_A1_AACCAACCG-GCCAAT_F2308_f0x2_q1_sorted_genomecov_d.txt.gz, and place in df$sample column
     df$sample <- sub("(Plate[A-Z]_\\D\\d+)_[A-Z-]+-[A-Z]+_F[\\w]+_sorted_genomecov_d.txt.gz", "\\1", basename(x), perl=TRUE)
     # \\w any letter, digit, underscore
     # \\D any non-digit, \\d any digit
@@ -283,7 +286,17 @@ loadFile2 <- function(x) {
     df$pathname_genomecov <- x
     # store full pathname in df$pathname
 
-    df <- df %>% dplyr::group_by(mitogenome) %>% summarise(sum_coverage = sum(coverage), mean_coverage = mean(coverage), stddev = sd(coverage), coefvar = sd(coverage)/mean(coverage), length = n(), sample = first(sample), well = first(well), samtools_filter = first(samtools_filter), pathname_genomecov = first(pathname_genomecov))
+    df <- df %>% dplyr::group_by(mitogenome) %>% 
+        summarise(sum_coverage = sum(coverage), 
+                  mean_coverage = mean(coverage), 
+                  stddev = sd(coverage), 
+                  coefvar = sd(coverage)/mean(coverage), 
+                  length = n(), 
+                  sample = first(sample), 
+                  well = first(well), 
+                  samtools_filter = first(samtools_filter), 
+                  pathname_genomecov = first(pathname_genomecov)
+                  )
 
     # output is df
     df
