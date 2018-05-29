@@ -10,8 +10,8 @@ set -o pipefail
 
 # upload the new samtools bsub file from macOS
 # run in macOS, not hpc
-# scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_bwa_samtools/loop_bwa_only_20180417.bsub b042@hpc.uea.ac.uk:~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/
-# scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_bwa_samtools/_loop_bwa_only_20180417.sh b042@hpc.uea.ac.uk:~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/
+scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_bwa_samtools/loop_bwa_only_20180417.bsub b042@hpc.uea.ac.uk:~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/
+scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_bwa_samtools/_loop_bwa_only_20180417.sh b042@hpc.uea.ac.uk:~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/
 
 scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_bwa_samtools/loop_samtools_only_20180417.bsub b042@hpc.uea.ac.uk:~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/
 scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_bwa_samtools/_loop_samtools_only_20180417.sh b042@hpc.uea.ac.uk:~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/
@@ -43,8 +43,8 @@ cd ~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine
 
 # parallel "sed 's/bwaloop01/bwaAB{}/g' BWA{}/${BWA_BSUB} > BWA{}/${BWA_BSUB}_tmp" ::: 01 02 03 04 05 06 07 08 09 10 11
 # parallel "mv BWA{}/${BWA_BSUB}_tmp BWA{}/${BWA_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10 11
-# head -n 5 BWA{01,02,03,04,05,06,07,08,09,10,11}/${BWA_BSUB} # check.  should be mnmploop11
-# tail -n 5 BWA{01,02,03,04,05,06,07,08,09,10,11}/${BWA_BSUB} # check.  should be mnmploop11
+# head -n 5 BWA{01,02,03,04,05,06,07,08,09,10,11}/${BWA_BSUB} # check.  should be bwaloop11
+# tail -n 5 BWA{01,02,03,04,05,06,07,08,09,10,11}/${BWA_BSUB} # check.
 
 parallel "sed 's/samtools01/samtlsAB{}/g' BWA{}/${SAMTOOLS_BSUB} > BWA{}/${SAMTOOLS_BSUB}_tmp" ::: 01 02 03 04 05 06 07 08 09 10 11
 parallel "mv BWA{}/${SAMTOOLS_BSUB}_tmp BWA{}/${SAMTOOLS_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10 11

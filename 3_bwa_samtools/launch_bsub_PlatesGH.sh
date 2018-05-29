@@ -10,8 +10,8 @@ set -o pipefail
 
 # upload the new samtools bsub file from macOS
 # run in macOS, not hpc
-# scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_bwa_samtools/loop_bwa_only_20180417.bsub b042@hpc.uea.ac.uk:~/greenland_2017/platesGH/platesGH_combined/
-# scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_bwa_samtools/_loop_bwa_only_20180417.sh b042@hpc.uea.ac.uk:~/greenland_2017/platesGH/platesGH_combined/
+scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_bwa_samtools/loop_bwa_only_20180417.bsub b042@hpc.uea.ac.uk:~/greenland_2017/platesGH/platesGH_combined/
+scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_bwa_samtools/_loop_bwa_only_20180417.sh b042@hpc.uea.ac.uk:~/greenland_2017/platesGH/platesGH_combined/
 
 scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_bwa_samtools/loop_samtools_only_20180417.bsub b042@hpc.uea.ac.uk:~/greenland_2017/platesGH/platesGH_combined/
 scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_bwa_samtools/_loop_samtools_only_20180417.sh b042@hpc.uea.ac.uk:~/greenland_2017/platesGH/platesGH_combined/
@@ -51,16 +51,16 @@ ls BWA{01,02,03,04,05,06,07,08,09,10} #| tail -n 2
 # edit the bsub files so that the correct job name will show up (i suppose i could have instead run a job array...)
 cd ~/greenland_2017/platesGH/platesGH_combined/
 
-# parallel "sed 's/bwaloop01/bwalpGH{}/g' BWA{}/${BWA_BSUB} > BWA{}/${BWA_BSUB}_tmp" ::: 01 02 03 04 05 06 07 08 09 10
-# parallel "mv BWA{}/${BWA_BSUB}_tmp BWA{}/${BWA_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10
-# head -n5 BWA{01,02,03,04,05,06,07,08,09,10}/${BWA_BSUB} # check.  should be bwalpGH{01,02,...}
-#      # check if i'm using mellanox-ib
-# tail -n2 BWA{01,02,03,04,05,06,07,08,09,10}/${BWA_BSUB} # check.  should be _loop_bwa_only_20180417.sh
+parallel "sed 's/bwaloop01/bwalpGH{}/g' BWA{}/${BWA_BSUB} > BWA{}/${BWA_BSUB}_tmp" ::: 01 02 03 04 05 06 07 08 09 10
+parallel "mv BWA{}/${BWA_BSUB}_tmp BWA{}/${BWA_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10
+head -n5 BWA{01,02,03,04,05,06,07,08,09,10}/${BWA_BSUB} # check.  should be bwalpGH{01,02,...}
+     # check if i'm using mellanox-ib
+tail -n2 BWA{01,02,03,04,05,06,07,08,09,10}/${BWA_BSUB} # check.  should be _loop_bwa_only_20180417.sh
 
-parallel "sed 's/samtools01/samtlsGH{}/g' BWA{}/${SAMTOOLS_BSUB} > BWA{}/${SAMTOOLS_BSUB}_tmp" ::: 01 02 03 04 05 06 07 08 09 10
-parallel "mv BWA{}/${SAMTOOLS_BSUB}_tmp BWA{}/${SAMTOOLS_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10
-head -n 5 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct index number
-tail -n 1 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct samtools shell filename
+# parallel "sed 's/samtools01/samtlsGH{}/g' BWA{}/${SAMTOOLS_BSUB} > BWA{}/${SAMTOOLS_BSUB}_tmp" ::: 01 02 03 04 05 06 07 08 09 10
+# parallel "mv BWA{}/${SAMTOOLS_BSUB}_tmp BWA{}/${SAMTOOLS_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10
+# head -n 5 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct index number
+# tail -n 1 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct samtools shell filename
 ls # BWA* folders should now sort to bottom
 
 # parallel "sed 's/trimgal01/trimgal{}/g' BWA{}/loop_trimgalore_20180216.bsub > BWA{}/loop_trimgalore_20180216_tmp.bsub" ::: 01 02 03 04 05 06 07 08 09 10
@@ -142,10 +142,12 @@ ls bwa_outputs # should start to see the new bam files
 cd ~/greenland_2017/platesGH/platesGH_combined/BWA04; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
+ls bwa_outputs # should start to see the new bam files
 
 cd ~/greenland_2017/platesGH/platesGH_combined/BWA05; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
+ls bwa_outputs # should start to see the new bam files
 
 cd ~/greenland_2017/platesGH/platesGH_combined/BWA06; ls
 bsub < ${SAMTOOLS_BSUB}

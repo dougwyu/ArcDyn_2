@@ -1,10 +1,10 @@
 #!/bin/sh
-#BSUB -q mellanox-ib     #long-ib & mellanox-ib (168 hours = 7 days), short-ib (24 hours)
+#BSUB -q long-ib     #long-ib & mellanox-ib (168 hours = 7 days), short-ib (24 hours)
 #BSUB -J bwaloop01
 #BSUB -oo bwaloop01.out
 #BSUB -eo bwaloop01.err
-#BSUB -R "rusage[mem=32000]"  # set at 32000. previous runs take around 19 GB (n.b. short-ib, long-ib, mellanox-ib)
-#BSUB -M 32000
+#BSUB -R "rusage[mem=72000]"  # set at 72000. previous runs take around 19 GB (n.b. short-ib, long-ib, mellanox-ib)
+#BSUB -M 72000
 #BSUB -x # exclusive access to node, should be in anything that is threaded
 #BSUB -B        # sends email to me when job starts
 #BSUB -N        # sends email to me when job finishes
@@ -20,7 +20,8 @@ PATH=$PATH:~/scripts/bwa_0.7.17_r1188/ # made 22 Jan 2018 from github
 PATH=$PATH:~/scripts/bfc/ # r181 # made 3 Aug 2015 from github
 PATH=$PATH:~/scripts/vsearch-2.6.2-linux-x86_64/bin/ # downloaded 22 Jan 2018 from github
 PATH=$PATH:~/scripts/TrimGalore-0.4.5/ # downloaded 22 Jan 2018 from github
-PATH=$PATH:~/scripts/minimap2/  # made 18 Feb 2018 from github 2.8-r711-dirty
+# PATH=$PATH:~/scripts/minimap2-2.8-r711-dirty/  # made 18 Feb 2018 from github 2.8-r711-dirty
+PATH=$PATH:~/scripts/minimap2-2.10_x64-linux/  # downloaded binary 28 May 2018 from github 2.10-r761
 PATH=$PATH:~/scripts/bedtools2/bin/ # made 22 Jan 2018 from github 2.27.1
 
 bash _loop_bwa_only_20180417.sh

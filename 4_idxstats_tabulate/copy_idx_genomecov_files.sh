@@ -13,8 +13,9 @@ interactive
 # to use parallel without a pathname in bsub scripts
 PATH=$PATH:~/scripts/parallel-20170722/bin/
 
-FILTER="F2308"
-OUTPUTFOLDER="bwa_all_outputs"
+# FILTER="F2308"
+OUTPUTFOLDER="minimap2_outputs"
+# OUTPUTFOLDER="bwa_outputs"
 # OUTPUTFOLDER="pardosa_spp_outputs"
 
 ####### cd into different folders and set up output folders to hold everything before running
@@ -24,9 +25,9 @@ PLATE="AB"
 WORKINGPATH="$HOME/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/"
 cd ${WORKINGPATH}
 ls
-mkdir bwa_all_outputs_Plates${PLATE}/
-ls # rm -rf bwa_all_outputs/
-ls bwa_all_outputs_Plates${PLATE}/
+mkdir ${OUTPUTFOLDER}_Plates${PLATE}/
+ls
+ls ${OUTPUTFOLDER}_Plates${PLATE}/
 # then run the generic code below
 
 # A2B2
@@ -34,9 +35,9 @@ PLATE="A2B2"
 WORKINGPATH="$HOME/greenland_2017/plates${PLATE}/plates${PLATE}_combined/"
 cd ${WORKINGPATH}
 ls
-mkdir bwa_all_outputs_Plates${PLATE}/
+mkdir ${OUTPUTFOLDER}_Plates${PLATE}/
 ls
-ls bwa_all_outputs_Plates${PLATE}/
+ls ${OUTPUTFOLDER}_Plates${PLATE}/
 # then run the generic code below
 
 # EF
@@ -44,9 +45,9 @@ PLATE="EF"
 WORKINGPATH="$HOME/greenland_2017/plates${PLATE}_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed"
 cd ${WORKINGPATH}
 ls
-mkdir bwa_all_outputs_Plates${PLATE}/
+mkdir ${OUTPUTFOLDER}_Plates${PLATE}/
 ls
-ls bwa_all_outputs_Plates${PLATE}/
+ls ${OUTPUTFOLDER}_Plates${PLATE}/
 # then run the generic code below
 
 # GH
@@ -91,10 +92,15 @@ parallel ls ${OUTPUTFOLDER}_Plates${PLATE}/*_{1}_q{2}_sorted_genomecov_d.txt.gz 
 ls ${OUTPUTFOLDER}_Plates${PLATE}/
 
 # tar and gzip for download
-du -sh ${OUTPUTFOLDER}_Plates${PLATE}/ # ~1.1 GB
+du -sh ${OUTPUTFOLDER}_Plates${PLATE}/ # ~4.9 GB
 tar -czvf ${OUTPUTFOLDER}_Plates${PLATE}_${FILTER2}_q${QUAL2}.tar.gz ${OUTPUTFOLDER}_Plates${PLATE}/
 ls
 rm -rf ${OUTPUTFOLDER}_Plates${PLATE}/
+ls
+
+# set filename to something that i can understand after download
+# format:  outputs_PlatesAB_F2308_q48_minimap2_outputs_20180527.tar.gz
+mv ${OUTPUTFOLDER}_Plates${PLATE}_${FILTER2}_q${QUAL2}.tar.gz outputs_Plates${PLATE}_${FILTER2}_q${QUAL2}_${OUTPUTFOLDER}_20180527.tar.gz
 ls
 
 # when i'm on a fast network, i can download using scp, but otherwise, use Transmit
