@@ -121,7 +121,7 @@ do
      # minimap2 -ax sr ~/greenland_2017/reference_seqs/positive_control_19_species_3_COI_spikes.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
 
      # against 308 full mitogenomes (full sequences, not just protein-coding genes) and 3 COI_spike barcodes
-     minimap2 -t 27 -ax sr ~/greenland_2017/reference_seqs/ArcDyn_308_full_mitogenomes_20180524.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
+     minimap2 -t 16 -ax sr ~/greenland_2017/reference_seqs/ArcDyn_308_full_mitogenomes_20180524.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@15 - -o ${sample}_sorted.bam
 
      # against 410 barcodes and 3 COI_spike barcodes
      # minimap2 -ax sr ~/greenland_2017/CO1_1sequence_perBIN_040915_COIspiking.fas ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
