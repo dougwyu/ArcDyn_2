@@ -53,7 +53,7 @@ cd ~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine
 
 parallel "sed 's/samtools01/samtlsAB{}/g' BWA{}/${SAMTOOLS_BSUB} > BWA{}/${SAMTOOLS_BSUB}_tmp" ::: 01 02 03 04 05 06 07 08 09 10 11
 parallel "mv BWA{}/${SAMTOOLS_BSUB}_tmp BWA{}/${SAMTOOLS_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10 11
-head -n 5 BWA{01,02,03,04,05,06,07,08,09,10,11}/${SAMTOOLS_BSUB} # check.  should have the correct index number
+head -n 8 BWA{01,02,03,04,05,06,07,08,09,10,11}/${SAMTOOLS_BSUB} # check.  should have the correct index number
 tail -n 1 BWA{01,02,03,04,05,06,07,08,09,10,11}/${SAMTOOLS_BSUB} # check.  should have the correct samtools shell filename
 ls # BWA* folders should now sort to bottom
 

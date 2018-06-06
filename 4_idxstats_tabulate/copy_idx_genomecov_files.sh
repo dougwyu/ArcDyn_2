@@ -20,19 +20,20 @@ OUTPUTFOLDER="minimap2_outputs"
 
 ####### cd into different folders and set up output folders to hold everything before running
 ####### the generic copy script below
-# AB # different scripts because the pathnames are different
-PLATE="AB"
-WORKINGPATH="$HOME/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/"
+# A2B2
+PLATE="A2B2"
+WORKINGPATH="$HOME/greenland_2017/plates${PLATE}/plates${PLATE}_combined/"
 cd ${WORKINGPATH}
 ls
 mkdir ${OUTPUTFOLDER}_Plates${PLATE}/
 ls
 ls ${OUTPUTFOLDER}_Plates${PLATE}/
+ls BWA*/*.out
 # then run the generic code below
 
-# A2B2
-PLATE="A2B2"
-WORKINGPATH="$HOME/greenland_2017/plates${PLATE}/plates${PLATE}_combined/"
+# AB # different scripts because the pathnames are different
+PLATE="AB"
+WORKINGPATH="$HOME/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/"
 cd ${WORKINGPATH}
 ls
 mkdir ${OUTPUTFOLDER}_Plates${PLATE}/
@@ -91,17 +92,18 @@ parallel cp BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ${OUTPUTFO
 parallel ls ${OUTPUTFOLDER}_Plates${PLATE}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # 384 = 2 X 192
 ls ${OUTPUTFOLDER}_Plates${PLATE}/
 
-# tar and gzip for download
+# rename, tar and gzip for download
 du -sh ${OUTPUTFOLDER}_Plates${PLATE}/ # ~4.9 GB
-tar -czvf ${OUTPUTFOLDER}_Plates${PLATE}_${FILTER2}_q${QUAL2}.tar.gz ${OUTPUTFOLDER}_Plates${PLATE}/
+# set filename to something that i can understand after download
+# format:  outputs_PlatesAB_F2308_f0x2_q48_minimap2_outputs_20180527.tar.gz
+mv ${OUTPUTFOLDER}_Plates${PLATE} outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180527
 ls
-rm -rf ${OUTPUTFOLDER}_Plates${PLATE}/
+# tar gzip for download
+tar -czvf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180527.tar.gz outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180527/
+ls
+rm -rf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180527/
 ls
 
-# set filename to something that i can understand after download
-# format:  outputs_PlatesAB_F2308_q48_minimap2_outputs_20180527.tar.gz
-mv ${OUTPUTFOLDER}_Plates${PLATE}_${FILTER2}_q${QUAL2}.tar.gz outputs_Plates${PLATE}_${FILTER2}_q${QUAL2}_${OUTPUTFOLDER}_20180527.tar.gz
-ls
 
 # when i'm on a fast network, i can download using scp, but otherwise, use Transmit
 ### 2016 run:  AB ###
