@@ -447,7 +447,7 @@ idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate(ratio_mordellid20_bom
 idx_meta_genomecov$ratio_mordellid20_bombyx10 <- round(idx_meta_genomecov$ratio_mordellid20_bombyx10, 1)
 ggplot(idx_meta_genomecov, aes(x=ratio_mordellid20_bombyx10)) + geom_density(alpha=0.5)
 mean(idx_meta_genomecov$ratio_mordellid20_bombyx10, na.rm = TRUE); sd(idx_meta_genomecov$ratio_mordellid20_bombyx10, na.rm = TRUE)
-# should be 2, and it's 2.18, sd = 0.37
+# should be 2, and it's 2.17, sd = 0.37
 
 idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate(ratio_elaterid40_bombyx=Coleoptera_Elateridae_40ng_COI/Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI)
 idx_meta_genomecov$ratio_elaterid40_bombyx <- round(idx_meta_genomecov$ratio_elaterid40_bombyx, 1)

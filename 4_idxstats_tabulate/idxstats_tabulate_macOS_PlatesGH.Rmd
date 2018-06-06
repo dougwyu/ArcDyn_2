@@ -438,7 +438,7 @@ hist(sum_idx_meta_genomecov$COI_spike_sum, breaks = 100000, xlim = c(0, 6502591)
 hist(sum_idx_meta_genomecov$COI_spike_sum, breaks = 100000, xlim = c(0, 2000000))
 par(mfrow=c(1,1))
 
-# filter out samples with COI_spike_sum < 1 000 000.  This removes 13 samples with small numbers of COI_spike_sum including the small ME50_1 mock community which seems to have failed
+# filter out samples with COI_spike_sum < 500 000.  This removes 13 samples with small numbers of COI_spike_sum including the small ME50_1 mock community which seems to have failed
 
 sample_names <- sum_idx_meta_genomecov %>% dplyr::filter(COI_spike_sum < 500000) %>% dplyr::select(Short_name_of_the_sample)
 samples_to_remove <- sample_names %>% dplyr::pull(Short_name_of_the_sample) # pull out a single variable
@@ -537,7 +537,7 @@ mocks_idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::filter(!mock_ArcDyn ==
 # mocks_idx_meta_genomecov <- read_delim("mocks_idx_meta_genomecov_PlatesGH_20180527.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
 # remove mock soup data from idx_meta_genomecov
-idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::filter(mock_ArcDyn == "arcdyn") # 27475 rows
+idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::filter(mock_ArcDyn == "arcdyn") # 53592 rows
 
 # create variable from Date and Trap(ABC):  Date_1997_08_04_TrapA
 # stringr::str_pad(x, width = 2, side = "left", pad = "0")  # to ensure that the date always has two digits, e.g. 07.

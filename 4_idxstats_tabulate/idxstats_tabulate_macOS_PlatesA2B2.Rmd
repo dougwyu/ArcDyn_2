@@ -61,7 +61,8 @@ samtoolsqual <- "q48"
 # idxstatsgenomecovfolder <- paste0("bwa_outputs_PlatesA2B2_", samtoolsfilter, "_", samtoolsqual, "_bwa_20180526")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 
 # use this version for minimap2
-idxstatsgenomecovfolder <- paste0("bwa_outputs_PlatesA2B2_", samtoolsfilter, "_", samtoolsqual, "_minimap2_20180527")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+# outputs_PlatesA2B2_F2308_f0x2_q48_minimap2_20180527
+idxstatsgenomecovfolder <- paste0("outputs_PlatesA2B2_", samtoolsfilter, "_", samtoolsqual, "_minimap2_20180527")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 
 # use this version for COI_barcodes mapping
 # idxstatsgenomecovfolder <- paste0("minimap2_all_outputs_PlatesA2B2_", samtoolsfilter, "_COIBarcodesOnly")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
@@ -149,11 +150,11 @@ idx <- do.call(rbind, idx) %>% dplyr::select(mitogenome, mt_length, mapped_reads
 
 # sanity checks
 idx %>% distinct(well) %>% count()  # 94, number of distinct values of well, as a sanity check
-idx %>% distinct(sample) %>% count()  # number of distinct values of sample:  152  I originally input 192, but only have 168 idx files.  
+idx %>% distinct(sample) %>% count()  # number of distinct values of sample:  168  I originally input 192, but only have 168 idx files.  
 idx %>% distinct(pathname) %>% count()  # number of distinct values of sample:  152  I originally input 192, but only have 168 idx files.  
 idx %>% distinct(samtools_filter) %>% count() # number of distinct values of samtools_filter: should be 1
-idx %>% distinct(samtools_filter) # should look something like:  F2308_f0x2_q1
-idx_mitogenome_table <- idx %>% group_by(well) %>% distinct(mitogenome) %>% count() %>% arrange(desc(n)); View(idx_mitogenome_table) # all columns should be 308
+idx %>% distinct(samtools_filter) # should look something like:  F2308_f0x2_q48
+idx_mitogenome_table <- idx %>% group_by(well) %>% distinct(mitogenome) %>% count() %>% arrange(desc(n)); View(idx_mitogenome_table) # all columns should be 311
 length(idx$mitogenome) / idx_mitogenome_table[1,2] == idx %>% distinct(sample) %>% count()  # should evaluate to TRUE
 # 46816 rows / 308 mitogenomes = 152 samples
 ```
@@ -308,7 +309,7 @@ genomecoverages_summ <- purrr::map(genomecov_files, loadFile2); notify("Your loa
 # rbind the list into a dataframe
 genomecoverages_summ <- do.call(rbind, genomecoverages_summ)
 # save this file to avoid having to constantly run the map() step
-# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesA2B2_20180526.RDS", compress = TRUE)
+# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesA2B2_20180527.RDS", compress = TRUE)
 # genomecoverages_summ <- readRDS("A2B2_outputs_20180526_F2308_f0x2_q48_BWA/genomecoverages_summ_PlatesA2B2_20180526.RDS")
 
 
@@ -334,7 +335,7 @@ names(idx_meta_genomecov)
 # [22] "Quantification_method"      "x.260_280_ratio"            "lysis_buffer_orig_total_ul"
 # [25] "lysis_buffer_purified_ul"   "lysis_buffer_proportion"    "sum_coverage"              
 # [28] "mean_coverage"              "stddev"                     "coefvar"                   
-# [31] "length"                     "pathname_genomecov"        
+# [31] "length"                     "pct_coverage"               "pathname_genomecov"         
 ```
 
 
@@ -439,7 +440,7 @@ idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate(ratio_mordellid20_bom
 idx_meta_genomecov$ratio_mordellid20_bombyx10 <- round(idx_meta_genomecov$ratio_mordellid20_bombyx10, 1)
 ggplot(idx_meta_genomecov, aes(x=ratio_mordellid20_bombyx10)) + geom_density(alpha=0.5)
 mean(idx_meta_genomecov$ratio_mordellid20_bombyx10, na.rm = TRUE); sd(idx_meta_genomecov$ratio_mordellid20_bombyx10, na.rm = TRUE)
-# should be 2, and it's 1.87, sd = 0.26
+# should be 2, and it's 1.84, sd = 0.26
 
 idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate(ratio_elaterid40_bombyx=Coleoptera_Elateridae_40ng_COI/Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI)
 idx_meta_genomecov$ratio_elaterid40_bombyx <- round(idx_meta_genomecov$ratio_elaterid40_bombyx, 1)
@@ -527,6 +528,7 @@ idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dpl
 
 
 # write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesA2B2_20180527.txt") # so if i need to read in a file during debuggging, here it is
+
 # used for debugging, in case i screw up the dataset while writing code
 # idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesA2B2_20180223.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 #

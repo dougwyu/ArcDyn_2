@@ -145,22 +145,14 @@ idx <- do.call(rbind, idx) %>% dplyr::select(mitogenome, mt_length, mapped_reads
 # str(idx)
 # dim(idx)
 # sanity checks
-idx %>% distinct(well) %>% count()  # number of distinct values of well, as a sanity check
+idx %>% distinct(well) %>% count()  # number of distinct values of well, as a sanity check:  96
 idx %>% distinct(sample) %>% count()  # number of distinct values of sample:  192
 idx %>% distinct(pathname) %>% count()  # number of distinct values of pathname:  192
 idx %>% distinct(samtools_filter) %>% count() # number of distinct values of samtools_filter: should be 1
-idx %>% distinct(samtools_filter)  # show samtools filter value:  should be something like F2308_f0x2_q1
+idx %>% distinct(samtools_filter)  # show samtools filter value:  should be something like F2308_f0x2_q48
 
 idx_mitogenome_table <- idx %>% group_by(well) %>% distinct(mitogenome) %>% count() %>% arrange(desc(n)); View(idx_mitogenome_table) # should be 311 in all rows
-
-idx_mitogenome_table2 <- idx %>% group_by(well) # %>% distinct(mitogenome) %>% count() %>% arrange(desc(n)); View(idx_mitogenome_table2) # should be 311 in all rows
-
-
-length(idx$mitogenome)
-idx_mitogenome_table[1,2]
-length(idx$mitogenome) / idx_mitogenome_table[1,2] 
 length(idx$mitogenome) / idx_mitogenome_table[1,2] == idx %>% distinct(sample) %>% count()  # should evaluate to TRUE
-# 30720 rows / 160 mitogenomes = 192 samples
 
 ```
 
@@ -444,7 +436,7 @@ samples_to_remove <- sample_names %>% dplyr::pull(Full_name_of_the_sample) # pul
 samples_to_remove # 1 sample to remove
 idx_meta_genomecov <- idx_meta_genomecov %>% filter(!Full_name_of_the_sample %in% samples_to_remove) # 29987 + 157 = 30144
 
-# sanity check:  189 samples, which is correct since i removed 1 sample
+# sanity check:  191 samples, which is correct since i removed 1 sample
 idx_meta_genomecov %>% distinct(Full_name_of_the_sample) %>% count()  # number of distinct values of Full_name_of_the_sample
 ```
 
