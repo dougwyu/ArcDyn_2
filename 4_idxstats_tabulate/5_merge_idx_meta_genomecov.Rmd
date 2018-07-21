@@ -118,7 +118,7 @@ identical(names_AB, names_GH) # TRUE
 idx_meta_genomecov_ABA2B2EFGH <- bind_rows(idx_meta_genomecov_AB, idx_meta_genomecov_A2B2, idx_meta_genomecov_EF, idx_meta_genomecov_GH)
 
 # put EI_RUN column first
-idx_meta_genomecov_ABA2B2EFGH <- idx_meta_genomecov_ABA2B2EFGH %>% dplyr::select(EI_RUN, Date:Full_name_of_the_sample)
+idx_meta_genomecov_ABA2B2EFGH <- idx_meta_genomecov_ABA2B2EFGH %>% dplyr::select(EI_RUN, everything())
 
 # confirm 308 mitogenomes
 idx_meta_genomecov_ABA2B2EFGH %>% distinct(mitogenome) %>% count()  # 308: number of distinct values of mitogenome (311 total mitogenomes - the 3 COI spikes = 308)
@@ -146,6 +146,22 @@ names(idx_meta_genomecov_ABA2B2EFGH)
 ```
 
 
+```{r add taxonomic ranks}
+taxonomyfilepath <- "~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/5_taxonomy/mitogenome_fasta"
+taxonomyfile <- "Species_for_mitogenome_sequencing_20180721.xlsx"
+
+taxonomies <- read_excel(file.path(taxonomyfilepath, taxonomyfile), sheet = "mitogenome_database", na = "NA") %>% dplyr::filter(to_be_sanger_sequenced == "no" &  mitogenome_status != "failed") 
+# mitogenome_status == "failed" indicates specimens that failed sequencing at Copenhagen and were sent to TGAC/EI
+# to_be_sanger_sequenced == "no" indicates specimens that successfully got contigs, either at EI or Copenhagen
+
+taxonomies <- taxonomies %>% dplyr::select(Yinqiu_mitogenome_fastaname, Order, Family, Genus, Species_BOLD)
+
+idx_meta_genomecov_ABA2B2EFGH <-  left_join(idx_meta_genomecov_ABA2B2EFGH, taxonomies, by = c("mitogenome" = "Yinqiu_mitogenome_fastaname")) %>% dplyr::select(EI_RUN:mitogenome, Order:Species_BOLD, everything())
+
+```
+
+
+
 ```{r make wide tables}
 # create variable from Date, Trap(ABC), and EI_RUN:  e.g. Date_1997_08_04_TrapA_AB
 # stringr::str_pad(x, width = 2, side = "left", pad = "0")  # to ensure that the date always has two digits, e.g. 07.
@@ -155,7 +171,9 @@ idx_meta_genomecov_ABA2B2EFGH$DateTrapEIRUN <- str_c("Date", year(idx_meta_genom
 # Make wide table for visualisation (left to right should follow temporal order (DateTrapEIRUN))
 idx_meta_genomecov_ABA2B2EFGH_wide <- idx_meta_genomecov_ABA2B2EFGH %>% dplyr::select(DateTrapEIRUN, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrapEIRUN) %>% tidyr::spread(DateTrapEIRUN, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
-idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin <- idx_meta_genomecov_ABA2B2EFGH %>% dplyr::filter(pct_coverage > 0.10) %>% dplyr::select(DateTrapEIRUN, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrapEIRUN) %>% tidyr::spread(DateTrapEIRUN, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
+pctcovermin <- 0.10
+
+idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin <- idx_meta_genomecov_ABA2B2EFGH %>% dplyr::filter(pct_coverage >= pctcovermin) %>% dplyr::select(DateTrapEIRUN, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrapEIRUN) %>% tidyr::spread(DateTrapEIRUN, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
 ```
 
@@ -194,6 +212,23 @@ idx_meta_genomecov <- read_tsv("idx_meta_genomecov_ABA2B2EFGH_minimap2_20180527.
 # idx_meta_genomecov <- read_tsv("idx_meta_genomecov_ABA2B2EFGH_20180214_COIBarcodesOnly.txt")
 
 names(idx_meta_genomecov)
+
+# EI_runs and mitogenomes are kept separate
+sum_idx_meta_genomecov <- idx_meta_genomecov %>% 
+    group_by_at(vars(Date, Trap, EI_RUN, mitogenome)) %>%
+    filter(pct_coverage >= 0.1) %>% 
+    summarise(
+        sum_mapped_reads=sum(mapped_reads),
+        species_obs_mapped_reads=sum(mapped_reads > 0),  # sum() a logical:  mapped_read
+        sum_mapped_reads_COI_corr=sum(mapped_reads_COI_corr),
+        sum_mapped_reads_COI_lysis_corr=sum(mapped_reads_COI_lysis_corr),
+        Bombycid10_spike=first(Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI),
+        Mordellid20_spike=first(Coleoptera_Mordellidae_20ng_COI),
+        Elaterid40_spike=first(Coleoptera_Elateridae_40ng_COI),
+        lysis_buffer_multipler=first(lysis_buffer_proportion)
+        ) %>% 
+    arrange(Date, Trap)
+# write_tsv(sum_idx_meta_genomecov, "idx_meta_genomecov_ABA2B2EFGH_summ0_minimap2_20180527.txt")
 
 # EI_runs are kept separate
 sum_idx_meta_genomecov <- idx_meta_genomecov %>% 
@@ -284,3 +319,4 @@ q + geom_line()
 r + geom_line()
 r + geom_point() + scale_x_date(breaks=scales::date_breaks("3 months"), labels=scales::date_format("%y"))
 ```
+
