@@ -11,6 +11,9 @@ library(tidyverse)
 library(readxl)
 library(lubridate)
 library(knitr)
+library(pheatmap)
+library(RColorBrewer)
+library(cowplot)
 ```
 
 
@@ -157,12 +160,10 @@ taxonomies <- read_excel(file.path(taxonomyfilepath, taxonomyfile), sheet = "mit
 taxonomies <- taxonomies %>% dplyr::select(Yinqiu_mitogenome_fastaname, Order, Family, Genus, Species_BOLD)
 
 idx_meta_genomecov_ABA2B2EFGH <-  left_join(idx_meta_genomecov_ABA2B2EFGH, taxonomies, by = c("mitogenome" = "Yinqiu_mitogenome_fastaname")) %>% dplyr::select(EI_RUN:mitogenome, Order:Species_BOLD, everything())
-
 ```
 
 
-
-```{r make wide tables}
+```{r make wide tables, eval = FALSE}
 # create variable from Date, Trap(ABC), and EI_RUN:  e.g. Date_1997_08_04_TrapA_AB
 # stringr::str_pad(x, width = 2, side = "left", pad = "0")  # to ensure that the date always has two digits, e.g. 07.
 # stringr::str_replace(idx_meta_genomecov_ABA2B2EFGH$EI_RUN, "idx_meta_genomecov_", "") # to extract AB, A2B2, EF, GH from EI_RUN
@@ -173,50 +174,121 @@ idx_meta_genomecov_ABA2B2EFGH_wide <- idx_meta_genomecov_ABA2B2EFGH %>% dplyr::s
 
 pctcovermin <- 0.10
 
-idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin <- idx_meta_genomecov_ABA2B2EFGH %>% dplyr::filter(pct_coverage >= pctcovermin) %>% dplyr::select(DateTrapEIRUN, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrapEIRUN) %>% tidyr::spread(DateTrapEIRUN, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
-
+idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin <- idx_meta_genomecov_ABA2B2EFGH %>%
+    dplyr::filter(pct_coverage >= pctcovermin) %>% 
+    dplyr::select(DateTrapEIRUN, mitogenome, mapped_reads_COI_lysis_corr) %>%
+    dplyr::arrange(DateTrapEIRUN) %>% 
+    tidyr::spread(DateTrapEIRUN, mapped_reads_COI_lysis_corr) %>% 
+    dplyr::arrange(mitogenome)
 ```
 
 
 ```{r write tables, eval=FALSE}
-# idx_meta-genomecov long table for Otso, 217448 rows, 37 columns
+# # idx_meta-genomecov long table for Otso, 217448 rows, 41 columns
 # setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesABA2B2EFGH")
-# write_tsv(idx_meta_genomecov_ABA2B2EFGH, "idx_meta_genomecov_ABA2B2EFGH_minimap2_20180527.txt")
+# write_tsv(idx_meta_genomecov_ABA2B2EFGH, "idx_meta_genomecov_ABA2B2EFGH_minimap2_20180721.txt")
+# 
 # # # idx_meta-genomecov wide table for visualisation:  308 rows, 707 columns
 # write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide, "idx_meta_genomecov_ABA2B2EFGH_wide_minimap2_20180527.txt")
+# 
 # # # idx_meta-genomecov wide table for visualisation:  148 rows, 707 columns
 # write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin, "idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin_minimap2_20180527.txt")
-# #
+
 ```
 
 
-```{r Wide PlateAB only}
+```{r pretty heatmap}
+# use only 1997 & 2013, only PlatesAB (or PlatesA2B2), only one Trap (A, B, or C), include the taxonomic columns
 # create new column:  DateTrapEIRUN
 # create variable from Date, Trap(ABC), and EI_RUN:  e.g. Date_1997_08_04_TrapA_AB
 # stringr::str_pad(x, width = 2, side = "left", pad = "0")  # to ensure that the date always has two digits, e.g. 07.
 # stringr::str_replace(idx_meta_genomecov_AB$EI_RUN, "idx_meta_genomecov_", "") # to extract AB, A2B2, EF, GH from EI_RUN
-idx_meta_genomecov_AB$DateTrapEIRUN <- str_c("Date", year(idx_meta_genomecov_AB$Date), str_pad(month(idx_meta_genomecov_AB$Date), 2, side = "left", pad = "0"), str_pad(day(idx_meta_genomecov_AB$Date), 2, side = "left", pad = "0"), idx_meta_genomecov_AB$Trap, str_replace(idx_meta_genomecov_AB$EI_RUN, "idx_meta_genomecov_", ""), sep = "_")
+idx_meta_genomecov_ABA2B2EFGH$DateTrapEIRUN <- str_c("Sample", year(idx_meta_genomecov_ABA2B2EFGH$Date), str_pad(month(idx_meta_genomecov_ABA2B2EFGH$Date), 2, side = "left", pad = "0"), str_pad(day(idx_meta_genomecov_ABA2B2EFGH$Date), 2, side = "left", pad = "0"), idx_meta_genomecov_ABA2B2EFGH$Trap, str_replace(idx_meta_genomecov_ABA2B2EFGH$EI_RUN, "idx_meta_genomecov_", ""), sep = "_")
 
-# Make wide table for visualisation (left to right should follow temporal order (DateTrapEIRUN))
-idx_meta_genomecov_AB_wide_pctcovmin <- idx_meta_genomecov_AB %>% dplyr::filter(pct_coverage > 0.1) %>% dplyr::select(DateTrapEIRUN, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrapEIRUN) %>% tidyr::spread(DateTrapEIRUN, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
+idx_meta_genomecov_ABA2B2EFGH$DateEIRUN <- str_c("Sample", year(idx_meta_genomecov_ABA2B2EFGH$Date), str_pad(month(idx_meta_genomecov_ABA2B2EFGH$Date), 2, side = "left", pad = "0"), str_pad(day(idx_meta_genomecov_ABA2B2EFGH$Date), 2, side = "left", pad = "0"), str_replace(idx_meta_genomecov_ABA2B2EFGH$EI_RUN, "idx_meta_genomecov_", ""), sep = "_")
+
+pctcovermin <- 0.10
+eirun <- "idx_meta_genomecov_AB"
+trap <- c("TrapA", "TrapB", "TrapC")
+# years <- c(1997, 2013)
+years <- c(1997, 1998, 1999, 2011, 2012, 2013)
+
+# Make wide table for visualisation (left to right should follow temporal order (Date))
+idx_meta_genomecov_wide_pctcovmin <- idx_meta_genomecov_ABA2B2EFGH %>% 
+    dplyr::mutate(Year = year(Date)) %>% 
+    dplyr::filter(EI_RUN == eirun, pct_coverage >= pctcovermin, Trap %in% trap, Year %in% years) %>% 
+    dplyr::select(DateEIRUN, EI_RUN, Date, Trap, Year, mitogenome, Order, Family, Genus, Species_BOLD, mapped_reads_COI_lysis_corr) %>%
+    dplyr::group_by(Order, Family, Genus, Species_BOLD, DateEIRUN, Date) %>% 
+    dplyr::summarise(mapped_reads_COI_lysis_corr_mean = round(mean(as.numeric(mapped_reads_COI_lysis_corr)))) %>% 
+    dplyr::arrange(Date) %>% 
+    tidyr::spread(DateEIRUN, mapped_reads_COI_lysis_corr_mean) %>% 
+    dplyr::arrange(Order, Family, Genus, Species_BOLD)
+
+# change the sample columns to numeric and replace NA with 0s
+idx_meta_genomecov_wide_pctcovmin <- idx_meta_genomecov_wide_pctcovmin %>%
+    mutate_at(vars(starts_with("Sample_")), funs(as.numeric(.))) %>%
+    mutate_at(vars(starts_with("Sample_")), funs(if_else(is.na(.), 0, .)))
+
+# add up rows that have the same taxonomy
+idx_meta_genomecov_wide_pctcovmin <- idx_meta_genomecov_wide_pctcovmin %>% 
+    group_by(Order, Family, Genus) %>% 
+    summarise_at(vars(starts_with("Sample_")), funs(sum(as.numeric(.)))) %>%
+    arrange(Order, Family, Genus)
+
+# remove any species (rows that have 0 total reads)
+idx_meta_genomecov_wide_pctcovmin <- idx_meta_genomecov_wide_pctcovmin %>% 
+    dplyr::ungroup() %>%   # must ungroup or dplyr forces Order, Family to be included in rowSums
+    dplyr::mutate(readsum = rowSums(select(., starts_with("Sample_")))) %>% 
+    dplyr::filter(readsum > 0) %>% 
+    dplyr::select(-readsum)
+
+# create taxonomy column from taxonomic ranks
+idx_meta_genomecov_wide_pctcovmin <- idx_meta_genomecov_wide_pctcovmin %>% tidyr::unite(taxonomy, Order, Family, Genus) 
+
+# place taxonomy in rownames
+idx_meta_genomecov_wide_pctcovmin <- idx_meta_genomecov_wide_pctcovmin %>% column_to_rownames(var = "taxonomy")
+
+
+arcdynheat <- idx_meta_genomecov_wide_pctcovmin %>% as.matrix(idx_meta_genomecov_wide_pctcovmin)
+
+cal_z_score <- function(x){
+  (x - mean(x)) / sd(x)
+}
+ 
+arcdynheat_norm <- t(apply(arcdynheat, 1, cal_z_score)) # 1 == margin = rows. 2 == cols
+
+# 1997, 2013 only, use gaps_col = c(9)
+# 1997, 1998, 1999, 2011, 2012, 2013, use gaps_col = c(9, 18, 26, 41, 54)
+pheatmap(arcdynheat_norm, 
+         color = colorRampPalette(c("white", "firebrick3"))(50),
+         # color = colorRampPalette(YlOrBr)(10),
+         # scale = "row",
+         gaps_col = c(9),
+         # gaps_col = c(9, 18, 26, 41, 54),
+         # display_numbers = TRUE,
+         cluster_cols = FALSE,
+         cluster_rows = TRUE,
+         cutree_rows = 7)
 
 # idx_meta-genomecov wide table for visualisation:  157 rows, 702 columns
-# write_tsv(idx_meta_genomecov_AB_wide_pctcovmin, "idx_meta_genomecov_AB_wide_pctcovmin_minimap2_20180527.txt")
+# write_tsv(idx_meta_genomecov_AB_wide_pctcovmin, "idx_meta_genomecov_AB_wide_pctcovmin_minimap2_20180721.txt")
 ```
 
 Summary tables to show how many reads and detected species per sample, also summed over year and trap, etc.
 
 ```{r summary tables}
-setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesABA2B2EFGH/minimap2_308mitogenomes_20180527")
-idx_meta_genomecov <- read_tsv("idx_meta_genomecov_ABA2B2EFGH_minimap2_20180527.txt")
+setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesABA2B2EFGH/minimap2_308mitogenomes_20180721")
+idx_meta_genomecov <- read_tsv("idx_meta_genomecov_ABA2B2EFGH_minimap2_20180721.txt")
 # idx_meta_genomecov <- read_tsv("idx_meta_genomecov_ABA2B2EFGH_20180214_COIBarcodesOnly.txt")
 
 names(idx_meta_genomecov)
 
+pctcovermin <- 0.1
+
 # EI_runs and mitogenomes are kept separate
 sum_idx_meta_genomecov <- idx_meta_genomecov %>% 
     group_by_at(vars(Date, Trap, EI_RUN, mitogenome)) %>%
-    filter(pct_coverage >= 0.1) %>% 
+    filter(pct_coverage >= pctcovermin) %>% 
     summarise(
         sum_mapped_reads=sum(mapped_reads),
         species_obs_mapped_reads=sum(mapped_reads > 0),  # sum() a logical:  mapped_read
@@ -228,12 +300,12 @@ sum_idx_meta_genomecov <- idx_meta_genomecov %>%
         lysis_buffer_multipler=first(lysis_buffer_proportion)
         ) %>% 
     arrange(Date, Trap)
-# write_tsv(sum_idx_meta_genomecov, "idx_meta_genomecov_ABA2B2EFGH_summ0_minimap2_20180527.txt")
+# write_tsv(sum_idx_meta_genomecov, "idx_meta_genomecov_ABA2B2EFGH_summ0_minimap2_20180721.txt")
 
 # EI_runs are kept separate
 sum_idx_meta_genomecov <- idx_meta_genomecov %>% 
     group_by_at(vars(Date, Trap, EI_RUN)) %>%
-    filter(pct_coverage >= 0.1) %>% 
+    filter(pct_coverage >= pctcovermin) %>% 
     summarise(
         sum_mapped_reads=sum(mapped_reads),
         species_obs_mapped_reads=sum(mapped_reads > 0),  # sum() a logical:  mapped_read
@@ -245,12 +317,12 @@ sum_idx_meta_genomecov <- idx_meta_genomecov %>%
         lysis_buffer_multipler=first(lysis_buffer_proportion)
         ) %>% 
     arrange(Date, Trap)
-# write_tsv(sum_idx_meta_genomecov, "idx_meta_genomecov_ABA2B2EFGH_summ1_minimap2_20180527.txt")
+# write_tsv(sum_idx_meta_genomecov, "idx_meta_genomecov_ABA2B2EFGH_summ1_minimap2_20180721.txt")
 
 # EI_runs with the same date and trap are summed together
 sum_idx_meta_genomecov2 <- idx_meta_genomecov %>% 
     group_by_at(vars(Date, Trap)) %>%
-    filter(pct_coverage >= 0.1) %>% 
+    filter(pct_coverage >= pctcovermin) %>% 
     summarise(
         sum_mapped_reads=sum(mapped_reads),
         species_obs_mapped_reads=sum(mapped_reads > 0),  # sum() a logical:  mapped_read
@@ -263,11 +335,11 @@ sum_idx_meta_genomecov2 <- idx_meta_genomecov %>%
         lysis_buffer_multipler=first(lysis_buffer_proportion)
         ) %>% 
     arrange(Date, Trap)
-# write_tsv(sum_idx_meta_genomecov2, "idx_meta_genomecov_ABA2B2EFGH_summ2_minimap2_20180527.txt")
+# write_tsv(sum_idx_meta_genomecov2, "idx_meta_genomecov_ABA2B2EFGH_summ2_minimap2_20180721.txt")
 
 # EI_RUNS with the same year are summed together
 sum_idx_meta_genomecov3 <- idx_meta_genomecov %>% 
-    filter(pct_coverage >= 0.1) %>% 
+    filter(pct_coverage >= pctcovermin) %>% 
     mutate(Year = year(Date)) %>% 
     group_by_at(vars(EI_RUN, Year, Trap)) %>%
     summarise(
@@ -284,8 +356,7 @@ sum_idx_meta_genomecov3 <- idx_meta_genomecov %>%
         ) %>%
     mutate(species_obs_mapped_reads_perweek = round(species_obs_mapped_reads/weeks, 1)) %>% 
     arrange(Year, Trap)
-# write_tsv(sum_idx_meta_genomecov3, "idx_meta_genomecov_ABA2B2EFGH_summ3_minimap2_20180527.txt")
-
+# write_tsv(sum_idx_meta_genomecov3, "idx_meta_genomecov_ABA2B2EFGH_summ3_minimap2_20180721.txt")
 ```
 
 
@@ -296,6 +367,7 @@ https://stats.idre.ucla.edu/r/faq/how-can-i-visualize-longitudinal-data-in-ggplo
 sum_idx_meta_genomecovA2B2 <- sum_idx_meta_genomecov %>% dplyr::filter(EI_RUN == "idx_meta_genomecov_A2B2")
 
 p <- ggplot(sum_idx_meta_genomecovA2B2, aes(x = Date, y = species_obs_mapped_reads, group = Trap))
+
 species_obs_each_week <- p + geom_bar(stat = "identity", width = 5) + scale_x_date(date_breaks = "1 year", labels=scales::date_format("%y")) + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +  facet_grid(. ~ Trap) + xlab("Year") + ylab("Observed species richness") + ggtitle("Species observed in each week")
 
 sum_idx_meta_genomecov3AB <- sum_idx_meta_genomecov3 %>% dplyr::filter(EI_RUN == "idx_meta_genomecov_AB")
@@ -305,15 +377,19 @@ sum_idx_meta_genomecov3EF <- sum_idx_meta_genomecov3 %>% dplyr::filter(EI_RUN ==
 sum_idx_meta_genomecov3sub <- sum_idx_meta_genomecov3A2B2
 
 q <- ggplot(sum_idx_meta_genomecov3sub, aes(x = as_date(Year), y = species_obs_mapped_reads, group = Trap))
+
 species_obs_per_year <- q + geom_bar(stat = "identity", width = .5) + scale_x_date(date_breaks = "1 year", labels=scales::date_format("%y")) + theme_bw() + theme(panel.grid.major = element_blank(), axis.line = element_line(colour = "black")) +  facet_grid(. ~ Trap) + xlab("Year") + ylab("Observed species richness") + ggtitle("Total number of species observed in each year")
 
 r <- ggplot(sum_idx_meta_genomecov3sub, aes(x = as_date(Year), y = species_obs_mapped_reads_perweek, group = Trap))
+
 species_obs_per_week <- r + geom_bar(stat = "identity", width = .5) + scale_x_date(date_breaks = "1 year", labels=scales::date_format("%y")) + theme_bw() + theme(panel.grid.major = element_blank(), axis.line = element_line(colour = "black")) +  facet_grid(. ~ Trap) + xlab("Year") + ylab("Observed species richness") + ggtitle("Mean number of species observed *per week* in each year")
 
 
 species_obs_per_year # q, Tot_species_per_year_AB
 species_obs_per_week # r, Tot_species_per_week_per_year_AB
 species_obs_each_week # p
+
+plot_grid(species_obs_per_year, species_obs_per_week, nrow = 2, align = "v")
 
 q + geom_line()
 r + geom_line()
