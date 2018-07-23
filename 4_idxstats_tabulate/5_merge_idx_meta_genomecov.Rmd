@@ -203,15 +203,15 @@ idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin <- idx_meta_genomecov_ABA2B2EFGH 
 # create variable from Date, Trap(ABC), and EI_RUN:  e.g. Date_1997_08_04_TrapA_AB
 # stringr::str_pad(x, width = 2, side = "left", pad = "0")  # to ensure that the date always has two digits, e.g. 07.
 # stringr::str_replace(idx_meta_genomecov_AB$EI_RUN, "idx_meta_genomecov_", "") # to extract AB, A2B2, EF, GH from EI_RUN
-idx_meta_genomecov_ABA2B2EFGH$DateTrapEIRUN <- str_c("Sample", year(idx_meta_genomecov_ABA2B2EFGH$Date), str_pad(month(idx_meta_genomecov_ABA2B2EFGH$Date), 2, side = "left", pad = "0"), str_pad(day(idx_meta_genomecov_ABA2B2EFGH$Date), 2, side = "left", pad = "0"), idx_meta_genomecov_ABA2B2EFGH$Trap, str_replace(idx_meta_genomecov_ABA2B2EFGH$EI_RUN, "idx_meta_genomecov_", ""), sep = "_")
+# idx_meta_genomecov_ABA2B2EFGH$DateTrapEIRUN <- str_c("Sample", year(idx_meta_genomecov_ABA2B2EFGH$Date), str_pad(month(idx_meta_genomecov_ABA2B2EFGH$Date), 2, side = "left", pad = "0"), str_pad(day(idx_meta_genomecov_ABA2B2EFGH$Date), 2, side = "left", pad = "0"), idx_meta_genomecov_ABA2B2EFGH$Trap, str_replace(idx_meta_genomecov_ABA2B2EFGH$EI_RUN, "idx_meta_genomecov_", ""), sep = "_")
 
 idx_meta_genomecov_ABA2B2EFGH$DateEIRUN <- str_c("Sample", year(idx_meta_genomecov_ABA2B2EFGH$Date), str_pad(month(idx_meta_genomecov_ABA2B2EFGH$Date), 2, side = "left", pad = "0"), str_pad(day(idx_meta_genomecov_ABA2B2EFGH$Date), 2, side = "left", pad = "0"), str_replace(idx_meta_genomecov_ABA2B2EFGH$EI_RUN, "idx_meta_genomecov_", ""), sep = "_")
 
 pctcovermin <- 0.10
 eirun <- "idx_meta_genomecov_AB"
 trap <- c("TrapA", "TrapB", "TrapC")
-# years <- c(1997, 2013)
-years <- c(1997, 1998, 1999, 2011, 2012, 2013)
+years <- c(1997, 2013)
+# years <- c(1997, 1998, 1999, 2011, 2012, 2013)
 
 # Make wide table for visualisation (left to right should follow temporal order (Date))
 idx_meta_genomecov_wide_pctcovmin <- idx_meta_genomecov_ABA2B2EFGH %>% 
@@ -266,9 +266,11 @@ pheatmap(arcdynheat_norm,
          gaps_col = c(9),
          # gaps_col = c(9, 18, 26, 41, 54),
          # display_numbers = TRUE,
+         clustering_method = "complete", # "complete", ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
+         clustering_distance_rows = "euclidean", # euclidean, manhattan, canberra, minkowski
          cluster_cols = FALSE,
          cluster_rows = TRUE,
-         cutree_rows = 7)
+         cutree_rows = 5)
 
 # idx_meta-genomecov wide table for visualisation:  157 rows, 702 columns
 # write_tsv(idx_meta_genomecov_AB_wide_pctcovmin, "idx_meta_genomecov_AB_wide_pctcovmin_minimap2_20180721.txt")
