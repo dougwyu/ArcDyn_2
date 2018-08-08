@@ -25,4 +25,4 @@ PATH=$PATH:~/scripts/minimap2-2.10_x64-linux/  # downloaded binary 28 May 2018 f
 PATH=$PATH:~/scripts/bedtools2/bin # made 22 Jan 2018 from github 2.27.1
 
 
-bash _loop_minimap2_only_20180528.sh
+bash _loop_minimap2_only_20180726.sh

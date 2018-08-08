@@ -8,7 +8,7 @@ set -o pipefail
 #######################################################################################
 #######################################################################################
 
-# Usage: bash _loop_minimap2_only_20180528.sh
+# Usage: bash _loop_minimap2_only_20180726.sh
 # this version uses the 308 mitogenome reference fasta
 
 # Interactive procedure:  first run these commands if running _loop_minimap2_20180122.sh interactively
@@ -54,7 +54,7 @@ set -o pipefail
      # PATH=$PATH:~/scripts/bedtools2/bin # made 22 Jan 2018 from github 2.27.1
      #
      #
-     # bash _loop_minimap2_only_20180226.sh
+     # bash _loop_minimap2_only_20180726.sh
      #######################################################################################
      #######################################################################################
 
@@ -121,10 +121,10 @@ do
      # minimap2 -ax sr ~/greenland_2017/reference_seqs/positive_control_19_species_3_COI_spikes.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
 
      # against 308 full mitogenomes (full sequences, not just protein-coding genes) and 3 COI_spike barcodes
-     minimap2 -t 16 -ax sr ~/greenland_2017/reference_seqs/ArcDyn_308_full_mitogenomes_20180524.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@15 - -o ${sample}_sorted.bam
+     # minimap2 -t 16 -ax sr ~/greenland_2017/reference_seqs/ArcDyn_308_full_mitogenomes_20180524.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@15 - -o ${sample}_sorted.bam
 
-     # against 410 barcodes and 3 COI_spike barcodes
-     # minimap2 -ax sr ~/greenland_2017/CO1_1sequence_perBIN_040915_COIspiking.fas ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
+     # against 406 barcodes and 3 COI_spike barcodes
+     minimap2 -ax sr ~/greenland_2017/reference_seqs/ArcDyn_406_COI_3spikes_20180726.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
      echo "**** end of minimap2, sam to bam conversion, sorting of bam file $(date)"
 
      # calculate flagstats

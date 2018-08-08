@@ -115,10 +115,10 @@ do
      #### bwa ####
 
      # against 308 full mitogenomes (full sequences, not just protein-coding genes) and 3 COI_spike barcodes
-     bwa mem -t 27 ~/greenland_2017/reference_seqs/ArcDyn_308_full_mitogenomes_20180524.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
+     # bwa mem -t 27 ~/greenland_2017/reference_seqs/ArcDyn_308_full_mitogenomes_20180524.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
 
-     # against 410 barcodes and 3 COI_spike barcodes
-     # bwa mem -t 27 ~/greenland_2017/CO1_1sequence_perBIN_040915_COIspiking.fas ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
+     # against 406 barcodes and 3 COI_spike barcodes
+     bwa mem -t 27 ~/greenland_2017/reference_seqs/ArcDyn_406_COI_3spikes_20180726.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
      echo "**** end of bwa, sam to bam conversion, sorting of bam file $(date)"
 
      # calculate flagstats

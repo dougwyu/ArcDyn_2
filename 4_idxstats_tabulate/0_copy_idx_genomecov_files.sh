@@ -95,13 +95,13 @@ ls ${OUTPUTFOLDER}_Plates${PLATE}/
 # rename, tar and gzip for download
 du -sh ${OUTPUTFOLDER}_Plates${PLATE}/ # ~4.9 GB
 # set filename to something that i can understand after download
-# format:  outputs_PlatesAB_F2308_f0x2_q48_minimap2_outputs_20180527.tar.gz
-mv ${OUTPUTFOLDER}_Plates${PLATE} outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180527
+# format:  outputs_PlatesAB_F2308_f0x2_q48_minimap2_outputs_20180727.tar.gz
+mv ${OUTPUTFOLDER}_Plates${PLATE} outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180727
 ls
 # tar gzip for download
-tar -czvf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180527.tar.gz outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180527/
+tar -czvf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180727.tar.gz outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180727/
 ls
-rm -rf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180527/
+rm -rf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180727/
 ls
 
 

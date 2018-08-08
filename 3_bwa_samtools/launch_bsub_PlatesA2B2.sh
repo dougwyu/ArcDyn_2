@@ -28,16 +28,16 @@ PATH=$PATH:~/scripts/parallel-20170722/bin/
 ############## by hand, copy 1/10 the sample files into each BWA folder
 
 ############# copy the bwa and samtools shell and bsub scripts into each BWA folder
-# BWA_BSUB="loop_bwa_only_20180417.bsub"; echo ${BWA_BSUB}
-# BWA_SH="_loop_bwa_only_20180417.sh"; echo ${BWA_SH}
-SAMTOOLS_BSUB="loop_samtools_only_20180417.bsub"; echo ${SAMTOOLS_BSUB}
-SAMTOOLS_SH="_loop_samtools_only_20180417.sh"; echo ${SAMTOOLS_SH}
+BWA_BSUB="loop_bwa_only_20180417.bsub"; echo ${BWA_BSUB}
+BWA_SH="_loop_bwa_only_20180417.sh"; echo ${BWA_SH}
+# SAMTOOLS_BSUB="loop_samtools_only_20180417.bsub"; echo ${SAMTOOLS_BSUB}
+# SAMTOOLS_SH="_loop_samtools_only_20180417.sh"; echo ${SAMTOOLS_SH}
 
 cd ~/greenland_2017/platesA2B2/platesA2B2_combined; ls
-# parallel cp ${BWA_BSUB} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
-# parallel cp ${BWA_SH} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
-parallel cp ${SAMTOOLS_BSUB} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
-parallel cp ${SAMTOOLS_SH} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
+parallel cp ${BWA_BSUB} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
+parallel cp ${BWA_SH} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
+# parallel cp ${SAMTOOLS_BSUB} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
+# parallel cp ${SAMTOOLS_SH} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
 # parallel cp loop_trimgalore_20180216.bsub BWA{} ::: 01 02 03 04 05 06 07 08 09 10
 # parallel cp _loop_trimgalore_20180216.sh BWA{} ::: 01 02 03 04 05 06 07 08 09 10
 ls BWA{01,02,03,04,05,06,07,08,09,10}

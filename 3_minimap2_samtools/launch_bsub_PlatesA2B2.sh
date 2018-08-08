@@ -10,8 +10,8 @@ set -o pipefail
 
 # upload the new samtools bsub file from macOS
 # run in macOS, not hpc
-scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_minimap2_samtools/loop_minimap2_only_20180528.bsub b042@hpc.uea.ac.uk:~/greenland_2017/platesA2B2/platesA2B2_combined/
-scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_minimap2_samtools/_loop_minimap2_only_20180528.sh b042@hpc.uea.ac.uk:~/greenland_2017/platesA2B2/platesA2B2_combined/
+scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_minimap2_samtools/loop_minimap2_only_20180726.bsub b042@hpc.uea.ac.uk:~/greenland_2017/platesA2B2/platesA2B2_combined/
+scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_minimap2_samtools/_loop_minimap2_only_20180726.sh b042@hpc.uea.ac.uk:~/greenland_2017/platesA2B2/platesA2B2_combined/
 
 scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_minimap2_samtools/loop_samtools_only_20180219.bsub b042@hpc.uea.ac.uk:~/greenland_2017/platesA2B2/platesA2B2_combined/
 scp ~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/3_minimap2_samtools/_loop_samtools_only_20180219.sh b042@hpc.uea.ac.uk:~/greenland_2017/platesA2B2/platesA2B2_combined/
@@ -28,8 +28,8 @@ PATH=$PATH:~/scripts/parallel-20170722/bin/
 ############## by hand, copy 1/10 the sample files into each BWA folder
 
 ############# copy the minimap and samtools shell and bsub scripts into each BWA folder
-# MINIMAP2_BSUB="loop_minimap2_only_20180528.bsub"; echo ${MINIMAP2_BSUB}
-# MINIMAP2_SH="_loop_minimap2_only_20180528.sh"; echo ${MINIMAP2_SH}
+# MINIMAP2_BSUB="loop_minimap2_only_20180726.bsub"; echo ${MINIMAP2_BSUB}
+# MINIMAP2_SH="_loop_minimap2_only_20180726.sh"; echo ${MINIMAP2_SH}
 SAMTOOLS_BSUB="loop_samtools_only_20180219.bsub"; echo ${SAMTOOLS_BSUB}
 SAMTOOLS_SH="_loop_samtools_only_20180219.sh"; echo ${SAMTOOLS_SH}
 
@@ -117,6 +117,9 @@ bsub < ${MINIMAP2_BSUB}
 bjobs
 ls
 
+bjobs
+ls ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA01/minimap2_outputs # check
+
 ####### launch samtools scripts #######
 cd ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA01; ls
 echo "${SAMTOOLS_BSUB}"
@@ -126,6 +129,7 @@ ls minimap2_outputs # should start to see the new bam files
 
 cd ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA02; ls
 bsub < ${SAMTOOLS_BSUB}
+bjobs
 
 cd ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA03; ls
 bsub < ${SAMTOOLS_BSUB}
@@ -133,9 +137,11 @@ bjobs
 
 cd ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA04; ls
 bsub < ${SAMTOOLS_BSUB}
+bjobs
 
 cd ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA05; ls
 bsub < ${SAMTOOLS_BSUB}
+bjobs
 
 cd ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA06; ls
 bsub < ${SAMTOOLS_BSUB}
@@ -153,6 +159,8 @@ bsub < ${SAMTOOLS_BSUB}
 cd ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA10; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
+
+cd ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA01
 ls minimap2_outputs # should show new bam files
 
 ####### launch trimgalore scripts #######

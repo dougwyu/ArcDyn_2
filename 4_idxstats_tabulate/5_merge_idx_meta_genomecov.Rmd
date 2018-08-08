@@ -17,11 +17,17 @@ library(cowplot)
 ```
 
 
+START HERE
+
 ```{r load PlatesAB}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/")
 
 outputfolder <- "AB_outputs_20180527_F2308_f0x2_q48_minimap2"
 idxmetagenomcovfile <- "idx_meta_genomecov_PlatesAB_20180527.txt"
+
+# outputfolder <- "AB_outputs_20180727_F2308_f0x2_q48_COIBarcodesOnly"
+# idxmetagenomcovfile <- "idx_meta_genomecov_PlatesAB_COIBarcodesOnly_20180727.txt"
+
 
 idx_meta_genomecov_AB <- read_delim(file.path(outputfolder, idxmetagenomcovfile), delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
@@ -40,6 +46,9 @@ setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesA2B2")
 
 outputfolder <- "A2B2_outputs_20180527_F2308_f0x2_q48_minimap2"
 idxmetagenomcovfile <- "idx_meta_genomecov_PlatesA2B2_20180527.txt"
+
+# outputfolder <- "A2B2_outputs_20180727_F2308_f0x2_q48_COIBarcodesOnly"
+# idxmetagenomcovfile <- "idx_meta_genomecov_PlatesA2B2_COIBarcodesOnly_20180727.txt"
 
 idx_meta_genomecov_A2B2 <- read_delim(file.path(outputfolder, idxmetagenomcovfile), delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
@@ -60,6 +69,9 @@ setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesEF")
 
 outputfolder <- "EF_outputs_20180527_F2308_f0x2_q48_minimap2"
 idxmetagenomcovfile <- "idx_meta_genomecov_PlatesEF_20180527.txt"
+
+# outputfolder <- "EF_outputs_20180727_F2308_f0x2_q48_minimap2_COIBarcodesOnly"
+# idxmetagenomcovfile <- "idx_meta_genomecov_PlatesEF_COIBarcodesOnly_20180727.txt"
 
 idx_meta_genomecov_EF <- read_delim(file.path(outputfolder, idxmetagenomcovfile), delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
@@ -84,6 +96,9 @@ setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesGH")
 
 outputfolder <- "GH_outputs_20180527_F2308_f0x2_q48_minimap2"
 idxmetagenomcovfile <- "idx_meta_genomecov_PlatesGH_20180527.txt"
+
+# outputfolder <- "GH_outputs_20180727_F2308_f0x2_q48_minimap2_COIBarcodesOnly"
+# idxmetagenomcovfile <- "idx_meta_genomecov_PlatesGH_COIBarcodesOnly_20180727.txt"
 
 idx_meta_genomecov_GH <- read_delim(file.path(outputfolder, idxmetagenomcovfile), delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
@@ -149,7 +164,20 @@ names(idx_meta_genomecov_ABA2B2EFGH)
 ```
 
 
-```{r add taxonomic ranks}
+ONLY if i'm using the COIBarcode database
+```{r parse out taxonomic ranks for COIBarcodeOnly file, eval = FALSE}
+# the info line of the COI_Barcode fasta file is already well formatted: 
+# Diptera_Anthomyiidae_Zaphne_divisa_BOLD:AAG2441
+# Even this one can be parsed by first keeping together (extra = "merge") everything after the fourth column (tundrica_BOLD:AAG1723). then merge the Species and BOLD_ID  columns (frontata_tundrica_BOLD:AAG1723)
+# Diptera_Anthomyiidae_Zaphne_frontata_tundrica_BOLD:AAG1723
+
+idx_meta_genomecov_ABA2B2EFGH <- idx_meta_genomecov_ABA2B2EFGH %>% tidyr::separate(mitogenome, c("Order", "Family", "Genus", "Species", "BOLD_ID"), sep = "_", remove = FALSE, extra = "merge")
+
+idx_meta_genomecov_ABA2B2EFGH <- idx_meta_genomecov_ABA2B2EFGH %>% tidyr::unite("Species_BOLD", c("Species", "BOLD_ID"))
+```
+
+
+```{r add taxonomic ranks to mitogenomes}
 taxonomyfilepath <- "~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/5_taxonomy/mitogenome_fasta"
 taxonomyfile <- "Species_for_mitogenome_sequencing_20180721.xlsx"
 
@@ -184,16 +212,16 @@ idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin <- idx_meta_genomecov_ABA2B2EFGH 
 
 
 ```{r write tables, eval=FALSE}
+## check the filenames
 # # idx_meta-genomecov long table for Otso, 217448 rows, 41 columns
-# setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesABA2B2EFGH")
-# write_tsv(idx_meta_genomecov_ABA2B2EFGH, "idx_meta_genomecov_ABA2B2EFGH_minimap2_20180721.txt")
+setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesABA2B2EFGH")
+# write_tsv(idx_meta_genomecov_ABA2B2EFGH, "idx_meta_genomecov_ABA2B2EFGH_minimap2_COIBarcodesOnly_20180727.txt")
 # 
 # # # idx_meta-genomecov wide table for visualisation:  308 rows, 707 columns
-# write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide, "idx_meta_genomecov_ABA2B2EFGH_wide_minimap2_20180527.txt")
+# write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide, "idx_meta_genomecov_ABA2B2EFGH_wide_minimap2_COIBarcodesOnly_20180727.txt")
 # 
 # # # idx_meta-genomecov wide table for visualisation:  148 rows, 707 columns
-# write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin, "idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin_minimap2_20180527.txt")
-
+# write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin, "idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin_minimap2_COIBarcodesOnly_20180727.txt")
 ```
 
 
@@ -210,8 +238,8 @@ idx_meta_genomecov_ABA2B2EFGH$DateEIRUN <- str_c("Sample", year(idx_meta_genomec
 pctcovermin <- 0.10
 eirun <- "idx_meta_genomecov_AB"
 trap <- c("TrapA", "TrapB", "TrapC")
-years <- c(1997, 2013)
-# years <- c(1997, 1998, 1999, 2011, 2012, 2013)
+# years <- c(1997, 2013)
+years <- c(1997, 1998, 1999, 2011, 2012, 2013)
 
 # Make wide table for visualisation (left to right should follow temporal order (Date))
 idx_meta_genomecov_wide_pctcovmin <- idx_meta_genomecov_ABA2B2EFGH %>% 
@@ -263,8 +291,8 @@ pheatmap(arcdynheat_norm,
          color = colorRampPalette(c("white", "firebrick3"))(50),
          # color = colorRampPalette(YlOrBr)(10),
          # scale = "row",
-         gaps_col = c(9),
-         # gaps_col = c(9, 18, 26, 41, 54),
+         # gaps_col = c(9),
+         gaps_col = c(9, 18, 26, 41, 54),
          # display_numbers = TRUE,
          clustering_method = "complete", # "complete", ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
          clustering_distance_rows = "euclidean", # euclidean, manhattan, canberra, minkowski
@@ -275,6 +303,15 @@ pheatmap(arcdynheat_norm,
 # idx_meta-genomecov wide table for visualisation:  157 rows, 702 columns
 # write_tsv(idx_meta_genomecov_AB_wide_pctcovmin, "idx_meta_genomecov_AB_wide_pctcovmin_minimap2_20180721.txt")
 ```
+
+
+i can see three basic species responses in the 1997/2013 heatmap:
+1.  from low abundance/no obvious peak in 1997, to producing a population peak in 2013
+2.  from having a population peak in 1997, to low abundance/no peak in 2013
+3.  change in timing of population peak between 1997 and 2013 (typically shifting to earlier)
+
+
+
 
 Summary tables to show how many reads and detected species per sample, also summed over year and trap, etc.
 
