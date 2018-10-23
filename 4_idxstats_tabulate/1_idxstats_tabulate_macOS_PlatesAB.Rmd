@@ -7,7 +7,7 @@ output: html_document
 
 This file takes the idxstats.txt outputs of the samtools filters and combines into a single large table, which is suitable for comparing with the
 
-This version is the macOS code version
+This version is the macOS code version. 
 
 ```{r}
 # rm(list=ls())
