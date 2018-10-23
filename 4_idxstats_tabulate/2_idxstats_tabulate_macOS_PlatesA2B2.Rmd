@@ -205,7 +205,7 @@ idx_meta <- idx_meta %>% tidyr::separate(Short_name_of_the_sample, c("Year", "Pl
 # sort columns, remove useless columns
 idx_meta <- idx_meta %>% dplyr::select(Date, Plot, Trap, Week, mitogenome:lysis_buffer_proportion)
 
-idx_meta <- idx_meta %>% dplyr::select(-row, -column, -sample_reference, -species_name, -barcode_used, -Sample_type, -x.260_230_ratio, -Buffer_used, -Extraction_kit_protocol) %>% dplyr::arrange(Date, Trap)
+idx_meta <- idx_meta %>% dplyr::select(-row, -column, -sample_reference, -species_name, -barcode_used, -Sample_type, -x.260_230_ratio, -Buffer_used, -Extraction_kit_protocol) %>% dplyr::arrange(Date, Trap) 
 
 names(idx_meta) # compared to PlatesAB, there is an extra column:  EI_sample (e.g. IPO3916, IPO3917)
 #  [1] "Date"                       "Plot"                       "Trap"                      
