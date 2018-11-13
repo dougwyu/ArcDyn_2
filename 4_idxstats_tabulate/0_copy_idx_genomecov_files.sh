@@ -5,6 +5,7 @@ set -o pipefail
 #######################################################################################
 #######################################################################################
 # a shell script to copy idx and genomcov files into a directory to be downloaded to my computer
+# run after running the samtools script, does not have to be uploaded to hpc
 #######################################################################################
 #######################################################################################
 
@@ -96,12 +97,12 @@ ls ${OUTPUTFOLDER}_Plates${PLATE}/
 du -sh ${OUTPUTFOLDER}_Plates${PLATE}/ # ~4.9 GB
 # set filename to something that i can understand after download
 # format:  outputs_PlatesAB_F2308_f0x2_q48_minimap2_outputs_20180727.tar.gz
-mv ${OUTPUTFOLDER}_Plates${PLATE} outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180727
+mv ${OUTPUTFOLDER}_Plates${PLATE} outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20181111
 ls
 # tar gzip for download
-tar -czvf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180727.tar.gz outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180727/
+tar -czvf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20181111.tar.gz outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20181111/
 ls
-rm -rf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20180727/
+rm -rf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_20181111/
 ls
 
 

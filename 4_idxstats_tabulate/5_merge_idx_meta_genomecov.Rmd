@@ -17,13 +17,11 @@ library(cowplot)
 ```
 
 
-START HERE
-
 ```{r load PlatesAB}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2016/bulk_samples/PlatesAB_EI_20160512/")
 
-outputfolder <- "AB_outputs_20180527_F2308_f0x2_q48_minimap2"
-idxmetagenomcovfile <- "idx_meta_genomecov_PlatesAB_20180527.txt"
+outputfolder <- "AB_outputs_20181111_F2308_f0x2_q48_minimap2"
+idxmetagenomcovfile <- "idx_meta_genomecov_PlatesAB_20181111.txt"
 
 # outputfolder <- "AB_outputs_20180727_F2308_f0x2_q48_COIBarcodesOnly"
 # idxmetagenomcovfile <- "idx_meta_genomecov_PlatesAB_COIBarcodesOnly_20180727.txt"
@@ -44,8 +42,8 @@ idx_meta_genomecov_AB$EI_RUN <- "idx_meta_genomecov_AB"
 ```{r load PlatesA2B2}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesA2B2")
 
-outputfolder <- "A2B2_outputs_20180527_F2308_f0x2_q48_minimap2"
-idxmetagenomcovfile <- "idx_meta_genomecov_PlatesA2B2_20180527.txt"
+outputfolder <- "A2B2_outputs_20181111_F2308_f0x2_q48_minimap2"
+idxmetagenomcovfile <- "idx_meta_genomecov_PlatesA2B2_20181111.txt"
 
 # outputfolder <- "A2B2_outputs_20180727_F2308_f0x2_q48_COIBarcodesOnly"
 # idxmetagenomcovfile <- "idx_meta_genomecov_PlatesA2B2_COIBarcodesOnly_20180727.txt"
@@ -67,8 +65,8 @@ idx_meta_genomecov_A2B2$EI_RUN <- "idx_meta_genomecov_A2B2"
 ```{r load PlatesEF}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesEF")
 
-outputfolder <- "EF_outputs_20180527_F2308_f0x2_q48_minimap2"
-idxmetagenomcovfile <- "idx_meta_genomecov_PlatesEF_20180527.txt"
+outputfolder <- "EF_outputs_20181111_F2308_f0x2_q48_minimap2"
+idxmetagenomcovfile <- "idx_meta_genomecov_PlatesEF_20181111.txt"
 
 # outputfolder <- "EF_outputs_20180727_F2308_f0x2_q48_minimap2_COIBarcodesOnly"
 # idxmetagenomcovfile <- "idx_meta_genomecov_PlatesEF_COIBarcodesOnly_20180727.txt"
@@ -94,8 +92,8 @@ idx_meta_genomecov_EF$EI_RUN <- "idx_meta_genomecov_EF"
 ```{r load PlatesGH}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesGH")
 
-outputfolder <- "GH_outputs_20180527_F2308_f0x2_q48_minimap2"
-idxmetagenomcovfile <- "idx_meta_genomecov_PlatesGH_20180527.txt"
+outputfolder <- "GH_outputs_20181111_F2308_f0x2_q48_minimap2"
+idxmetagenomcovfile <- "idx_meta_genomecov_PlatesGH_20181111.txt"
 
 # outputfolder <- "GH_outputs_20180727_F2308_f0x2_q48_minimap2_COIBarcodesOnly"
 # idxmetagenomcovfile <- "idx_meta_genomecov_PlatesGH_COIBarcodesOnly_20180727.txt"
@@ -138,8 +136,8 @@ idx_meta_genomecov_ABA2B2EFGH <- bind_rows(idx_meta_genomecov_AB, idx_meta_genom
 # put EI_RUN column first
 idx_meta_genomecov_ABA2B2EFGH <- idx_meta_genomecov_ABA2B2EFGH %>% dplyr::select(EI_RUN, everything())
 
-# confirm 308 mitogenomes
-idx_meta_genomecov_ABA2B2EFGH %>% distinct(mitogenome) %>% count()  # 308: number of distinct values of mitogenome (311 total mitogenomes - the 3 COI spikes = 308)
+# confirm 349 mitogenomes
+idx_meta_genomecov_ABA2B2EFGH %>% distinct(mitogenome) %>% count()  # 349: number of distinct values of mitogenome (308 mitogenomes + 41 COI_CytB - the 3 COI spikes = 349)
 
 # view names
 names(idx_meta_genomecov_ABA2B2EFGH)
@@ -179,11 +177,12 @@ idx_meta_genomecov_ABA2B2EFGH <- idx_meta_genomecov_ABA2B2EFGH %>% tidyr::unite(
 
 ```{r add taxonomic ranks to mitogenomes}
 taxonomyfilepath <- "~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/mapping_git/5_taxonomy/mitogenome_fasta"
-taxonomyfile <- "Species_for_mitogenome_sequencing_20180721.xlsx"
+taxonomyfile <- "Species_for_mitogenome_sequencing_20181112.xlsx"
 
-taxonomies <- read_excel(file.path(taxonomyfilepath, taxonomyfile), sheet = "mitogenome_database", na = "NA") %>% dplyr::filter(to_be_sanger_sequenced == "no" &  mitogenome_status != "failed") 
-# mitogenome_status == "failed" indicates specimens that failed sequencing at Copenhagen and were sent to TGAC/EI
-# to_be_sanger_sequenced == "no" indicates specimens that successfully got contigs, either at EI or Copenhagen
+taxonomies <- read_excel(file.path(taxonomyfilepath, taxonomyfile), sheet = "mitogenome_database", na = "NA") %>% dplyr::filter(mitogenome_status != "failed")  # 366 rows
+# taxonomies <- read_excel(file.path(taxonomyfilepath, taxonomyfile), sheet = "mitogenome_database", na = "NA") %>% dplyr::filter(to_be_sanger_sequenced == "no" &  mitogenome_status != "failed") 
+# mitogenome_status == "failed" indicates specimens that failed sequencing at Copenhagen and were sent to TGAC/EI 
+# COI_CytB_sanger_sequenced == "yes" indicates specimens that for which we got COI and cytB seqs from Sanger sequencing (n = 41)
 
 taxonomies <- taxonomies %>% dplyr::select(Yinqiu_mitogenome_fastaname, Order, Family, Genus, Species_BOLD)
 
@@ -215,13 +214,14 @@ idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin <- idx_meta_genomecov_ABA2B2EFGH 
 ## check the filenames
 # # idx_meta-genomecov long table for Otso, 217448 rows, 41 columns
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesABA2B2EFGH")
-# write_tsv(idx_meta_genomecov_ABA2B2EFGH, "idx_meta_genomecov_ABA2B2EFGH_minimap2_COIBarcodesOnly_20180727.txt")
-# 
-# # # idx_meta-genomecov wide table for visualisation:  308 rows, 707 columns
-# write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide, "idx_meta_genomecov_ABA2B2EFGH_wide_minimap2_COIBarcodesOnly_20180727.txt")
-# 
-# # # idx_meta-genomecov wide table for visualisation:  148 rows, 707 columns
-# write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin, "idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin_minimap2_COIBarcodesOnly_20180727.txt")
+
+# write_tsv(idx_meta_genomecov_ABA2B2EFGH, "idx_meta_genomecov_ABA2B2EFGH_minimap2_20181111.txt")
+# # 
+# # # # idx_meta-genomecov wide table for visualisation:  308 rows, 707 columns
+# write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide, "idx_meta_genomecov_ABA2B2EFGH_wide_minimap2_20181111.txt")
+# # 
+# # # # idx_meta-genomecov wide table for visualisation:  148 rows, 707 columns
+# write_tsv(idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin, "idx_meta_genomecov_ABA2B2EFGH_wide_pctcovermin_minimap2_20181111.txt")
 ```
 
 

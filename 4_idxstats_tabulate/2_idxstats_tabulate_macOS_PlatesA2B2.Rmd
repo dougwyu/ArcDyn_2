@@ -62,10 +62,10 @@ samtoolsqual <- "q48"
 
 # use this version for minimap2
 # outputs_PlatesA2B2_F2308_f0x2_q48_minimap2_20180527
-idxstatsgenomecovfolder <- paste0("outputs_PlatesA2B2_", samtoolsfilter, "_", samtoolsqual, "_minimap2_20180527")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+idxstatsgenomecovfolder <- paste0("outputs_PlatesA2B2_", samtoolsfilter, "_", samtoolsqual, "_minimap2_outputs_20181111")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 
 # use this version for COI_barcodes mapping
-idxstatsgenomecovfolder <- paste0("outputs_PlatesA2B2_", samtoolsfilter, "_", samtoolsqual, "_COIBarcodesOnly_minimap2_outputs_20180727")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+# idxstatsgenomecovfolder <- paste0("outputs_PlatesA2B2_", samtoolsfilter, "_", samtoolsqual, "_COIBarcodesOnly_minimap2_outputs_20180727")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 # outputs_PlatesA2B2_F2308_f0x2_q48_COIBarcodesOnly_minimap2_outputs_20180727
 
 idxstatsfile <- paste0("*", samtoolsfilter, "_", samtoolsqual, "_sorted.bam_idxstats\\.txt")  
@@ -155,7 +155,7 @@ idx %>% distinct(sample) %>% count()  # number of distinct values of sample:  16
 idx %>% distinct(pathname) %>% count()  # number of distinct values of sample:  152  I originally input 192, but only have 168 idx files.  
 idx %>% distinct(samtools_filter) %>% count() # number of distinct values of samtools_filter: should be 1
 idx %>% distinct(samtools_filter) # should look something like:  F2308_f0x2_q48
-idx_mitogenome_table <- idx %>% group_by(well) %>% distinct(mitogenome) %>% count() %>% arrange(desc(n)); View(idx_mitogenome_table) # all columns should be 311
+idx_mitogenome_table <- idx %>% group_by(well) %>% distinct(mitogenome) %>% count() %>% arrange(desc(n)); View(idx_mitogenome_table) # all columns should be 352
 length(idx$mitogenome) / idx_mitogenome_table[1,2] == idx %>% distinct(sample) %>% count()  # should evaluate to TRUE
 # 46816 rows / 308 mitogenomes = 152 samples
 ```
@@ -225,7 +225,7 @@ idx_meta %>% distinct(Date) %>% count()  # number of distinct values of Date:  6
 idx_meta %>% distinct(Plot) %>% count()  # number of distinct values of Plot:  should be 1
 idx_meta %>% distinct(Trap) %>% count()  # number of distinct values of Trap:  should be 3 (A,B,C)
 idx_meta %>% distinct(Week) %>% count()  # number of distinct values of Week:  18
-idx_meta %>% distinct(mitogenome) %>% count()  # number of distinct values of mitogenome (incl 3 COI spikes):  308
+idx_meta %>% distinct(mitogenome) %>% count()  # number of distinct values of mitogenome (incl 3 COI spikes):  352
 idx_meta %>% distinct(sample) %>% count()  # number of distinct values of sample:   152 (168 is the number of input idx files)
 idx_meta %>% distinct(sample)
 idx_meta %>% distinct(Sample_alias) %>% count()  # number of distinct values of Sample_alias:  should be = sample = 168
@@ -310,7 +310,7 @@ genomecoverages_summ <- purrr::map(genomecov_files, loadFile2); notify("Your loa
 # rbind the list into a dataframe
 genomecoverages_summ <- do.call(rbind, genomecoverages_summ)
 # save this file to avoid having to constantly run the map() step
-# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesA2B2_20180527.RDS", compress = TRUE)
+# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesA2B2_20181111.RDS", compress = TRUE)
 # genomecoverages_summ <- readRDS("A2B2_outputs_20180526_F2308_f0x2_q48_BWA/genomecoverages_summ_PlatesA2B2_20180526.RDS")
 
 
@@ -320,7 +320,7 @@ idx_meta_genomecov <- left_join(idx_meta, genomecoverages_summ) # R message:  Jo
 idx_meta_genomecov <- idx_meta_genomecov %>% arrange(Date, Trap)
 
 # use grepl() to find mitogenome names that are COI spike names
-idx_meta_genomecov$COI_Species <- if_else(grepl("_COI", idx_meta_genomecov$mitogenome), "COI_Spike", "ArcDyn_Species")
+idx_meta_genomecov$COI_Species <- if_else(grepl("ng_COI", idx_meta_genomecov$mitogenome), "COI_Spike", "ArcDyn_Species")
 
 # reorder the columns for convenience
 idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::select(Date:mitogenome, COI_Species, mapped_reads, mt_length:pathname_genomecov) # changed sample to mt_length
@@ -357,11 +357,11 @@ names(COI_spike_reads_wide)
 # [3] "1-2_Lepidoptera_Bombycidae_Bombyx_mori_COI" "2-1_Coleoptera_Elateridae_COI"             
 # [5] "3-1_Coleoptera_Mordellidae_COI"  
 # rename columns to remove numbers from in front
-COI_spike_reads_wide <- COI_spike_reads_wide %>% rename(Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI="1-2_Lepidoptera_Bombycidae_Bombyx_mori_COI")
+COI_spike_reads_wide <- COI_spike_reads_wide %>% dplyr::rename(Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI="1-2_Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI")
 
-COI_spike_reads_wide <- COI_spike_reads_wide %>% rename(Coleoptera_Elateridae_40ng_COI="2-1_Coleoptera_Elateridae_COI")
+COI_spike_reads_wide <- COI_spike_reads_wide %>% dplyr::rename(Coleoptera_Elateridae_40ng_COI="2-1_Coleoptera_Elateridae_40ng_COI")
 
-COI_spike_reads_wide <- COI_spike_reads_wide %>% rename(Coleoptera_Mordellidae_20ng_COI="3-1_Coleoptera_Mordellidae_COI")
+COI_spike_reads_wide <- COI_spike_reads_wide %>% dplyr::rename(Coleoptera_Mordellidae_20ng_COI="3-1_Coleoptera_Mordellidae_20ng_COI")
 
 names(COI_spike_reads_wide)
 # [1] "sample"                                      "Full_name_of_the_sample"                    
@@ -408,7 +408,6 @@ rm(sample_names)
 # rm(test_idx_meta_genomecov)
 ```
 
-
 Filter out samples that have too-few mapped reads and/or COI_spike reads.  this allows calculation of the best ratio of COI spikes to use.  I'm only doing this so that the wide table doesn't use a too-small COI_spike correction.
 ```{r}
 # calculate sum of all COI spike reads for each row
@@ -432,14 +431,14 @@ hist(sum_idx_meta_genomecov$COI_spike_sum, breaks = 1000000, xlim = c(0, 4200000
 hist(sum_idx_meta_genomecov$COI_spike_sum, breaks = 1000000, xlim = c(0, 100000))
 par(mfrow=c(1,1))
 
-# filter out samples with COI_spike_sum < 800 000 (summed over all 160 mitogenomes in the sample).  The largest value of elaterid_mordellid_sum is 16,727,485,975, so this keeps the COI_corr from getting too large (and thus causing the COI_corr reads from getting too small)
+# filter out samples with COI_spike_sum < 282 832 (summed over all 160 mitogenomes in the sample).  The largest value of elaterid_mordellid_sum is 16,727,485,975, so this keeps the COI_corr from getting too large (and thus causing the COI_corr reads from getting too small)
 
-sample_names <- sum_idx_meta_genomecov %>% dplyr::filter(COI_spike_sum < 282832) %>% dplyr::select(Full_name_of_the_sample)
+sample_names <- sum_idx_meta_genomecov %>% dplyr::filter(COI_spike_sum < 200000) %>% dplyr::select(Full_name_of_the_sample)
 samples_to_remove <- sample_names %>% dplyr::pull(Full_name_of_the_sample) # pull out a single variable
 samples_to_remove # 11 samples to remove
 idx_meta_genomecov <- idx_meta_genomecov %>% filter(!Full_name_of_the_sample %in% samples_to_remove) # 24021 obs
 
-# sanity check:  157 samples, which is correct since i removed 11 samples
+# sanity check:  161 samples, which is correct since i removed 7 samples
 idx_meta_genomecov %>% distinct(Full_name_of_the_sample) %>% count()  # number of distinct values of Full_name_of_the_sample
 ```
 
@@ -538,7 +537,7 @@ idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dpl
 # i originally found that TrapC_2013_Jul_22 occurred once for week 30 and once for week 29.  I checked the original Excel worksheet and found that 2013JUL22_Art3_TrapC_Wk29 should be 2013JUL15_Art3_TrapC_Wk29.  Thus, the TrapC_2013_Jul_22/week29 combination shouldn't exist.  I have fixed the Excel file.
 
 
-# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesA2B2_20180527.txt") # so if i need to read in a file during debuggging, here it is
+# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesA2B2_20181111.txt") # so if i need to read in a file during debuggging, here it is
 
 # used for debugging, in case i screw up the dataset while writing code
 # idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesA2B2_20180223.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
@@ -551,7 +550,7 @@ Make wide table for visualisation
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save table
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesA2B2_20180527.txt")
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesA2B2_20181111.txt")
 
 # make wide table with pct_coverage > pctcovmin > 0.1
 plot(idx_meta_genomecov$pct_coverage, idx_meta_genomecov$coefvar)
@@ -577,7 +576,7 @@ idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate_at(vars(mapped_reads_
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_pctcovmin_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr_pctcovmin) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr_pctcovmin) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save table
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_pctcovmin_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_pctcovmin_wide_PlatesA2B2_20180527.txt")
+write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_pctcovmin_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_pctcovmin_wide_PlatesA2B2_20181111.txt")
 ```
 
 ```{r, eval=FALSE}

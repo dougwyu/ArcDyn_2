@@ -58,13 +58,13 @@ samtoolsqual <- "q48"
 
 # use this version for minimap2
 # outputs_PlatesGH_F2308_f0x2_q48_minimap2_20180527
-idxstatsgenomecovfolder <- paste0("outputs_PlatesGH_", samtoolsfilter, "_", samtoolsqual, "_minimap2_20180527")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+idxstatsgenomecovfolder <- paste0("outputs_PlatesGH_", samtoolsfilter, "_", samtoolsqual, "_minimap2_outputs_20181111")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 
 # use this version for the run where i map against 19 pos ctrl mitogenomes
 # idxstatsgenomecovfolder <- "minimap2_all_outputs_PlatesGH_19posctrls_F2308_f0x2_q48"
 
 # use this version for COI_barcodes mapping
-idxstatsgenomecovfolder <- paste0("outputs_PlatesGH_", samtoolsfilter, "_", samtoolsqual, "_COIBarcodesOnly_minimap2_outputs_20180727")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+# idxstatsgenomecovfolder <- paste0("outputs_PlatesGH_", samtoolsfilter, "_", samtoolsqual, "_COIBarcodesOnly_minimap2_outputs_20180727")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 # outputs_PlatesGH_F2308_f0x2_q48_COIBarcodesOnly_minimap2_outputs_20180727
 
 idxstatsfile <- paste0("*", samtoolsfilter, "_", samtoolsqual, "_sorted.bam_idxstats\\.txt")  
@@ -238,14 +238,14 @@ names(idx_meta)
 ```{r sanity checks}
 years <- idx_meta %>% distinct(Year) 
 idx_meta %>% distinct(Year) %>% count()  # number of distinct values of Year:  21 (some resequenced samples and some controls and some mocks)  
-idx_meta %>% distinct(Date) %>% count()  # 
+idx_meta %>% distinct(Date) %>% count()  # 102
 idx_meta %>% distinct(Plot) %>% count()  # number of distinct values of Plot:  4 because we also have the mocks
 idx_meta %>% distinct(Trap) %>% count()  # number of distinct values of Trap:  should be 3 (A,B,C) but 5 because of the mocks
 idx_meta %>% distinct(Week) %>% count()  # number of distinct values of Week:  17
-idx_meta %>% distinct(mitogenome) %>% count()  # number of distinct values of mitogenome (incl 3 COI spikes):  310
+idx_meta %>% distinct(mitogenome) %>% count()  # number of distinct values of mitogenome (incl 3 COI spikes):  352 = 308 mitogenomes + 41 coi_cytb + 3 coi spikes
 idx_meta %>% distinct(sample) %>% count()  # number of distinct values of sample:   190
 idx_meta %>% distinct(sample)
-idx_meta %>% distinct(Sample_alias) %>% count()  # number of distinct values of Sample_alias:  should be = sample = 192
+idx_meta %>% distinct(Sample_alias) %>% count()  # number of distinct values of Sample_alias:  should be = sample = 190
 idx_meta %>% distinct(Sample_alias)
 idx_meta %>% distinct(well) %>% count()  # number of distinct values of well:  96
 idx_meta %>% distinct(Plate) %>% count()  # number of distinct values of ArcDyn_Plate_name:  should be 2
@@ -327,8 +327,8 @@ genomecoverages_summ <- purrr::map(genomecov_files, loadFile2); notify("Your loa
 # rbind the list into a dataframe
 genomecoverages_summ <- do.call(rbind, genomecoverages_summ)
 # save this file to avoid having to constantly run the map() step
-# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesGH_minimap2_20180527.RDS", compress = TRUE)
-# genomecoverages_summ <- readRDS("GH_outputs_20180227_F2308_q48/genomecoverages_summ_PlatesGH_20180227.RDS")
+# saveRDS(genomecoverages_summ, "genomecoverages_summ_PlatesGH_minimap2_20181111.RDS", compress = TRUE)
+# genomecoverages_summ <- readRDS("genomecoverages_summ_PlatesGH_minimap2_20181111.RDS")
 # 
 
 # left_join genomecoverages_summ to idx_meta
@@ -337,7 +337,7 @@ idx_meta_genomecov <- left_join(idx_meta, genomecoverages_summ) # R message:  Jo
 idx_meta_genomecov <- idx_meta_genomecov %>% arrange(Date, Week, Trap)
 
 # use grepl() to find mitogenome names that are COI spike names
-idx_meta_genomecov$COI_Species <- if_else(grepl("_COI", idx_meta_genomecov$mitogenome), "COI_Spike", "ArcDyn_Species")
+idx_meta_genomecov$COI_Species <- if_else(grepl("ng_COI", idx_meta_genomecov$mitogenome), "COI_Spike", "ArcDyn_Species")
 
 # reorder the columns for convenience  # this is a dangerous step
 idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::select(Date, Plot:mitogenome, COI_Species, mock_ArcDyn, mapped_reads, mt_length:Full_name_of_the_sample, Year, Short_name_of_the_sample, Plate, Sample_alias:pathname_genomecov)
@@ -374,11 +374,11 @@ names(COI_spike_reads_wide)
 # [3] "1-2_Lepidoptera_Bombycidae_Bombyx_mori_COI" "2-1_Coleoptera_Elateridae_COI"             
 # [5] "3-1_Coleoptera_Mordellidae_COI"  
 # rename columns to remove numbers from in front
-COI_spike_reads_wide <- COI_spike_reads_wide %>% rename(Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI="1-2_Lepidoptera_Bombycidae_Bombyx_mori_COI")
+COI_spike_reads_wide <- COI_spike_reads_wide %>% dplyr::rename(Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI="1-2_Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI")
 
-COI_spike_reads_wide <- COI_spike_reads_wide %>% rename(Coleoptera_Elateridae_40ng_COI="2-1_Coleoptera_Elateridae_COI")
+COI_spike_reads_wide <- COI_spike_reads_wide %>% dplyr::rename(Coleoptera_Elateridae_40ng_COI="2-1_Coleoptera_Elateridae_40ng_COI")
 
-COI_spike_reads_wide <- COI_spike_reads_wide %>% rename(Coleoptera_Mordellidae_20ng_COI="3-1_Coleoptera_Mordellidae_COI")
+COI_spike_reads_wide <- COI_spike_reads_wide %>% dplyr::rename(Coleoptera_Mordellidae_20ng_COI="3-1_Coleoptera_Mordellidae_20ng_COI")
 
 names(COI_spike_reads_wide)
 # [1] "sample"                                      "Full_name_of_the_sample"                    
@@ -453,12 +453,12 @@ par(mfrow=c(1,1))
 
 # filter out samples with COI_spike_sum < 500 000.  This removes 13 samples with small numbers of COI_spike_sum including the small ME50_1 mock community which seems to have failed
 
-sample_names <- sum_idx_meta_genomecov %>% dplyr::filter(COI_spike_sum < 371896) %>% dplyr::select(Short_name_of_the_sample)
+sample_names <- sum_idx_meta_genomecov %>% dplyr::filter(COI_spike_sum < 300000) %>% dplyr::select(Short_name_of_the_sample)
 samples_to_remove <- sample_names %>% dplyr::pull(Short_name_of_the_sample) # pull out a single variable
-samples_to_remove # 6 samples to remove including ME50_1
-idx_meta_genomecov <- idx_meta_genomecov %>% filter(!Short_name_of_the_sample %in% samples_to_remove) # 29045 obs
+samples_to_remove # 5 samples to remove including ME50_1
+idx_meta_genomecov <- idx_meta_genomecov %>% filter(!Short_name_of_the_sample %in% samples_to_remove) # 64565 obs
 
-# sanity check:  184 samples, which is correct since i removed 6 samples
+# sanity check:  185 samples, which is correct since i removed 5 samples
 idx_meta_genomecov %>% distinct(Short_name_of_the_sample) %>% dplyr::count()  # number of distinct values of Full_name_of_the_sample
 ```
 
@@ -546,7 +546,7 @@ names(idx_meta_genomecov)
 ```{r separate mock soups from arcdyn samples}
 # save mock soup data
 mocks_idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::filter(!mock_ArcDyn == "arcdyn") # to include COI_negative control
-# write_tsv(mocks_idx_meta_genomecov, "mocks_idx_meta_genomecov_PlatesGH_20180527.txt") # so if i need to read in a file during debuggging, here it is
+# write_tsv(mocks_idx_meta_genomecov, "mocks_idx_meta_genomecov_PlatesGH_20181111.txt") # so if i need to read in a file during debuggging, here it is
 # mocks_idx_meta_genomecov <- read_delim("mocks_idx_meta_genomecov_PlatesGH_20180527.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 
 # remove mock soup data from idx_meta_genomecov
@@ -570,7 +570,7 @@ idxstats_by_DateTrap <- idx_meta_genomecov %>% dplyr::group_by(DateTrap) %>% dpl
 idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dplyr::distinct(pathname) %>% dplyr::count() %>% dplyr::arrange(desc(n));  View(idxstats_by_pathname)
 
 # uncomment to save files
-# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesGH_20180527.txt") # so if i need to read in a file during debuggging, here it is.  This is the file for HMSC analysis.
+# write_tsv(idx_meta_genomecov, "idx_meta_genomecov_PlatesGH_20181111.txt") # so if i need to read in a file during debuggging, here it is.  This is the file for HMSC analysis.
 # # used for debugging, in case i screw up the dataset while writing code
 # idx_meta_genomecov <- read_delim("idx_meta_genomecov_PlatesGH_20180527.txt", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 ```
@@ -582,7 +582,7 @@ idxstats_by_pathname <- idx_meta_genomecov %>% dplyr::group_by(pathname) %>% dpl
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save wide table
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesGH_20180527.txt")
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide_PlatesGH_20181111.txt")
 
 # make wide table with pct_coverage > pctcovmin > 0.1
 plot(idx_meta_genomecov$pct_coverage, idx_meta_genomecov$coefvar)
@@ -611,7 +611,7 @@ idx_meta_genomecov <- idx_meta_genomecov %>% dplyr::mutate_at(vars(mapped_reads_
 idx_meta_genomecov_mapped_reads_COI_lysis_corr_pctcovmin_wide <- idx_meta_genomecov %>% dplyr::select(DateTrap, mitogenome, mapped_reads_COI_lysis_corr_pctcovmin) %>% dplyr::arrange(DateTrap) %>% tidyr::spread(DateTrap, mapped_reads_COI_lysis_corr_pctcovmin) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save table
-# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_pctcovmin_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_pctcovmin_wide_PlatesGH_20180527.txt")
+# write_tsv(idx_meta_genomecov_mapped_reads_COI_lysis_corr_pctcovmin_wide, "idx_meta_genomecov_mapped_reads_COI_lysis_corr_pctcovmin_wide_PlatesGH_20181111.txt")
 
 # Make wide tables for visualisation of the mock soups
 mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide <- mocks_idx_meta_genomecov %>% dplyr::select(Short_name_of_the_sample, mitogenome, mapped_reads_COI_corr) %>% dplyr::arrange(Short_name_of_the_sample) %>% tidyr::spread(Short_name_of_the_sample, mapped_reads_COI_corr) %>% dplyr::arrange(mitogenome)
@@ -621,9 +621,9 @@ mocks_idx_meta_genomecov_pctcov_wide <- mocks_idx_meta_genomecov %>% dplyr::sele
 mocks_idx_meta_genomecov_mapped_reads_wide <- mocks_idx_meta_genomecov %>% dplyr::select(Short_name_of_the_sample, mitogenome, mapped_reads) %>% dplyr::arrange(Short_name_of_the_sample) %>% tidyr::spread(Short_name_of_the_sample, mapped_reads) %>% dplyr::arrange(mitogenome)
 
 # uncomment to save wide tables
-# write_tsv(mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide, "mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide_PlatesGH_20180527.txt")
-# write_tsv(mocks_idx_meta_genomecov_pctcov_wide, "mocks_idx_meta_genomecov_mocks_idx_meta_genomecov_pctcov_wide_wide_PlatesGH_20180527.txt")
-# write_tsv(mocks_idx_meta_genomecov_mapped_reads_wide, "mocks_idx_meta_genomecov_mapped_reads_wide_PlatesGH_20180527.txt")
+# write_tsv(mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide, "mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide_PlatesGH_20181111.txt")
+# write_tsv(mocks_idx_meta_genomecov_pctcov_wide, "mocks_idx_meta_genomecov_mocks_idx_meta_genomecov_pctcov_wide_wide_PlatesGH_20181111.txt")
+# write_tsv(mocks_idx_meta_genomecov_mapped_reads_wide, "mocks_idx_meta_genomecov_mapped_reads_wide_PlatesGH_20181111.txt")
 ```
 
 ```{r, eval=FALSE}

@@ -33,19 +33,19 @@ PATH=$PATH:~/scripts/parallel-20170722/bin/
 ###### MAKE SURE THAT "SAMPLE_*" HAS BEEN CHGED TO "PLATES*" IN THE SHELL SCRIPT
 
 # copy the minimap and samtools shell and bsub scripts into each BWA folder
-MINIMAP2_BSUB="loop_minimap2_only_20181111.bsub"; echo ${MINIMAP2_BSUB}
-MINIMAP2_SH="_loop_minimap2_only_20181111.sh"; echo ${MINIMAP2_SH}
-# SAMTOOLS_BSUB="loop_samtools_only_20181111.bsub"; echo ${SAMTOOLS_BSUB}
-# SAMTOOLS_SH="_loop_samtools_only_20181111.sh"; echo ${SAMTOOLS_SH}
+# MINIMAP2_BSUB="loop_minimap2_only_20181111.bsub"; echo ${MINIMAP2_BSUB}
+# MINIMAP2_SH="_loop_minimap2_only_20181111.sh"; echo ${MINIMAP2_SH}
+SAMTOOLS_BSUB="loop_samtools_only_20181111.bsub"; echo ${SAMTOOLS_BSUB}
+SAMTOOLS_SH="_loop_samtools_only_20181111.sh"; echo ${SAMTOOLS_SH}
 
 # MAKE SURE THAT Sample_* has been changed to Plate* in _loop_minimap2_only_20181111.sh
 
 cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed; ls
 # loop_samtools_only_20180210.bsub and _loop_samtools_only_20180210.sh should sort to bottom
-parallel cp ${MINIMAP2_BSUB} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
-parallel cp ${MINIMAP2_SH} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
-# parallel cp ${SAMTOOLS_BSUB} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
-# parallel cp ${SAMTOOLS_SH} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
+# parallel cp ${MINIMAP2_BSUB} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
+# parallel cp ${MINIMAP2_SH} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
+parallel cp ${SAMTOOLS_BSUB} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
+parallel cp ${SAMTOOLS_SH} BWA{} ::: 01 02 03 04 05 06 07 08 09 10
 # parallel cp loop_trimgalore_20180216.bsub BWA{} ::: 01 02 03 04 05 06 07 08 09 10
 # parallel cp _loop_trimgalore_20180216.sh BWA{} ::: 01 02 03 04 05 06 07 08 09 10
 ls
@@ -58,15 +58,15 @@ ls
 # edit the bsub files so that the correct job name will show up (i suppose i could have instead run a job array...)
 cd ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed; ls
 
-parallel "sed 's/mnmploop01/mnmpEF{}/g' BWA{}/${MINIMAP2_BSUB} > BWA{}/${MINIMAP2_BSUB}_tmp.bsub" ::: 01 02 03 04 05 06 07 08 09 10
-parallel "mv BWA{}/${MINIMAP2_BSUB}_tmp.bsub BWA{}/${MINIMAP2_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10
-head -n 7 BWA{01,02,03,04,05,06,07,08,09,10}/${MINIMAP2_BSUB} # check.  should be mnmpEF10
-tail -n 5 BWA{01,02,03,04,05,06,07,08,09,10}/${MINIMAP2_BSUB} # check for correct version
+# parallel "sed 's/mnmploop01/mnmpEF{}/g' BWA{}/${MINIMAP2_BSUB} > BWA{}/${MINIMAP2_BSUB}_tmp.bsub" ::: 01 02 03 04 05 06 07 08 09 10
+# parallel "mv BWA{}/${MINIMAP2_BSUB}_tmp.bsub BWA{}/${MINIMAP2_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10
+# head -n 7 BWA{01,02,03,04,05,06,07,08,09,10}/${MINIMAP2_BSUB} # check.  should be mnmpEF10
+# tail -n 5 BWA{01,02,03,04,05,06,07,08,09,10}/${MINIMAP2_BSUB} # check for correct version
 
-# parallel "sed 's/samtools01/samtlsEF{}/g' BWA{}/${SAMTOOLS_BSUB} > BWA{}/${SAMTOOLS_BSUB}_tmp" ::: 01 02 03 04 05 06 07 08 09 10
-# parallel "mv BWA{}/${SAMTOOLS_BSUB}_tmp BWA{}/${SAMTOOLS_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10
-# head -n 5 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct index number
-# tail -n 1 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct samtools shell filename
+parallel "sed 's/samtools01/samtlsEF{}/g' BWA{}/${SAMTOOLS_BSUB} > BWA{}/${SAMTOOLS_BSUB}_tmp" ::: 01 02 03 04 05 06 07 08 09 10
+parallel "mv BWA{}/${SAMTOOLS_BSUB}_tmp BWA{}/${SAMTOOLS_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10
+head -n 5 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct index number
+tail -n 1 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct samtools shell filename
 
 ls # BWA* folders should now sort to bottom
 
