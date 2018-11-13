@@ -622,7 +622,7 @@ mocks_idx_meta_genomecov_mapped_reads_wide <- mocks_idx_meta_genomecov %>% dplyr
 
 # uncomment to save wide tables
 # write_tsv(mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide, "mocks_idx_meta_genomecov_mapped_reads_COI_corr_wide_PlatesGH_20181111.txt")
-# write_tsv(mocks_idx_meta_genomecov_pctcov_wide, "mocks_idx_meta_genomecov_mocks_idx_meta_genomecov_pctcov_wide_wide_PlatesGH_20181111.txt")
+# write_tsv(mocks_idx_meta_genomecov_pctcov_wide, "mocks_idx_meta_genomecov_mocks_idx_meta_genomecov_pctcov_wide_PlatesGH_20181111.txt")
 # write_tsv(mocks_idx_meta_genomecov_mapped_reads_wide, "mocks_idx_meta_genomecov_mapped_reads_wide_PlatesGH_20181111.txt")
 ```
 
