@@ -645,8 +645,7 @@ mocks_idx_meta_genomecov_mapped_reads_wide <- mocks_idx_meta_genomecov %>% dplyr
 10. DONE minimap2/samtools for platesA2B2
 11. DONE create lysis buffer datasets, download idxstats and genomecov data, run R code on Plates AB, A2B2, EF, GH:  COMPARE PlatesAB and A2B2 WITH YINQIU'S BWA_results_20161025.xlsx.  Compare Plates?? with the positive controls, the seasonal patterns, the COI spikes
 12. DONE remove original, noncombined fastq.gz files from A2B2 and GH when i'm done mapping and checking.
-
-13. make textfile for taxonomy (class, order, family, genus, species) of each mitogenome and join to idx_meta_genomecov
+13. DONE make textfile for taxonomy (class, order, family, genus, species) of each mitogenome and join to idx_meta_genomecov
 
 14. visualise minimap2 bam files and check that i am not mapping to the Ns between the protein-coding genes. SHOULD I SUBTRACT A FIXED NUMBER FROM EACH MITOGENOME LENGTH TO CALCULATE THE CORRECT LENGTH OF THE CODING PORTION?  
 
