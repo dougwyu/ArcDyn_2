@@ -631,14 +631,14 @@ mocks_idx_meta_genomecov_mapped_reads_wide <- mocks_idx_meta_genomecov %>% dplyr
 
 Make files for publication. on 20 Dec 2018, Otso Ovaskainen requested that i create 7 datafiles out of the one datafile for publication in the methods paper.
 
-```{r}
+```{r data files for Otso on 20181221}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesABA2B2EFGH")
 getwd()
 
 # Can ignore this code:  I confirmed used arsenal::compare to confirm that the only difference between the 20180527 and 20180721 datasets are the four Latin name columns
 # soupdata <- read_tsv("send_to_ArcDyn_collaborators_20180527/for_Otso/minimap2_soup_data/idx_meta_genomecov_ABA2B2EFGH_minimap2_20180527.txt.zip") # orig file
 # soupdata2 <- read_tsv("send_to_ArcDyn_collaborators_20180721/idx_meta_genomecov_ABA2B2EFGH_minimap2_20180721.txt.zip") # added Latin names to mitogenomes in a new version of the mapping file
-# summary(compare(soupdata, soupdata2)) # 
+# summary(compare(soupdata, soupdata2))
 
 
 
@@ -751,7 +751,7 @@ names(mock_data)
 
 
 ## save data files
-save(mock_inputspp, mock_design, mock_data, file = "~/Dropbox/Working_docs/Roslin_Greenland/2018/manuscript_methods/Supp_Info_data_and_R_scripts/arcdyn_suppfiles_mocks.RData")
+# save(mock_inputspp, mock_design, mock_data, file = "~/Dropbox/Working_docs/Roslin_Greenland/2018/manuscript_methods/Supp_Info_data_and_R_scripts/arcdyn_suppfiles_mocks.RData")
 
 
 
