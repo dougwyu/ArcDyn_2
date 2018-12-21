@@ -192,7 +192,6 @@ samplemetadata %>% distinct(well) %>% count()  # 96, number of distinct values o
 ```
 
 
-
 ```{r 2. read lysis buffer info and join to sample metadata}
 lysisbufferdata <- read_excel(file.path(samplemetadatafolder, lysisbufferfilename), sheet = "lysis_buffer_GH", na = "NA")
 lysisbufferdata <- lysisbufferdata %>% dplyr::mutate(lysis_buffer_orig_total_ul=lysis_buffer_orig_total_ml*1000)
@@ -628,6 +627,136 @@ mocks_idx_meta_genomecov_mapped_reads_wide <- mocks_idx_meta_genomecov %>% dplyr
 
 ```{r, eval=FALSE}
 # purl("idxstats_tabulate_macOS.Rmd")
+```
+
+Make files for publication. on 20 Dec 2018, Otso Ovaskainen requested that i create 7 datafiles out of the one datafile for publication in the methods paper.
+
+```{r}
+setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesABA2B2EFGH")
+getwd()
+
+# Can ignore this code:  I confirmed used arsenal::compare to confirm that the only difference between the 20180527 and 20180721 datasets are the four Latin name columns
+# soupdata <- read_tsv("send_to_ArcDyn_collaborators_20180527/for_Otso/minimap2_soup_data/idx_meta_genomecov_ABA2B2EFGH_minimap2_20180527.txt.zip") # orig file
+# soupdata2 <- read_tsv("send_to_ArcDyn_collaborators_20180721/idx_meta_genomecov_ABA2B2EFGH_minimap2_20180721.txt.zip") # added Latin names to mitogenomes in a new version of the mapping file
+# summary(compare(soupdata, soupdata2)) # 
+
+
+
+# soups dataset
+soupdata <- read_tsv("send_to_ArcDyn_collaborators_20180721/idx_meta_genomecov_ABA2B2EFGH_minimap2_20180721.txt.zip")
+
+# mitogenomes_data
+mitogenomes_data <- soupdata %>% dplyr::select(mitogenome, mt_length, Order, Family, Genus, Species_BOLD)
+
+# env_design
+## spike input DNA amount
+Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI <- rep(10, nrow(soupdata))
+Coleoptera_Mordellidae_20ng_COI <- rep(20, nrow(soupdata))
+Coleoptera_Elateridae_40ng_COI <- rep(40, nrow(soupdata))
+## env_design, select sample, Date, 
+env_design <- soupdata %>% dplyr::select(sample = DateTrapEIRUN, date = Date, trap = Trap, run = EI_RUN, lysis_buffer_orig_total_ul, lysis_buffer_purified_ul, lysis_buffer_proportion)
+env_design <- bind_cols(env_design, data_frame(Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI))
+
+# env_data
+# make long-format dataset of the COI_spike mapped reads, one row per sample and spike_species
+env_spikes <- soupdata %>% dplyr::select(sample = DateTrapEIRUN, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI) %>% 
+    tidyr::gather(species, mapped_reads_COI, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI) %>% 
+    dplyr::distinct(sample, species, mapped_reads_COI)
+
+# extract mapped reads and pct_coverage for each mitogenome in each sample
+env_data <- soupdata %>% 
+    dplyr::select(sample = DateTrapEIRUN, species = mitogenome, mapped_reads_mitogenome = mapped_reads, pct_coverage_mitogenome = pct_coverage)
+# bind rows with env_spikes dataset, with different cols for mapped reads to mitogenomes and COI spike
+env_data <- bind_rows(env_data, env_spikes) %>% arrange(sample) 
+
+# code if i want to create a column indicating mitogenome or COI_spike
+# env_data$mito_spike <- if_else(grepl("ng_COI", env_data$species), "spike", "mitogenome") %>% dplyr::select(sample, mito_spike, species, mapped_reads, pct_coverage)
+
+# save(mitogenomes_data, env_design, env_data, file = "~/Dropbox/Working_docs/Roslin_Greenland/2018/manuscript_methods/Supp_Info_data_and_R_scripts/arcdyn_suppfiles_soups.RData")
+
+##############
+
+# mock datasets
+setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesABA2B2EFGH")
+mockall <- read_excel("send_to_ArcDyn_collaborators_20180527/for_Otso/minimap2_mock_data/mocks_idx_meta_genomecov_PlatesEFGH_20180527.xlsx", sheet = "mocks_idx_meta_genomecov_Plates", na = "NA")
+
+## to make mock_inputspp
+### extract COI_spike columns, make a long-format dataset (with gather), change column name to mitogenome, reduce to unique COI_spike names, and add a new column with index numbers (1,2,3)
+mock_spikes <- mockall %>% 
+    dplyr::select(Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI) %>% 
+    tidyr::gather(species, mapped_reads, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI) %>% 
+    dplyr::select(mitogenome = species) %>% 
+    dplyr::distinct(mitogenome)
+mock_spikes <- cbind(mock_spikes, order = seq(nrow(mock_spikes)))
+
+### extract mitogenome column, reduce to unique mitogenome names, and add a new column with index numbers (1,...,308)
+mock_mitogenomes <- mockall %>% 
+    dplyr::select(mitogenome) %>% 
+    dplyr::distinct(mitogenome)
+mock_mitogenomes <- cbind(mock_mitogenomes, order = seq(nrow(mock_mitogenomes)))
+
+### bind mock_mitogenomes and mock_spikes, add spike or sp as prefix, merge with index number, change column order
+mock_inputspp <- dplyr::bind_rows(mock_mitogenomes, mock_spikes)
+mock_inputspp$species <- if_else(grepl("ng_COI", mock_inputspp$mitogenome), "spike", "sp")
+mock_inputspp <- mock_inputspp %>% 
+    unite(species, c("species", "order"), sep = "") %>% 
+    dplyr::select(species, mitogenome)
+
+
+## to make mock_design
+## sample	experiment	run	lysis	input species	input mount
+### select columns except for the COI_spike columns
+mock_design <- mockall %>% 
+    dplyr::select(plate = Plate, shortname = Expt_shortname, experiment, run = Replicate, mitogenome_spike = mitogenome, input_amount = inputDNA_ng)
+### left_join mock_inputspp. Do not include lysis (not necessary), do include mitogenome name
+mock_design <- dplyr::left_join(mock_design, mock_inputspp, by = c("mitogenome_spike" = "mitogenome")) %>% 
+    dplyr::select(plate, shortname, experiment, run, mitogenome_spike, input_species = species, input_amount)
+
+### select COI_spike species 
+mock_spikes <- mockall %>% dplyr::select(plate = Plate, shortname = Expt_shortname, experiment, run = Replicate, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI) %>% 
+    tidyr::gather(mitogenome_spike, mapped_reads_COI, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI) %>% 
+    dplyr::distinct(plate, shortname, experiment, run, mitogenome_spike, mapped_reads_COI)
+
+mock_spikes <- mock_spikes %>% mutate(
+    input_amount = case_when(
+        mitogenome_spike == "Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI" ~ 10,
+        mitogenome_spike == "Coleoptera_Mordellidae_20ng_COI" ~ 20,
+        mitogenome_spike == "Coleoptera_Elateridae_40ng_COI" ~ 40
+    )
+)
+
+mock_spikes <- left_join(mock_spikes, mock_inputspp, by = c("mitogenome_spike" = "mitogenome")) # %>% tidyr::separate(sample, c(NA, "Run"), sep = "_", remove = FALSE) # 
+
+mock_spikes <- mock_spikes %>% dplyr::select(plate, shortname, experiment, run, mitogenome_spike, input_species = species, input_amount)
+
+mock_design <- bind_rows(mock_design, mock_spikes) %>% arrange(plate, shortname, run) # 4976 obs
+mock_design <- mock_design %>% unite("sample", c(plate, shortname, run), remove = FALSE)
+names(mock_design)
+
+
+
+## to make mock_data
+## sample mitogenome_spike mapped_reads_mitogenome pct_coverage_mitogenome mapped_reads_COI
+
+### select columns except for the COI_spike columns
+mock_data <- mockall %>% dplyr::select(plate = Plate, shortname = Expt_shortname, experiment, run = Replicate, mitogenome_spike = mitogenome, mapped_reads_mitogenome = mapped_reads, pct_coverage_mitogenome = pct_coverage)
+
+mock_spikes <- mockall %>% dplyr::select(plate = Plate, shortname = Expt_shortname, experiment, run = Replicate, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI) %>% 
+    tidyr::gather(mitogenome_spike, mapped_reads_COI, Lepidoptera_Bombycidae_Bombyx_mori_10ng_COI, Coleoptera_Mordellidae_20ng_COI, Coleoptera_Elateridae_40ng_COI) %>% 
+    dplyr::distinct(plate, shortname, experiment, run, mitogenome_spike, mapped_reads_COI)
+
+mock_data <- bind_rows(mock_data, mock_spikes) %>% arrange(plate, shortname, run)
+mock_data <- mock_data %>% unite("sample", c(plate, shortname, run), remove = FALSE)
+names(mock_data)
+
+
+## save data files
+save(mock_inputspp, mock_design, mock_data, file = "~/Dropbox/Working_docs/Roslin_Greenland/2018/manuscript_methods/Supp_Info_data_and_R_scripts/arcdyn_suppfiles_mocks.RData")
+
+
+
+# load("~/Dropbox/Working_docs/Roslin_Greenland/2018/manuscript_methods/Supp_Info_data_and_R_scripts/arcdyn_suppfiles_mocks.RData")
+# load("~/Dropbox/Working_docs/Roslin_Greenland/2018/manuscript_methods/Supp_Info_data_and_R_scripts/arcdyn_suppfiles_soups.RData")
 ```
 
 
