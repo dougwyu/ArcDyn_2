@@ -59,7 +59,7 @@ samtoolsqual <- "q48"
 
 # use this version for minimap2
 # outputs_PlatesGH_F2308_f0x2_q48_minimap2_20180527
-idxstatsgenomecovfolder <- paste0("outputs_PlatesGH_", samtoolsfilter, "_", samtoolsqual, "_minimap2_outputs_20181111")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+idxstatsgenomecovfolder <- paste0("outputs_PlatesGH_", samtoolsfilter, "_", samtoolsqual, "_minimap2_20180527")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 
 # use this version for the run where i map against 19 pos ctrl mitogenomes
 # idxstatsgenomecovfolder <- "minimap2_all_outputs_PlatesGH_19posctrls_F2308_f0x2_q48"
@@ -97,7 +97,7 @@ cat("idxstatsfile search pattern is: ", idxstatsfile)
 idx_files <- list.files(Sys.glob(file.path(idxstatsgenomecovfolder)), pattern = idxstatsfile, full.names = TRUE)
 head(idx_files); cat("    ", length(idx_files), "total files")
     # Sys.glob is used to generate:  
-        # [1] "minimap2_all_outputs_PlatesGH/Sample_PRO1747_PlateG_A1_F2308_f0x2_q1_sorted.bam_idxstats.txt"
+        # [1] "outputs_PlatesGH_F2308_f0x2_q48_minimap2_20180527/Sample_PRO1747_PlateG_A1_F2308_f0x2_q1_sorted.bam_idxstats.txt"
     # list.files is used to look in those folders for files matching "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"
     # full.names = TRUE is used to return the pathnames
     # \\ is used to escape the . before txt (because it is read with grep as "any character")
@@ -167,7 +167,7 @@ Read in sample metadata
 ```{r 2. read sample metadata and create Short_name_of_the_sample}
 samplemetadata <- read_excel(file.path(samplemetadatafolder, samplemetadatafilename), sheet = "edited", na = "NA")
 
-# use tidyr::separate to parse out metadata from Full_name_of_the_sample
+# use tidyr::separate to parse out metadata from Short_name_of_the_sample
 samplemetadata <- samplemetadata %>% tidyr::separate(Short_name_of_the_sample, c("Year", "Plot", "Trap", "Week"), sep = "_", remove = FALSE)
 # Warning message:
 # Expected 4 pieces. Missing pieces filled with `NA` in 10 rows [181, 184, 185, 186, 187, 188, 189, 190, 191, 192]. 
@@ -634,6 +634,81 @@ mocks_idx_meta_genomecov_mapped_reads_wide <- mocks_idx_meta_genomecov %>% dplyr
 
 Make files for publication. on 20 Dec 2018, Otso Ovaskainen requested that i create 7 datafiles out of the one datafile for publication in the methods paper.
 
+```{bash seqkit stats to count total numbers of reads per fastq file} 
+# run this on hpc (i ran these four commands in parallel in multiple terminal windows)
+# opt-cmd-return to send to Terminal console
+ssh hpc
+interactive
+PATH=$PATH:~/scripts/
+seqkit # chk that command is working
+
+cd ~ # go to root folder and run these commands sequentially
+
+# PlatesAB
+seqkit stats ~/greenland_2016/platesAB_Earlham_soups/Earlham_soups_fastq_combine/BWA*/Sample*/Sample*fq.gz > fastq_read_counts_PlatesAB.txt
+
+# PlatesA2B2
+seqkit stats ~/greenland_2017/platesA2B2/platesA2B2_combined/BWA*/Sample*/Sample*fq.gz > fastq_read_counts_PlatesA2B2.txt
+
+# PlatesEF
+seqkit stats ~/greenland_2017/platesEF_Earlham_soups_20170603/Earlham_soups_20170603_fastq_combine/fastqc_completed/BWA*/Plate*/Plate*fq.gz > fastq_read_counts_PlatesEF.txt
+
+# PlatesGH
+seqkit stats ~/greenland_2017/platesGH/platesGH_combined/BWA*/Sample*/Sample*fq.gz > fastq_read_counts_PlatesGH.txt
+
+# download to local folders
+```
+
+
+```{r reformat seqkit stats output}
+# A2B2 resequenced (most of) the same samples as AB, but fortunately, Earlham Institute coded the AB samples as IPO3916/7_A1 and the A2B2 samples as PlateA/B_A1. So I can use this column to join with the other metadata
+setwd("~/Dropbox/Working_docs/Roslin_Greenland/")
+getwd()
+# merge the files into one file AB
+# sample identifier in soupdata has form IPO3916_A1, where IPO3916 is PlateA, IPO3917 is PlateB
+fastq_read_counts_PlatesAB <- read_table("2016/bulk_samples/PlatesAB_EI_20160512/fastq_read_counts_PlatesAB.txt")
+
+fastq_read_counts_PlatesAB <- fastq_read_counts_PlatesAB %>% 
+    tidyr::separate(file, into = c(NA, "gpfs", "home", "b042", "greenland", "plates", "platessub", "BWA", "sample", "fastqfile"), sep = "/", remove = TRUE) %>%
+    mutate_at("sample", str_remove, "Sample_") %>% # remove "Sample_" from beginning of string
+    dplyr::select(sample, tot_num_seqs = num_seqs) %>% 
+    dplyr::group_by(sample) %>% 
+    summarise(tot_num_seqs = sum(tot_num_seqs))
+ 
+# merge the files into one file A2B2
+# sample identifier in soupdata has form PlateA_A1
+fastq_read_counts_PlatesA2B2 <- read_table("2017/bulk_samples/PlatesA2B2/fastq_read_counts_PlatesA2B2.txt")
+
+fastq_read_counts_PlatesA2B2 <- fastq_read_counts_PlatesA2B2 %>% 
+    tidyr::separate(file, into = c(NA, "gpfs", "home", "b042", "greenland", "plates", "platessub", "BWA", "sample", "fastqfile"), sep = "/", remove = TRUE) %>%
+    mutate_at("sample", str_remove, "Sample_PRO1322_") %>% # remove "Sample_PRO1322_" from beginning of string
+    dplyr::select(sample, tot_num_seqs = num_seqs) %>% 
+    dplyr::group_by(sample) %>% 
+    summarise(tot_num_seqs = sum(tot_num_seqs))
+
+# merge the files into one file EF
+fastq_read_counts_PlatesEF <- read_table("2017/bulk_samples/PlatesEF/fastq_read_counts_PlatesEF.txt")
+
+fastq_read_counts_PlatesEF <- fastq_read_counts_PlatesEF %>% 
+    tidyr::separate(file, into = c(NA, "gpfs", "home", "b042", "greenland", "plates", "platessub", "fastqc", "BWA", "sample", "fastqfile"), sep = "/", remove = TRUE) %>%
+    mutate_at("sample", str_remove, "_[ACGT]{9}-[ACGT]{6}") %>% # remove index sequence from end of string, e.g. _TAGGTTAGG-GCCAAT
+    dplyr::select(sample, tot_num_seqs = num_seqs) %>% 
+    dplyr::group_by(sample) %>% 
+    summarise(tot_num_seqs = sum(tot_num_seqs))
+
+# merge the files into one file GH
+fastq_read_counts_PlatesGH <- read_table("2017/bulk_samples/PlatesGH/fastq_read_counts_PlatesGH.txt")
+
+fastq_read_counts_PlatesGH <- fastq_read_counts_PlatesGH %>% 
+    tidyr::separate(file, into = c(NA, "gpfs", "home", "b042", "greenland", "plates", "platessub", "BWA", "sample", "fastqfile"), sep = "/", remove = TRUE) %>%
+    mutate_at("sample", str_remove, "Sample_PRO1747_") %>% # remove index sequence from end of string, Sample_PRO1747_
+    dplyr::select(sample, tot_num_seqs = num_seqs) %>% 
+    dplyr::group_by(sample) %>% 
+    summarise(tot_num_seqs = sum(tot_num_seqs))
+ 
+```
+
+
 ```{r data files for Otso on 20181221 using 308 mitogenomes}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesABA2B2EFGH")
 getwd()
@@ -782,12 +857,10 @@ names(mock_data)
 # save(mock_inputspp, mock_design, mock_data, file = "~/Dropbox/Working_docs/Roslin_Greenland/2018/manuscript_methods/Supp_Info_data_and_R_scripts/arcdyn_suppfiles_mocks_20181221.RData")
 
 
-# load("~/Dropbox/Working_docs/Roslin_Greenland/2018/manuscript_methods/Supp_Info_data_and_R_scripts/arcdyn_suppfiles_soups_20181221.RData")
+load("~/Dropbox/Working_docs/Roslin_Greenland/2018/manuscript_methods/Supp_Info_data_and_R_scripts/arcdyn_suppfiles_soups_20181221.RData")
 
 # load("~/Dropbox/Working_docs/Roslin_Greenland/2018/manuscript_methods/Supp_Info_data_and_R_scripts/arcdyn_suppfiles_mocks_20181221.RData")
 ```
-
-       
 
 ```{r data files for Otso on 20181221 using 406 COI barcodes}
 setwd("~/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/PlatesABA2B2EFGH")
