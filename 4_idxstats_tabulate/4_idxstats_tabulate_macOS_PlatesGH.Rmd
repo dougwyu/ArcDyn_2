@@ -705,7 +705,11 @@ fastq_read_counts_PlatesGH <- fastq_read_counts_PlatesGH %>%
     dplyr::select(sample, tot_num_seqs = num_seqs) %>% 
     dplyr::group_by(sample) %>% 
     summarise(tot_num_seqs = sum(tot_num_seqs))
- 
+
+fastq_read_counts_PlatesABA2B2EFGH <- bind_rows(fastq_read_counts_PlatesAB, fastq_read_counts_PlatesA2B2, fastq_read_counts_PlatesEF, fastq_read_counts_PlatesGH)
+
+# sanity check: should have: "IPO3916" "IPO3917" "PlateA"  "PlateB"  "PlateE"  "PlateF"  "PlateG"  "PlateH"
+fastq_read_counts_PlatesABA2B2EFGH %>% dplyr::select(sample) %>% tidyr::separate(sample, sep = "_", into = c("sampleprefix", "samplesuffix")) %>% dplyr::count(sampleprefix) %>% arrange(sampleprefix) 
 ```
 
 
@@ -721,6 +725,9 @@ getwd()
 
 # soups dataset
 soupdata <- read_tsv("send_to_ArcDyn_collaborators_20180721_20180527_plus_taxonomies/idx_meta_genomecov_ABA2B2EFGH_minimap2_20180721.txt.zip")
+
+    # # sanity check:  should have: "IPO3916" "IPO3917" "PlateA"  "PlateB"  "PlateE"  "PlateF"  "PlateG"  "PlateH"
+    # souptest <- soupdata %>% dplyr::select(sample) %>% tidyr::separate(sample, sep = "_", into = c("sampleprefix", "samplesuffix")) %>% dplyr::count(sampleprefix) %>% arrange(sampleprefix) 
 
 # mitogenomes_data
 mitogenomes_data <- soupdata %>% dplyr::select(mitogenome, mt_length, Order, Family, Genus, Species_BOLD)
@@ -766,15 +773,19 @@ env_spikes <- soupdata %>% dplyr::select(sample = DateTrapEIRUN, Lepidoptera_Bom
 
 # extract mapped reads and pct_coverage for each mitogenome in each sample
 env_data <- soupdata %>% 
-    dplyr::select(sample = DateTrapEIRUN, species = mitogenome, mapped_reads_mitogenome = mapped_reads, pct_coverage_mitogenome = pct_coverage)
+    dplyr::select(sample = DateTrapEIRUN, species = mitogenome, mapped_reads_mitogenome = mapped_reads, pct_coverage_mitogenome = pct_coverage, sampleorig = sample)
+
+# add fastq read counts to dataset, 
+env_data <- left_join(env_data, fastq_read_counts_PlatesABA2B2EFGH, by = c("sampleorig" = "sample")) %>% dplyr::select(-sampleorig)
+
 # bind rows with env_spikes dataset, with different cols for mapped reads to mitogenomes and COI spike
 env_data <- bind_rows(env_data, env_spikes) %>% arrange(sample) 
 
 # create a column indicating mitogenome or COI_spike species, change column order
 env_data$mito_spike <- if_else(grepl("_COI$", env_data$species), "spike", "mitogenome") 
-env_data <- env_data %>% dplyr::select(sample, mito_spike, species, mapped_reads_mitogenome, pct_coverage_mitogenome)
+env_data <- env_data %>% dplyr::select(sample, mito_spike, everything())
 
-# save(mitogenomes_data, env_design, env_data, file = "~/Dropbox/Working_docs/Roslin_Greenland/2018/manuscript_methods/Supp_Info_data_and_R_scripts/arcdyn_suppfiles_soups_20181221.RData")
+# save(mitogenomes_data, env_design, env_data, file = "~/Dropbox/Working_docs/Roslin_Greenland/2018/manuscript_methods/Supp_Info_data_and_R_scripts/arcdyn_suppfiles_soups_20181223.RData")
 
 ##############
 
