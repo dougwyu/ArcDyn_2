@@ -632,7 +632,7 @@ mocks_idx_meta_genomecov_mapped_reads_wide <- mocks_idx_meta_genomecov %>% dplyr
 
 
 
-Make files for publication. on 20 Dec 2018, Otso Ovaskainen requested that i create 7 datafiles out of the one datafile for publication in the methods paper.
+Make files for publication. On 20 Dec 2018, Otso Ovaskainen requested that i create 7 datafiles out of the one datafile for publication in the methods paper.
 
 ```{bash seqkit stats to count total numbers of reads per fastq file} 
 # run this on hpc (i ran these four commands in parallel in multiple terminal windows)

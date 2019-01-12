@@ -1,5 +1,25 @@
 - This file records notes about what i have done with the ArcDyn files, and also lists to dos
-To dos:
+ArcDyn paper recode 2019:
+	- redownload the files from Amazon S3
+		- create repo
+		- start restore process
+		- re-org the sequence data to prep for upload to datadryad:  create a single folder holding all sequence files.  @done(2019-01-12)
+		- download from S3
+		- run fastq_combine scripts
+		- run fastqc
+		- upload fastq files to SRA
+	- clean up and revise the bash and R code to run on the re-organised sequence files
+		- # CHECK THIS:  
+			The sequencing of plates G and H for quotation HEL.TR.ENQ-2379.B.01 has now been completed and a summary of the raw data is attached.  Please note that your sample references have been taken from the attached sample information form (SIF), assuming that samples S1 – S96 are Plate G and S97 onwards (well “A13”) are plate H.   There are 2 samples in Plate H which didn’t generate reads, from wells C2 and H12; according to the SIF, Plate H well H12 (sample S192) contains a blank. 
+		- find the origin of the single 1998 sample that is out of sequence in Table S4.2.  
+		- especially fix the bit of code checking the ratios of the spikes in 4_idxstats_tabulate_macOS_PlatesGH.Rmd  (should indeed be 1:2:4)
+		- merge and rewrite code in 4 _idxstats_tabulate_macOS_PlatesGH.Rmd and S0_clean_data_files.r to produce input_data_step5.RData.  There are 10 files.  These 10 files should be the output of 4_idxstats_tabulate_macOS_PlatesGH.Rmd or of 5_merge_idx_meta_genomecov.Rmd (not sure which one.  i added Otso's code to 4_idxstats_tabulate_macOS_PlatesGH.Rmd, but i think it will make more sense to add to 5_merge_idx_meta_genomecov.Rmd.  
+		- create a new repo with the new code, which can be published on github
+		- create column to allow removal of these taxa: c("Sarcoptiformes", "Trombidiformes", "Entomobryomorpha", "Neelipleona", "Poduromorpha", "Symphypleona")   
+	- management tasks
+		- after i successfully re-run with the PlatesAB, i can delete the redundant folder amazon-working-douglasyu/Earlham_soups_20160910/ 
+		- update content of:  amazon-working-douglasyu/readme_Amazon_glacier_file_descriptions_20180128
+Archived To Dos that i should add to above:
 	- go over code in fine detail and see if i can find any bugs:  especially in the table joining steps
 	- list which samples produced very little or no data, check against the library QC information, and see if any are legitimately missing or i can ask EI to resupply
 		- Darren has sent me library QC information for GH.  look up A2B2, EF:  
@@ -35,12 +55,12 @@ To dos:
 		- samtools depth -a instead of bedtools genomecov -d
 	- Pardosa glacialis missing from mock samples.  WHY?  @flag
 		- extract Pardosa-mapped reads from a bam file (htsbox bam2fq?)  that has lots of Pardosa in it and use those to map against the mock samples
-	- ArcDyn:  genes and primers for the non-mitogenome species @flag
-	- make textfile for taxonomy (class, order, family, genus, species) of each mitogenome and join to idx_meta_genomecov
+	- ArcDyn:  genes and primers for the non-mitogenome species @flag @done(2019-01-12)
+	- make textfile for taxonomy (class, order, family, genus, species) of each mitogenome and join to idx_meta_genomecov @done(2019-01-12)
 Records:
 	- A2B2 missing files
 		- situation as of 20180219
-			- I think hat 16 samples are still running on lane 11
+			- I think that 16 samples are still running on lane 11
 			- 8 samples produced no data but were included in the already-run 10 lanes and thus produced no fastq files
 			- 168 samples successfully produced at least some data
 			- 16+9+168 = 192 samples
