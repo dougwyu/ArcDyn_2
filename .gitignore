@@ -31,3 +31,8 @@
 
 1_fastQC_script/multiqc_report_platesA2B2.html
 .Rproj.user
+0_s3cmdget/s3cmddownload.bsub
+0_s3cmdget/s3cmddownload_A2B2.bsub
+0_s3cmdget/s3cmddownload_AB.bsub
+0_s3cmdget/s3cmddownload_EF.bsub
+0_s3cmdget/s3cmddownload_GH.bsub
