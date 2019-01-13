@@ -1,7 +1,7 @@
 - This file records notes about what i have done with the ArcDyn files, and also lists to dos
 ArcDyn paper recode 2019:
 	- redownload the files from Amazon S3
-		- create repo
+		- create repo @done(2019-01-13)
 		- start restore process
 		- re-org the sequence data to prep for upload to datadryad:  create a single folder holding all sequence files.  @done(2019-01-12)
 		- download from S3

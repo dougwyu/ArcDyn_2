@@ -1,0 +1,24 @@
+#!/bin/sh
+#BSUB -q long-eth     # debug, short (24 hours), medium (24 hours), long (168 hours = 7 days)
+#BSUB -J s3dwnEarlhm
+#BSUB -oo s3dwnEarlhm.out
+#BSUB -eo s3dwnEarlhm.err
+#BSUB -M 4000
+#BSUB -B        # sends email to me when job starts
+#BSUB -N        # sends email to me when job finishes
+
+. /etc/profile
+module purge
+module add python/anaconda/2.5/2.7
+
+cd ~/ArcDyn || exit
+
+# s3cmd get s3://BUCKET/OBJECT LOCAL_FILE
+s3cmd get --multipart-chunk-size-mb=100 s3://amazon-glacier-douglasyu/Earlham_soups_20160910.tar Earlham_soups_20160910.tar
+s3cmd get --multipart-chunk-size-mb=100 s3://amazon-glacier-douglasyu/Earlham_soups_20170603.tar Earlham_soups_20170603.tar
+s3cmd get --multipart-chunk-size-mb=100 s3://amazon-glacier-douglasyu/PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1600.tar PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1600.tar
+s3cmd get --multipart-chunk-size-mb=100 s3://amazon-glacier-douglasyu/PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1603.tar PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1603.tar
+s3cmd get --multipart-chunk-size-mb=100 s3://amazon-glacier-douglasyu/PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1586-trimmed.tar PlatesGH_PKG-ENQ-2379-Data_Transfer-PSEQ-1586-trimmed.tar
+s3cmd get --multipart-chunk-size-mb=100 s3://amazon-glacier-douglasyu/PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1600_2_lanes.tar PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1600_2_lanes.tar
+s3cmd get --multipart-chunk-size-mb=100 s3://amazon-glacier-douglasyu/PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1618_8_lanes.tar PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1618_8_lanes.tar
+s3cmd get --multipart-chunk-size-mb=100 s3://amazon-glacier-douglasyu/PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1657_1_lane.tar.gz PlatesA2B2_PKG-ENQ-1643-Data_Transfer-PSEQ-1657_1_lane.tar.gz
