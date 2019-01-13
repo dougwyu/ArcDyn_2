@@ -36,3 +36,4 @@
 0_s3cmdget/s3cmddownload_AB.bsub
 0_s3cmdget/s3cmddownload_EF.bsub
 0_s3cmdget/s3cmddownload_GH.bsub
+not_included_in_repo/
