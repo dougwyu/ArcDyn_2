@@ -1,13 +1,22 @@
 - This file records notes about what i have done with the ArcDyn files, and also lists to dos
 ArcDyn paper recode 2019:
-	- redownload the files from Amazon S3
+	- redownload the files from Amazon S3 @done(2019-01-14)
 		- create repo @done(2019-01-13)
-		- start restore process
+		- start restore process @done(2019-01-13)
 		- re-org the sequence data to prep for upload to datadryad:  create a single folder holding all sequence files.  @done(2019-01-12)
-		- download from S3
-		- run fastq_combine scripts
-		- run fastqc
-		- upload fastq files to SRA
+		- download from S3 @done(2019-01-13)
+	- combine fastq files @done(2019-01-14)
+		- run fastq_combine to concatenate fastq.gz files within the same sample.  large fastq files are broken into multiple fastq files and into multiple folders @done(2019-01-14)
+		- PlatesA2B2 @done(2019-01-14)
+			- I think i fixed a bug here and now include files that had been in PKG-ENQ-1643-Data_Transfer-PSEQ-1657_1_lanes/ but not included before because the folder name previously was PKG-ENQ-1643-Data_Transfer-PSEQ-1657_1_lane/ and my pathname was PKG*lanes/ @done(2019-01-14)
+			- I have 171 wells @done(2019-01-14)
+		- PlatesAB @done(2019-01-14)
+		- PlatesEF @done(2019-01-14)
+		- PlatesGH @done(2019-01-14)
+	- trimgalore
+		- rm the original fastq.gz files, leaving only the post-trimmed fq.gz files
+	- fastqc and multiqc
+	- minimap and samtools
 	- clean up and revise the bash and R code to run on the re-organised sequence files
 		- # CHECK THIS:  
 			The sequencing of plates G and H for quotation HEL.TR.ENQ-2379.B.01 has now been completed and a summary of the raw data is attached.  Please note that your sample references have been taken from the attached sample information form (SIF), assuming that samples S1 – S96 are Plate G and S97 onwards (well “A13”) are plate H.   There are 2 samples in Plate H which didn’t generate reads, from wells C2 and H12; according to the SIF, Plate H well H12 (sample S192) contains a blank. 
@@ -16,9 +25,17 @@ ArcDyn paper recode 2019:
 		- merge and rewrite code in 4 _idxstats_tabulate_macOS_PlatesGH.Rmd and S0_clean_data_files.r to produce input_data_step5.RData.  There are 10 files.  These 10 files should be the output of 4_idxstats_tabulate_macOS_PlatesGH.Rmd or of 5_merge_idx_meta_genomecov.Rmd (not sure which one.  i added Otso's code to 4_idxstats_tabulate_macOS_PlatesGH.Rmd, but i think it will make more sense to add to 5_merge_idx_meta_genomecov.Rmd.  
 		- create a new repo with the new code, which can be published on github
 		- create column to allow removal of these taxa: c("Sarcoptiformes", "Trombidiformes", "Entomobryomorpha", "Neelipleona", "Poduromorpha", "Symphypleona")   
-	- management tasks
-		- after i successfully re-run with the PlatesAB, i can delete the redundant folder amazon-working-douglasyu/Earlham_soups_20160910/ 
-		- update content of:  amazon-working-douglasyu/readme_Amazon_glacier_file_descriptions_20180128
+	- management tasks after running the pipeline
+		- make README files for each RUN, describing the origins of the sequence files and what i did to them
+		- after i run whole pipeline, remove these folders and files
+			- original archived files on HPC that i downloaded from Amazon Glacier:  ~/ArcDyn/Amazon_archive_files_to_rm_at_end
+			- the redundant folder on S3:  amazon-working-douglasyu/Earlham_soups_20160910/ 
+		- update content of:  amazon-working-douglasyu/readme_Amazon_glacier_file_descriptions_20180128 (explain that PlatesEF contains four PSEQ folders, with 'Plate' as the prefix)
+		- make subfolders in Amazon-glacier and organise files in there
+		- ask Yinqiu to delete files from her folder
+		- upload fastq files to SRA
+			- Plates IJCD
+			- Plates A2B2, AB, EF, GH
 Archived To Dos that i should add to above:
 	- go over code in fine detail and see if i can find any bugs:  especially in the table joining steps
 	- list which samples produced very little or no data, check against the library QC information, and see if any are legitimately missing or i can ask EI to resupply
@@ -53,8 +70,8 @@ Archived To Dos that i should add to above:
 		- bwa index -a bwtsw genome.fa # build index.  What is bwtsw?
 		- bwa mem -t $NPROC genome.fa reads1.fq reads2.fq | samtools view -F 0x4 -b | samtools sort > aln-pe.bam # 
 		- samtools depth -a instead of bedtools genomecov -d
-	- Pardosa glacialis missing from mock samples.  WHY?  @flag
-		- extract Pardosa-mapped reads from a bam file (htsbox bam2fq?)  that has lots of Pardosa in it and use those to map against the mock samples
+	- Pardosa glacialis missing from mock samples.  WHY?  @flag @done(2019-01-13)
+		- extract Pardosa-mapped reads from a bam file (htsbox bam2fq?)  that has lots of Pardosa in it and use those to map against the mock samples @done(2019-01-13)
 	- ArcDyn:  genes and primers for the non-mitogenome species @flag @done(2019-01-12)
 	- make textfile for taxonomy (class, order, family, genus, species) of each mitogenome and join to idx_meta_genomecov @done(2019-01-12)
 Records:
