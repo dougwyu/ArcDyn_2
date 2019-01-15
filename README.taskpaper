@@ -13,9 +13,9 @@ ArcDyn paper recode 2019:
 		- PlatesAB @done(2019-01-14)
 		- PlatesEF @done(2019-01-14)
 		- PlatesGH @done(2019-01-14)
-	- trimgalore
-		- rm the original fastq.gz files, leaving only the post-trimmed fq.gz files
-	- fastqc and multiqc
+	- trimgalore @done(2019-01-15)
+		- rm the original fastq.gz files, leaving only the post-trimmed fq.gz files @done(2019-01-15)
+	- fastqc and multiqc @done(2019-01-15)
 	- minimap and samtools
 	- clean up and revise the bash and R code to run on the re-organised sequence files
 		- # CHECK THIS:  
