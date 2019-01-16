@@ -57,7 +57,7 @@ tail -n2 BWA{01,02,03,04,05,06,07,08,09,10}/${MINIMAP2_BSUB} # check.  should be
 
 parallel "sed 's/samtools01/smtlA2B2{}/g' BWA{}/${SAMTOOLS_BSUB} > BWA{}/${SAMTOOLS_BSUB}_tmp" ::: 01 02 03 04 05 06 07 08 09 10
 parallel "mv BWA{}/${SAMTOOLS_BSUB}_tmp BWA{}/${SAMTOOLS_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10
-head -n 5 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct index number
+head -n 7 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct index number
      # check if i'm using mellanox-ib or short-eth
 tail -n 1 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct samtools shell filename
 
@@ -68,52 +68,42 @@ ls # BWA* folders should now sort to bottom
 cd ~/ArcDyn/PlatesA2B2/PlatesA2B2_combined/BWA01; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesA2B2/PlatesA2B2_combined/BWA02; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesA2B2/PlatesA2B2_combined/BWA03; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesA2B2/PlatesA2B2_combined/BWA04; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesA2B2/PlatesA2B2_combined/BWA05; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesA2B2/PlatesA2B2_combined/BWA06; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesA2B2/PlatesA2B2_combined/BWA07; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesA2B2/PlatesA2B2_combined/BWA08; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesA2B2/PlatesA2B2_combined/BWA09; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesA2B2/PlatesA2B2_combined/BWA10; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 bjobs
 bqueues

@@ -63,7 +63,7 @@ tail -n 5 BWA{01,02,03,04,05,06,07,08,09,10}/${MINIMAP2_BSUB} # check for correc
 
 parallel "sed 's/samtools01/samtlsEF{}/g' BWA{}/${SAMTOOLS_BSUB} > BWA{}/${SAMTOOLS_BSUB}_tmp" ::: 01 02 03 04 05 06 07 08 09 10
 parallel "mv BWA{}/${SAMTOOLS_BSUB}_tmp BWA{}/${SAMTOOLS_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10
-head -n 5 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct index number
+head -n 7 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct index number
      # check if i'm using mellanox-ib or short-eth
 tail -n 1 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct samtools shell filename
 
@@ -73,47 +73,38 @@ ls # BWA* folders should now sort to bottom
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA01; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA02; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA03; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA04; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA05; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA06; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA07; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA08; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA09; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA10; ls
 bsub < ${MINIMAP2_BSUB}
@@ -127,12 +118,10 @@ cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA01; ls
 echo "${SAMTOOLS_BSUB}"
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls minimap2_outputs # should start to see the new bam files
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA02; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls minimap2_outputs # should start to see the new bam files
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA03; ls
 bsub < ${SAMTOOLS_BSUB}
@@ -142,17 +131,14 @@ ls minimap2_outputs # should start to see the new bam files
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA04; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls minimap2_outputs # should start to see the new bam files
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA05; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls minimap2_outputs # should start to see the new bam files
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA06; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls minimap2_outputs # should start to see the new bam files
 
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA07; ls
 bsub < ${SAMTOOLS_BSUB}
@@ -170,5 +156,5 @@ cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA10; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
 
-cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA10; ls
+cd ~/ArcDyn/PlatesEF/PlatesEF_combined/BWA01; ls
 ls minimap2_outputs # should show new bam files

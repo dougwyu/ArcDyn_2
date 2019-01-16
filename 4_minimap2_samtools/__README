@@ -22,6 +22,12 @@ I use sed to change the jobID text in both bsub files so that the jobs identify 
 
 4. I launch the minimap2 shell script from within each BWA subfolder within each RUN. In total, i launch 10 jobs per RUN, 40 jobs total.
 
-5. After all minimap2 jobs are done (typically they collectively run about 16 hours, since 7 jobs at a time is the max allowed on mellanox-ib), I go back to each launch_minimap2_samtools_Plates*.sh and launch the 40 jobs total for samtools.
+5. After all minimap2 jobs are done after about 12 hours (typically each job runs 1-2 hours, and there are 40 total jobs. Since I can run 7 jobs at a time on the mellanox-ib queue, that's ~6 sets of jobs at 2 hours/set = 12 hours to finish all jobs), I go back to each launch_minimap2_samtools_Plates*.sh and launch the 40 jobs total for samtools. These jobs run quickly and are done in a couple of hours.
+
+6. Finally, I run launch_postsamtools_copy_idx_genomecov_files.sh, which copies the samtools output files into a single folder per RUN and tar/gzips it to be downloaded.  NB.  This script runs a few commands to mkdir a folder for one RUN and then jumps down to run some generic code.  So there are four jumps from top to bottom to run this script.
+
+7. I can re-run the above 6 steps for a second mapping target (308mitogenomes and 406barcodes).
+
+End
 
 N.B. PlateH_D10_mapQ_histogram_example.pdf is a single example of the distribution of minimap2 mapping quality scores. We see a seriously bimodal distribution, and I semi-arbitrarily chose -q 48 as the minimum allowable mapping quality for samtools filtering

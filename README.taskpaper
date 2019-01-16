@@ -16,7 +16,10 @@ ArcDyn paper recode 2019:
 	- trimgalore @done(2019-01-15)
 		- rm the original fastq.gz files, leaving only the post-trimmed fq.gz files @done(2019-01-15)
 	- fastqc and multiqc @done(2019-01-15)
-	- minimap and samtools
+	- minimap and samtools against 308 mitogenomes
+	- minimap and samtools against 406 COI barcodes
+	- download minimap2_output files
+	- AFTER downloading the files, add a line to remove minimap2_outputs/ folders in all BWA folders.  This can be added to the launch_postsamtools_copy_idx_genomecov_files.sh file
 	- clean up and revise the bash and R code to run on the re-organised sequence files
 		- # CHECK THIS:  
 			The sequencing of plates G and H for quotation HEL.TR.ENQ-2379.B.01 has now been completed and a summary of the raw data is attached.  Please note that your sample references have been taken from the attached sample information form (SIF), assuming that samples S1 – S96 are Plate G and S97 onwards (well “A13”) are plate H.   There are 2 samples in Plate H which didn’t generate reads, from wells C2 and H12; according to the SIF, Plate H well H12 (sample S192) contains a blank. 

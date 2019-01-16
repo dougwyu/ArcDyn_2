@@ -23,7 +23,7 @@ PATH=$PATH:~/scripts/parallel-20170722/bin/
 
 ############## by hand, copy 1/10 the sample folders into each BWA folder
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/; ls
-mkdir BWA{01,02,03,04,05,06,07,08,09,10}; ls # BWA is prefix because this was the original mapping software
+# mkdir BWA{01,02,03,04,05,06,07,08,09,10}; ls # BWA is prefix because this was the original mapping software
 # there are 192 sample folders:  hand move 19 into each BWA folder (easier than writing a script)
 
 ############# copy the minimap and samtools shell and bsub scripts into each BWA folder and edit the jobIDs
@@ -56,7 +56,7 @@ tail -n 4 BWA{01,02,03,04,05,06,07,08,09,10}/${MINIMAP2_BSUB} # check for correc
 
 parallel "sed 's/samtools01/samtlsAB{}/g' BWA{}/${SAMTOOLS_BSUB} > BWA{}/${SAMTOOLS_BSUB}_tmp" ::: 01 02 03 04 05 06 07 08 09 10
 parallel "mv BWA{}/${SAMTOOLS_BSUB}_tmp BWA{}/${SAMTOOLS_BSUB}" ::: 01 02 03 04 05 06 07 08 09 10
-head -n 8 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct index number
+head -n 7 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct index number
      # check if i'm using mellanox-ib or short-eth
 tail -n 1 BWA{01,02,03,04,05,06,07,08,09,10}/${SAMTOOLS_BSUB} # check.  should have the correct samtools shell filename
 
@@ -66,7 +66,6 @@ ls # BWA* folders should now sort to bottom
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/BWA01; ls
 bsub < ${MINIMAP2_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/BWA02; ls
 bsub < ${MINIMAP2_BSUB}
@@ -117,42 +116,35 @@ ls minimap2_outputs # should start to see the new bam files
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/BWA03; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls minimap2_outputs # should start to see the new bam files
 
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/BWA04; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/BWA05; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls minimap2_outputs
 
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/BWA06; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/BWA07; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/BWA08; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/BWA09; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/BWA10; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls
 
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/BWA10; ls
+bjobs
 ls minimap2_outputs # should show new bam files

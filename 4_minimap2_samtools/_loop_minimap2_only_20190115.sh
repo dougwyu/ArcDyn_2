@@ -54,7 +54,7 @@ set -o pipefail
      # PATH=$PATH:~/scripts/bedtools2/bin # made 22 Jan 2018 from github 2.27.1
      #
      #
-     # bash _loop_minimap2_only_20180726.sh
+     # bash _loop_minimap2_only_20190115.sh
      #######################################################################################
      #######################################################################################
 
@@ -117,10 +117,10 @@ do
      # minimap2 -ax sr ref.fa read1.fq read2.fq > aln.sam     # paired-end alignment
 
      # against 308 full mitogenomes (full sequences, not just protein-coding genes) and 3 COI_spike barcodes
-     minimap2 -t 16 -ax sr ~/ArcDyn/reference_seqs/ArcDyn_308_full_mitogenomes_20180524.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@15 - -o ${sample}_sorted.bam
+     # minimap2 -t 16 -ax sr ~/ArcDyn/reference_seqs/ArcDyn_308_full_mitogenomes_20180524.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@15 - -o ${sample}_sorted.bam
 
      # against 406 barcodes and 3 COI_spike barcodes
-     # minimap2 -ax sr ~/ArcDyn/reference_seqs/ArcDyn_406_COI_3spikes_20180726.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
+     minimap2 -ax sr ~/ArcDyn/reference_seqs/ArcDyn_406_COI_3spikes_20180726.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@27 - -o ${sample}_sorted.bam
 
      # against 308 full mitogenomes (full seqs, not just protein-coding genes), 41 COI+CYTB seqs, and 3 COI_spike barcodes
      # minimap2 -t 16 -ax sr ~/ArcDyn/reference_seqs/ArcDyn_308_full_mitogenomes_and_41_COI_CYTB_20181109.fasta ${sample}_R1_val_1.fq.gz ${sample}_R2_val_2.fq.gz | samtools view -b | samtools sort -@15 - -o ${sample}_sorted.bam

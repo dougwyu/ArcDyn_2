@@ -86,12 +86,12 @@ echo $OUTPUTFOLDER
 # e.g. Sample_IPO3916_C5_F2308_f0x2_q60_sorted.bam_idxstats.txt
 # check before copying
 parallel ls -l BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted.bam_idxstats.txt ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2}
-parallel ls BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted.bam_idxstats.txt ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # A2B2: 342 files == 171 * 2;
+parallel ls BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted.bam_idxstats.txt ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # A2B2: 342 files == 171*2; AB: 384; EF: 384 files == 192*2; GH: 380;
 # copy
 parallel cp BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted.bam_idxstats.txt ${OUTPUTFOLDER}_Plates${PLATE}/ ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2}
 # check after copying
 ls ${OUTPUTFOLDER}_Plates${PLATE}/
-ls ${OUTPUTFOLDER}_Plates${PLATE}/*_q*_sorted.bam_idxstats.txt | wc -l # A2B2: 342;
+ls ${OUTPUTFOLDER}_Plates${PLATE}/*_q*_sorted.bam_idxstats.txt | wc -l # A2B2: 342; AB:384; EF: 382; GH: 380
 # copy flagstat files
 cp BWA*/${OUTPUTFOLDER}/*_sorted.bam.flagstat.txt ${OUTPUTFOLDER}_Plates${PLATE}/
 ls ${OUTPUTFOLDER}_Plates${PLATE}/
@@ -99,26 +99,33 @@ ls ${OUTPUTFOLDER}_Plates${PLATE}/
 # e.g. Sample_IPO3916_C5_F2308_f0x2_q1_sorted_genomecov_d.txt.gz
 # check
 parallel ls -l BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2}
-parallel ls -l BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # A2B2: 342;
+parallel ls -l BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # A2B2: 342; AB: 384; EF: 384; GH: 380;
 # copy
 parallel cp BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ${OUTPUTFOLDER}_Plates${PLATE}/ ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2}  # takes longer than above
 # check again
-parallel ls ${OUTPUTFOLDER}_Plates${PLATE}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # A2B2: 342;
-ls ${OUTPUTFOLDER}_Plates${PLATE}/*genomecov_d.txt.gz # A2B2: 342;
-ls ${OUTPUTFOLDER}_Plates${PLATE}/*genomecov_d.txt.gz | wc -l # A2B2: 342;
+parallel ls ${OUTPUTFOLDER}_Plates${PLATE}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # A2B2: 342; AB: 384; EF: 384; GH: 380;
+ls ${OUTPUTFOLDER}_Plates${PLATE}/*genomecov_d.txt.gz
+ls ${OUTPUTFOLDER}_Plates${PLATE}/*genomecov_d.txt.gz | wc -l # A2B2: 342; AB: 384; EF: 384; GH: 380;
 
 # rename, tar, and gzip for download
 MAPDATE="20190115"
+TARGET="406barcodes" # "308mitogenomes" or "406barcodes"
 du -sh ${OUTPUTFOLDER}_Plates${PLATE}/ # ~4.4 GB
 # set filename to something that i can understand after download
-mv ${OUTPUTFOLDER}_Plates${PLATE} outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_${MAPDATE}
-ls # e.g. outputs_PlatesA2B2_F2308_f0x2_q48_minimap2_outputs_20190115/
+mv ${OUTPUTFOLDER}_Plates${PLATE} outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_${MAPDATE}_${TARGET}
+ls # e.g. outputs_PlatesA2B2_F2308_f0x2_q48_minimap2_outputs_20190115_308mitogenomes/
 # tar gzip for download
-tar -czvf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_${MAPDATE}.tar.gz outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_${MAPDATE}/
-# # format:  outputs_PlatesA2B2_F2308_f0x2_q48_minimap2_outputs_20190115.tar.gz
+tar -czvf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_${MAPDATE}_${TARGET}.tar.gz outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_${MAPDATE}_${TARGET}/
+# # format:  outputs_PlatesA2B2_F2308_f0x2_q48_minimap2_outputs_20190115_308mitogenomes.tar.gz
 ls
-rm -rf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_${MAPDATE}/
+rm -rf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_${MAPDATE}_${TARGET}/
 ls
+
+# code needs to be made more robust and checked before running
+# remove the minimap2_output files after i've finished the mapping jobs. these are the bam, bam.bai, idxstats, flagstats, and genomecov files. Should save
+# parallel "ls BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+# parallel "rm -rf BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+
 
 # when i'm on a fast network, i can download using scp, but otherwise, use Transmit for robustness
 ### 2016 run:  AB ###
