@@ -28,7 +28,9 @@ mkdir ${OUTPUTFOLDER}_Plates${PLATE}/
 ls
 ls ${OUTPUTFOLDER}_Plates${PLATE}/
 # ls BWA*/*.out # don't know what this is for
-# then jump down and run the GENERIC CODE below
+####### THEN JUMP DOWN AND RUN THE GENERIC CODE below
+
+
 
 # AB # different scripts because the pathnames are different
 PLATE="AB"
@@ -38,7 +40,9 @@ ls
 mkdir ${OUTPUTFOLDER}_Plates${PLATE}/
 ls
 ls ${OUTPUTFOLDER}_Plates${PLATE}/
-# then jump down and run the GENERIC CODE below
+####### THEN JUMP DOWN AND RUN THE GENERIC CODE below
+
+
 
 # EF
 PLATE="EF"
@@ -48,7 +52,9 @@ ls
 mkdir ${OUTPUTFOLDER}_Plates${PLATE}/
 ls
 ls ${OUTPUTFOLDER}_Plates${PLATE}/
-# then jump down and run the GENERIC CODE below
+####### THEN JUMP DOWN AND RUN THE GENERIC CODE below
+
+
 
 # GH
 PLATE="GH"
@@ -58,14 +64,14 @@ ls
 mkdir ${OUTPUTFOLDER}_Plates${PLATE}/
 ls
 ls ${OUTPUTFOLDER}_Plates${PLATE}/
-# then jump down and run the GENERIC CODE below
+####### THEN JUMP DOWN AND RUN THE GENERIC CODE below
 
 
 ####### GENERIC CODE to copy samtools output files to folder:  bwa_all_outputs_Plates${PLATE}/ #######
 ####### This folder is then downloaded to my laptop to process with R:  idxstats_tabulate_macOS_Plates*.Rmd
 ####### Run once for each library:  A2B2, AB, EF, GH
 
-# choose filters and minimum mapping quality scores
+# set filters and minimum mapping quality scores
 FILTER1="F2308_f0x2" # filter 1
 FILTER2="F2308" # filter 2
 echo $FILTER1
@@ -78,34 +84,41 @@ echo $OUTPUTFOLDER
 
 # copy output files into bwa_all_outputs_Plates${PLATE}/
 # e.g. Sample_IPO3916_C5_F2308_f0x2_q60_sorted.bam_idxstats.txt
+# check before copying
 parallel ls -l BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted.bam_idxstats.txt ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2}
-parallel ls BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted.bam_idxstats.txt ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # 384 = 2 X 192
+parallel ls BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted.bam_idxstats.txt ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # A2B2: 342 files == 171 * 2;
+# copy
 parallel cp BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted.bam_idxstats.txt ${OUTPUTFOLDER}_Plates${PLATE}/ ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2}
-ls ${OUTPUTFOLDER}_Plates${PLATE}/*_q*_sorted.bam_idxstats.txt | wc -l # 384 = 2 X 192
+# check after copying
 ls ${OUTPUTFOLDER}_Plates${PLATE}/
+ls ${OUTPUTFOLDER}_Plates${PLATE}/*_q*_sorted.bam_idxstats.txt | wc -l # A2B2: 342;
+# copy flagstat files
 cp BWA*/${OUTPUTFOLDER}/*_sorted.bam.flagstat.txt ${OUTPUTFOLDER}_Plates${PLATE}/
 ls ${OUTPUTFOLDER}_Plates${PLATE}/
 
 # e.g. Sample_IPO3916_C5_F2308_f0x2_q1_sorted_genomecov_d.txt.gz
+# check
 parallel ls -l BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2}
-parallel ls -l BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # 384 = 2 X 192
-parallel cp BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ${OUTPUTFOLDER}_Plates${PLATE}/ ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2}
-parallel ls ${OUTPUTFOLDER}_Plates${PLATE}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # 384 = 2 X 192
-ls ${OUTPUTFOLDER}_Plates${PLATE}/
+parallel ls -l BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # A2B2: 342;
+# copy
+parallel cp BWA*/${OUTPUTFOLDER}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ${OUTPUTFOLDER}_Plates${PLATE}/ ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2}  # takes longer than above
+# check again
+parallel ls ${OUTPUTFOLDER}_Plates${PLATE}/*_{1}_q{2}_sorted_genomecov_d.txt.gz ::: ${FILTER1} ${FILTER2} ::: ${QUAL1} ${QUAL2} | wc -l # A2B2: 342;
+ls ${OUTPUTFOLDER}_Plates${PLATE}/*genomecov_d.txt.gz # A2B2: 342;
+ls ${OUTPUTFOLDER}_Plates${PLATE}/*genomecov_d.txt.gz | wc -l # A2B2: 342;
 
 # rename, tar, and gzip for download
 MAPDATE="20190115"
-du -sh ${OUTPUTFOLDER}_Plates${PLATE}/ # ~4.9 GB
+du -sh ${OUTPUTFOLDER}_Plates${PLATE}/ # ~4.4 GB
 # set filename to something that i can understand after download
-# format:  outputs_PlatesAB_F2308_f0x2_q48_minimap2_outputs_20180727.tar.gz
 mv ${OUTPUTFOLDER}_Plates${PLATE} outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_${MAPDATE}
-ls
+ls # e.g. outputs_PlatesA2B2_F2308_f0x2_q48_minimap2_outputs_20190115/
 # tar gzip for download
 tar -czvf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_${MAPDATE}.tar.gz outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_${MAPDATE}/
+# # format:  outputs_PlatesA2B2_F2308_f0x2_q48_minimap2_outputs_20190115.tar.gz
 ls
 rm -rf outputs_Plates${PLATE}_${FILTER1}_q${QUAL2}_${OUTPUTFOLDER}_${MAPDATE}/
 ls
-
 
 # when i'm on a fast network, i can download using scp, but otherwise, use Transmit for robustness
 ### 2016 run:  AB ###
