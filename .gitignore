@@ -30,7 +30,11 @@
 1_fastQC_script/multiqc_report_platesA2B2.html
 
 1_fastQC_script/multiqc_report_platesA2B2.html
+
 .Rproj.user
+
 0_s3cmdget/s3cmddownload.bsub
-not_included_in_repo/
+
+not_included_in_repo/*
+
 README.taskpaper
