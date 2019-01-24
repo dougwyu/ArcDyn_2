@@ -4,7 +4,7 @@ set -u
 set -o pipefail
 ##################################################################################################
 ##################################################################################################
-# a shell commands to move Amazon-S3-downloaded sequence files to the correct folder, md5sum check them,
+# shell commands to move the Amazon-S3-downloaded sequence files to the correct folders, md5sum check them,
 # and then untar them.  I run these commands interactively with nohup &. Then i move the downloaded
 # Amazon-S3-downloaded files to a temp folder to hold until i don't need them anymore.
 # At the end, i will have the folders ready for concatenating with _loop_combine_fastqfiles shell script

@@ -1,39 +1,16 @@
 .DS_Store
-4_idxstats_tabulate/idxstats_files/*
-4_idxstats_tabulate/.Rproj.user/*
-4_idxstats_tabulate/idx_meta_genomecov_wide.txt
-4_idxstats_tabulate/idx_meta_genomecov.txt
-4_idxstats_tabulate/idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide.txt
-4_idxstats_tabulate/idx_meta_genomecov_mapped_reads_COI_lysis_corr_wide.xlsx
-4_idxstats_tabulate/.Rhistory
 
-3_minimap2_samtools/2016MayJuneDec_and_8mix2015_greenland_13mtgenes_ref_localnt_transmit5.0.5.xml.gz
+1_fastq_combine_script/old/*
 
-5_taxonomy/CO1_1sequence_perBIN_040915_COIspiking_305_to_413.fas
+2_trimgalore/old/*
 
-5_taxonomy/CO1_1sequence_perBIN_040915_COIspiking_96_to_100_seqs1_to_304.tsv
+3_fastQC/old/*
 
-5_taxonomy/CO1_1sequence_perBIN_040915_COIspiking_96_to_100.tsv
+5_idxstats_tabulate/old/*
 
-5_taxonomy/CO1_1sequence_perBIN_040915_COIspiking_96_to_100.tsv
-
-5_taxonomy/CO1_1sequence_perBIN_040915_COIspiking_96_to_100.xlsx
-
-5_taxonomy/CO1_1sequence_perBIN_040915_COIspiking_seqs1_to_304.tsv
-
-5_taxonomy/2016MayJuneDec_and_8mix2015_greenland_13mtgenes_ref_localnt.xml.gz
-
-1_fastQC_script/multiqc_data/*
-
-1_fastQC_script/multiqc_report_platesA2B2_lane11.html
-
-1_fastQC_script/multiqc_report_platesA2B2.html
-
-1_fastQC_script/multiqc_report_platesA2B2.html
+5_idxstats_tabulate/.Rhistory
 
 .Rproj.user
-
-0_s3cmdget/s3cmddownload.bsub
 
 not_included_in_repo/*
 
