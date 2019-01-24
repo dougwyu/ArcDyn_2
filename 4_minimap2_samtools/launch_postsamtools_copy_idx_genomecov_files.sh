@@ -95,6 +95,7 @@ ls ${OUTPUTFOLDER}_Plates${PLATE}/*_q*_sorted.bam_idxstats.txt | wc -l # A2B2: 3
 # copy flagstat files
 cp BWA*/${OUTPUTFOLDER}/*_sorted.bam.flagstat.txt ${OUTPUTFOLDER}_Plates${PLATE}/
 ls ${OUTPUTFOLDER}_Plates${PLATE}/
+ls ${OUTPUTFOLDER}_Plates${PLATE}/*_sorted.bam.flagstat.txt | wc -l # half the idxstats values
 
 # e.g. Sample_IPO3916_C5_F2308_f0x2_q1_sorted_genomecov_d.txt.gz
 # check
@@ -108,7 +109,7 @@ ls ${OUTPUTFOLDER}_Plates${PLATE}/*genomecov_d.txt.gz
 ls ${OUTPUTFOLDER}_Plates${PLATE}/*genomecov_d.txt.gz | wc -l # A2B2: 342; AB: 384; EF: 384; GH: 380;
 
 # rename, tar, and gzip for download
-MAPDATE="20190115"
+MAPDATE="20190116"
 TARGET="406barcodes" # "308mitogenomes" or "406barcodes"
 du -sh ${OUTPUTFOLDER}_Plates${PLATE}/ # ~4.4 GB
 # set filename to something that i can understand after download
@@ -125,6 +126,50 @@ ls
 # remove the minimap2_output files after i've finished the mapping jobs. these are the bam, bam.bai, idxstats, flagstats, and genomecov files. Should save
 # parallel "ls BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
 # parallel "rm -rf BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+
+######## remove the minimap2_output files after i've finished the mapping jobs. these are the bam, bam.bai, idxstats, flagstats, and genomecov files. Should save
+# to use parallel without a pathname in bsub scripts
+PATH=$PATH:~/scripts/parallel-20170722/bin/
+# FILTER="F2308"
+OUTPUTFOLDER="minimap2_outputs"
+
+# A2B2
+PLATE="A2B2"
+WORKINGPATH="$HOME/ArcDyn/Plates${PLATE}/Plates${PLATE}_combined/"
+cd ${WORKINGPATH}
+ls
+parallel "ls BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+# parallel "rm -rf BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+parallel "ls BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+
+# AB # different scripts because the pathnames are different
+PLATE="AB"
+WORKINGPATH="$HOME/ArcDyn/Plates${PLATE}/Plates${PLATE}_combined/"
+cd ${WORKINGPATH}
+ls
+parallel "ls BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+# parallel "rm -rf BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+parallel "ls BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+
+
+# EF
+PLATE="EF"
+WORKINGPATH="$HOME/ArcDyn/Plates${PLATE}/Plates${PLATE}_combined/"
+cd ${WORKINGPATH}
+ls
+parallel "ls BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+# parallel "rm -rf BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+parallel "ls BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+
+
+# GH
+PLATE="GH"
+WORKINGPATH="$HOME/ArcDyn/Plates${PLATE}/Plates${PLATE}_combined/"
+cd ${WORKINGPATH}
+ls
+parallel "ls BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+# parallel "rm -rf BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
+parallel "ls BWA{}/minimap2_outputs/" ::: 01 02 03 04 05 06 07 08 09 10
 
 
 # when i'm on a fast network, i can download using scp, but otherwise, use Transmit for robustness

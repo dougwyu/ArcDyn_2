@@ -16,23 +16,39 @@ set -o pipefail
 # scp /Users/Negorashi2011/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/ArcDyn_scripts/4_minimap2_samtools/_loop_samtools_only_20190115.sh b042@hpc.uea.ac.uk:~/ArcDyn/PlatesEF/PlatesEF_combined/
 # scp /Users/Negorashi2011/Dropbox/Working_docs/Roslin_Greenland/2017/bulk_samples/ArcDyn_scripts/4_minimap2_samtools/_loop_samtools_only_20190115.bsub b042@hpc.uea.ac.uk:~/ArcDyn/PlatesEF/PlatesEF_combined/
 
-#######
-# MAKE SURE THAT Sample_* has been changed to Plate* in the uploaded _loop_minimap2_only_20190115.sh
-#######
+
+
+######
+# CHANGE "Sample_*" to "Plate*" in _loop_minimap2_only_20190115.sh
+# PlatesEF prefix the sample folders with "Plate" not "Sample_"
+# escape the * in the name with \*
+cd ~/ArcDyn/PlatesEF/PlatesEF_combined/; ls
+sed 's/-name "Sample_\*"/-name "Plate\*"/g' _loop_minimap2_only_20190115.sh > _loop_minimap2_only_20190115_edited.sh
+mv _loop_minimap2_only_20190115_edited.sh _loop_minimap2_only_20190115.sh
+cat _loop_minimap2_only_20190115.sh | head -90 # search for the find command in line 87
+# find * -maxdepth 0 -type d -name "Plate*" > folderlist.txt  # find all folders (-type d) starting with "Plate*"
+######
+
+
+
+
 
 # ssh hpc
 # interactive
 # to use parallel without a pathname in bsub scripts
 PATH=$PATH:~/scripts/parallel-20170722/bin/
 
-# cd ~/greenland_2017/platesA2B2/platesA2B2_combined/
-
 ############## by hand, copy 1/10 the sample folders into each BWA folder
 cd ~/ArcDyn/PlatesEF/PlatesEF_combined/; ls
 # mkdir BWA{01,02,03,04,05,06,07,08,09,10}; ls # BWA is prefix because this was the original mapping software
 # there are 192 sample folders:  hand move 19 into each BWA folder (easier than writing a script)
 
+
+
+
 ###### SECOND REMINDER:  MAKE SURE THAT "Sample_*" HAS BEEN CHGED TO "Plate*" IN THE SHELL SCRIPT
+
+
 
 ############# copy the minimap and samtools shell and bsub scripts into each BWA folder and edit the jobIDs
 MINIMAP2_BSUB="_loop_minimap2_only_20190115.bsub"; echo ${MINIMAP2_BSUB}

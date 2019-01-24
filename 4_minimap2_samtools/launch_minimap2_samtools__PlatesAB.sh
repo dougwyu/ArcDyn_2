@@ -111,7 +111,6 @@ ls minimap2_outputs # should start to see the new bam files
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/BWA02; ls
 bsub < ${SAMTOOLS_BSUB}
 bjobs
-ls minimap2_outputs # should start to see the new bam files
 
 cd ~/ArcDyn/PlatesAB/PlatesAB_combined/BWA03; ls
 bsub < ${SAMTOOLS_BSUB}
