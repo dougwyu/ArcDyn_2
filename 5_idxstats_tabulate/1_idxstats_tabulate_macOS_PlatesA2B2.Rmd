@@ -52,11 +52,15 @@ samtoolsqual <- "q48"
 
 # use this version for minimap2 mapping to 308mitogenomes
 # outputs_PlatesA2B2_F2308_f0x2_q48_minimap2_outputs_20190115_308mitogenomes
-# idxstatsgenomecovfolder <- paste0("outputs_PlatesA2B2_", samtoolsfilter, "_", samtoolsqual, "_minimap2_outputs_20190115_308mitogenomes")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+idxstatsgenomecovfolder <- paste0("outputs_PlatesA2B2_", samtoolsfilter, "_", samtoolsqual, "_minimap2_outputs_20190115_308mitogenomes")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+# this is where i store the outputs of this script
+outputidxstatstabulatefolder <- "A2B2_outputs_20190115_F2308_f0x2_q48_minimap2_308mitogenomes"
 
 # use this version for minimap2 mapping to 406 COI_barcodes
-idxstatsgenomecovfolder <- paste0("outputs_PlatesA2B2_", samtoolsfilter, "_", samtoolsqual, "_minimap2_outputs_20190116_406barcodes")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+# idxstatsgenomecovfolder <- paste0("outputs_PlatesA2B2_", samtoolsfilter, "_", samtoolsqual, "_minimap2_outputs_20190116_406barcodes")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 # outputs_PlatesA2B2_F2308_f0x2_q48_minimap2_outputs_20190116_406barcodes
+# this is where i store the outputs of this script
+# outputidxstatstabulatefolder <- "A2B2_outputs_20190116_F2308_f0x2_q48_minimap2_406barcodes"
 
 idxstatsfile <- paste0("*", samtoolsfilter, "_", samtoolsqual, "_sorted.bam_idxstats\\.txt")  
     # e.g. "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"
@@ -72,12 +76,6 @@ samplemetadatafolder <- "../ArcDyn_scripts/6_referenceseqs_metadata/PlatesAB_met
 samplemetadatafilename <- "Samples_for_sequencing_at_TGAC_Zackenberg_bulk_samples_April_2016_20160512.xlsx"
 
 lysisbufferfilename <- "lysis_buffer_volumes_PlatesAB_A2B2_20180208.xlsx"  # this is based on Yinqiu's lysis buffer datasheet, which i edited a bit to make the sample names consistent so that tables could be joined via "Short_name_of_the_sample".  Also, i replaced missing data or cells with notes with NA
-
-# this is where i store the outputs of this script
-# mitogenomes
-# outputidxstatstabulatefolder <- "A2B2_outputs_20190115_F2308_f0x2_q48_minimap2_308mitogenomes"
-# barcodes
-outputidxstatstabulatefolder <- "A2B2_outputs_20190116_F2308_f0x2_q48_minimap2_406barcodes"
 ```
 
 
@@ -395,6 +393,10 @@ sample_names <- sum_idx_meta_genomecov %>%
 samples_to_remove <- sample_names %>% 
     dplyr::pull(Full_name_of_the_sample) # pull out a single variable
 samples_to_remove # 10 samples to remove
+#  [1] "1997AUG20_Art3_TrapA_Wk34" "1997JUL08_Art3_TrapA_Wk28" "2011JUL14_Art3_TrapC_Wk28"
+#  [4] "2013AUG19_Art3_TrapB_Wk34" "2013AUG26_Art3_TrapA_Wk35" "2013JUL01_Art3_TrapB_Wk27"
+#  [7] "2013JUL09_Art3_TrapB_Wk28" "2013JUN24_Art3_TrapB_Wk26" "2012AUG19_Art3_TrapA_Wk33"
+# [10] "1997AUG05_Art3_TrapC_Wk32"
 idx_meta_genomecov <- idx_meta_genomecov %>% 
     filter(!Full_name_of_the_sample %in% samples_to_remove) # 50071 obs mitogenomes, 65849 obs barcodes
 

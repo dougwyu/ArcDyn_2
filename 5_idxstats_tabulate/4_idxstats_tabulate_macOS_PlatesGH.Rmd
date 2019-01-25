@@ -52,17 +52,17 @@ samtoolsqual <- "q48"
 
 # use this version for minimap2
 # outputs_PlatesGH_F2308_f0x2_q48_minimap2_outputs_20190115_308mitogenomes
-idxstatsgenomecovfolder <- paste0("outputs_PlatesGH_", samtoolsfilter, "_", samtoolsqual, "_minimap2_outputs_20190115_308mitogenomes")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+# idxstatsgenomecovfolder <- paste0("outputs_PlatesGH_", samtoolsfilter, "_", samtoolsqual, "_minimap2_outputs_20190115_308mitogenomes")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 # this is where i store the outputs of this script
 # mitogenomes
-outputidxstatstabulatefolder <- "GH_outputs_20190115_F2308_f0x2_q48_minimap2_308mitogenomes"
+# outputidxstatstabulatefolder <- "GH_outputs_20190115_F2308_f0x2_q48_minimap2_308mitogenomes"
 
 # use this version for COI_barcodes mapping
-# idxstatsgenomecovfolder <- paste0("outputs_PlatesGH_", samtoolsfilter, "_", samtoolsqual, "_minimap2_outputs_20190116_406barcodes")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
+idxstatsgenomecovfolder <- paste0("outputs_PlatesGH_", samtoolsfilter, "_", samtoolsqual, "_minimap2_outputs_20190116_406barcodes")  # this is the enclosing folder around the idxstats and genomcov files for a given set of soups
 # outputs_PlatesGH_F2308_f0x2_q48_minimap2_outputs_20190116_406barcodes
 # this is where i store the outputs of this script
 # barcodes
-# outputidxstatstabulatefolder <- "GH_outputs_20190116_F2308_f0x2_q48_minimap2_406barcodes"
+outputidxstatstabulatefolder <- "GH_outputs_20190116_F2308_f0x2_q48_minimap2_406barcodes"
 
 idxstatsfile <- paste0("*", samtoolsfilter, "_", samtoolsqual, "_sorted.bam_idxstats\\.txt")  
     # e.g. "*F2308_f0x2_q1_sorted.bam_idxstats\\.txt"
@@ -429,6 +429,8 @@ sample_names <- sum_idx_meta_genomecov %>%
 samples_to_remove <- sample_names %>% 
     dplyr::pull(Short_name_of_the_sample) # pull out a single variable
 samples_to_remove # 5 samples to remove
+# [1] "2000_Art3_TrapA_Wk25" "2004_Art3_TrapB_Wk30" "1999_Art3_TrapA_Wk34" "1997_Art3_TrapA_Wk29"
+# [5] "ME50_1"   
 idx_meta_genomecov <- idx_meta_genomecov %>% 
     filter(!Short_name_of_the_sample %in% samples_to_remove) # 57535 obs mitogenomes, 75665 obs barcodes
 
@@ -492,7 +494,7 @@ idxstats_by_mitogenome <- idx_meta_genomecov %>%
 # save idx_meta_genomecov files
 # write_tsv(idx_meta_genomecov, file.path(outputidxstatstabulatefolder, "idx_meta_genomecov_PlatesGH_20190115_308mitogenomes.txt")) # output file for merging with the other RUN outputs
 # write_tsv(idx_meta_genomecov, file.path(outputidxstatstabulatefolder, "idx_meta_genomecov_PlatesGH_20190116_406barcodes.txt")) # output file for merging with the other RUN outputs
-# file.path(outputidxstatstabulatefolder, "idx_meta_genomecov_PlatesGH_20190116_406barcodes.txt")
+
 # in case i want to read in the output datafiles
 # idx_meta_genomecov <- read_delim(file.path(outputidxstatstabulatefolder, "idx_meta_genomecov_PlatesGH_20190115_308mitogenomes.txt"), delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 # idx_meta_genomecov <- read_delim(file.path(outputidxstatstabulatefolder, "idx_meta_genomecov_PlatesGH_20190116_406barcodes.txt"), delim = "\t", escape_double = FALSE, trim_ws = TRUE)
