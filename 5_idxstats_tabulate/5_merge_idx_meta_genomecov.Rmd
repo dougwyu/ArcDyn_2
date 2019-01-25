@@ -538,7 +538,7 @@ barcodesoutputidxstatstabulatefolder <- "../../PlatesABA2B2EFGH/minimap2_406barc
 mitogenomesoutputidxstatstabulatefolder <- "../../PlatesABA2B2EFGH/minimap2_308mitogenomes_20190115"
 
 # write_tsv(mocks_idx_meta_genomecov_EFGH_barcodes, file.path(barcodesoutputidxstatstabulatefolder, "mocks_idx_meta_genomecov_EFGH_minimap2_20190116_406barcodes.txt")) # output file for merging with the other RUN outputs
-# 
+# # 
 # write_tsv(mocks_idx_meta_genomecov_EFGH_mitogenomes, file.path(mitogenomesoutputidxstatstabulatefolder, "mocks_idx_meta_genomecov_EFGH_minimap2_20190115_308mitogenomes.txt")) # output file for merging with the other RUN outputs
 
 # version that gzips the output file if it is too big
