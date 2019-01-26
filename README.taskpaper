@@ -37,14 +37,16 @@ ArcDyn paper recode 2019:
 		- Now the new mock dataset looks exactly like the mock dataset used by Otso for the original analyses. @done(2019-01-20)
 	- rewrite 1,2,3,4_idxstats_tabulate_macOS_PlatesA2B2.Rmd and 7_datafiles_for_ArcDyn_methods.Rmd to output input_data_step5_20190120.RData for Otso's Step 5.1 code (there are 10 files) @flag @done(2019-01-24)
 		- create column to allow removal of these in the env_data files:  c("Sarcoptiformes", "Trombidiformes", "Entomobryomorpha", "Neelipleona", "Poduromorpha", "Symphypleona") @done(2019-01-24)
+	- # CHECK THESE ISSUES:  @done(2019-01-24)
+		- This is correct: H12 is a buffer blank, and C2 did not generate sequence data. "The sequencing of plates G and H for quotation HEL.TR.ENQ-2379.B.01 has now been completed and a summary of the raw data is attached.  Please note that your sample references have been taken from the attached sample information form (SIF), assuming that samples S1 – S96 are Plate G and S97 onwards (well “A13”) are plate H.   There are 2 samples in Plate H which didn’t generate reads, from wells C2 and H12; according to the SIF, Plate H well H12 (sample S192) contains a blank. " @done(2019-01-24)
+		- "find the origin of the single 1998 sample that is out of sequence in Table S4.2."  This sample was originally written as in the metadata sheet as "1998Jul28_Art3_TrapA_wk31", but there are no Jul28 samples, only Jul29 samples. So i changed to 1998Jul29_Art3_TrapA_Wk31. In Plates EF, there are 5 total samples that are technical replicates (2 from 1998, 1 from 1999, and 2 from 2013). I have fixed Table S4.2 to reflect this  @flag @done(2019-01-24)
+			- I have fixed Table S4.2. There are two samples that failed to get sequenced in their original runs but did get sequenced in a subsequent run. by default, these are originals, and the total number of unique environmental samples is now 492. @done(2019-01-24)
+		- run the tutorial pipeline on macOS.  If it works, then send to Otso.
+	- Management tasks after running the pipeline
 		- create a new repo with the new code, which can be published on github
-		- # CHECK THESE ISSUES:  
-			- find the origin of the single 1998 sample that is out of sequence in Table S4.2.  
-			- The sequencing of plates G and H for quotation HEL.TR.ENQ-2379.B.01 has now been completed and a summary of the raw data is attached.  Please note that your sample references have been taken from the attached sample information form (SIF), assuming that samples S1 – S96 are Plate G and S97 onwards (well “A13”) are plate H.   There are 2 samples in Plate H which didn’t generate reads, from wells C2 and H12; according to the SIF, Plate H well H12 (sample S192) contains a blank. 
-	- management tasks after running the pipeline
 		- make README files for each RUN, describing the origins of the sequence files and what i did to them
 		- after i run whole pipeline, remove these folders and files
-			- original archived files on HPC that i downloaded from Amazon Glacier:  ~/ArcDyn/Amazon_archive_files_to_rm_at_end
+			- original archived files on HPC that i downloaded from Amazon Glacier:  ~/ArcDyn/Amazon_archive_files_to_rm_at_end @done(2019-01-24)
 			- the redundant folder on S3:  amazon-working-douglasyu/Earlham_soups_20160910/ 
 		- update content of:  amazon-working-douglasyu/readme_Amazon_glacier_file_descriptions_20180128 (explain that PlatesEF contains four PSEQ folders, with 'Plate' as the prefix)
 		- make subfolders in Amazon-glacier and organise files in there
